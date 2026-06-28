@@ -416,10 +416,16 @@ tbody tr:hover{background:var(--surface-1)}
       </div>
     </div>
 
-    <div style="background:var(--surface-1);border-radius:10px;padding:14px 16px;margin-bottom:20px;border:1.5px solid var(--border)">
-      <div style="font-size:12px;font-weight:600;color:var(--text-s);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">🌿 Ingresa tu nombre de usuario</div>
-      <input class="form-control" id="login-user" type="text" placeholder="Ej: juan.perez" autocomplete="username" autocapitalize="none" style="font-size:16px">
-      <div id="login-error" style="display:none;color:var(--danger);font-size:13px;margin-top:8px;font-weight:500"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div style="background:var(--surface-1);border-radius:10px;padding:14px 16px;border:1.5px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--text-s);margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em">👤 Usuario</div>
+        <input class="form-control" id="login-user" type="text" placeholder="Ej: juan.perez" autocomplete="username" autocapitalize="none" style="font-size:15px;background:transparent;border-color:var(--border)">
+      </div>
+      <div style="background:var(--surface-1);border-radius:10px;padding:14px 16px;border:1.5px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--text-s);margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em">🔒 Contraseña</div>
+        <input class="form-control" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" style="font-size:15px;background:transparent;border-color:var(--border)">
+      </div>
+      <div id="login-error" style="display:none;background:#fdedec;color:var(--danger);font-size:13px;padding:10px 14px;border-radius:8px;font-weight:500;border-left:3px solid var(--danger)"></div>
     </div>
 
     <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()" style="background:linear-gradient(135deg,#1a5c2a,#2e7d32);font-size:16px;letter-spacing:.02em">
@@ -1029,7 +1035,11 @@ tbody tr:hover{background:var(--surface-1)}
     <div class="form-group">
       <label class="form-label">Usuario (login) *</label>
       <input class="form-control" id="usr-login" type="text" placeholder="juan.perez" autocapitalize="none">
-      <div class="form-hint">Este es el nombre con el que el usuario ingresará al sistema. Sin espacios, sin mayúsculas.</div>
+      <div class="form-hint">Sin espacios ni mayúsculas. Con este nombre ingresará al sistema.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña *</label>
+      <input class="form-control" id="usr-pass" type="password" placeholder="Mínimo 4 caracteres">
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -1097,52 +1107,63 @@ function initSampleData() {
   ];
 
   APP.data.usuarios = [
-    {id:1,login:'operador1',nombre:'Juan',apellido:'Pérez',rol:'operador',guardia:'A',activo:true},
-    {id:2,login:'operador2',nombre:'María',apellido:'García',rol:'operador',guardia:'A',activo:true},
-    {id:3,login:'operador3',nombre:'Carlos',apellido:'López',rol:'operador',guardia:'B',activo:true},
-    {id:4,login:'supervisor1',nombre:'Roberto',apellido:'Torres',rol:'supervisor',guardia:'ambas',activo:true},
-    {id:5,login:'gerencia1',nombre:'Alejandro',apellido:'Castro',rol:'gerencia',guardia:'ambas',activo:true},
-    {id:6,login:'admin',nombre:'Admin',apellido:'Sistema',rol:'admin',guardia:'ambas',activo:true},
+    {id:1,login:'operador1',pass:'1234',nombre:'Juan',apellido:'Pérez',rol:'operador',guardia:'A',activo:true},
+    {id:2,login:'operador2',pass:'1234',nombre:'María',apellido:'García',rol:'operador',guardia:'A',activo:true},
+    {id:3,login:'operador3',pass:'1234',nombre:'Carlos',apellido:'López',rol:'operador',guardia:'B',activo:true},
+    {id:4,login:'supervisor1',pass:'1234',nombre:'Roberto',apellido:'Torres',rol:'supervisor',guardia:'ambas',activo:true},
+    {id:5,login:'gerencia1',pass:'1234',nombre:'Alejandro',apellido:'Castro',rol:'gerencia',guardia:'ambas',activo:true},
+    {id:6,login:'admin',pass:'admin123',nombre:'Admin',apellido:'Sistema',rol:'admin',guardia:'ambas',activo:true},
   ];
 }
 
 /* ===== AUTH ===== */
 function doLogin() {
   const loginInput = document.getElementById('login-user').value.trim().toLowerCase();
-  const errEl = document.getElementById('login-error');
+  const passInput  = document.getElementById('login-pass').value;
+  const errEl      = document.getElementById('login-error');
   errEl.style.display = 'none';
 
-  if(!loginInput) {
-    errEl.textContent = 'Ingresa tu nombre de usuario.';
+  if(!loginInput || !passInput) {
+    errEl.textContent = 'Ingresa tu usuario y contraseña.';
     errEl.style.display = 'block';
     return;
   }
 
-  const found = APP.data.usuarios.find(u => u.login.toLowerCase() === loginInput && u.activo);
-  if(!found) {
-    const inactivo = APP.data.usuarios.find(u => u.login.toLowerCase() === loginInput);
-    errEl.textContent = inactivo
-      ? 'Usuario inactivo. Contacta al administrador.'
-      : 'Usuario no encontrado. Verifica el nombre de usuario.';
+  const userMatch = APP.data.usuarios.find(u => u.login.toLowerCase() === loginInput);
+  if(!userMatch) {
+    errEl.textContent = 'Usuario no encontrado. Verifica tus datos.';
     errEl.style.display = 'block';
     return;
   }
+  if(!userMatch.activo) {
+    errEl.textContent = 'Usuario inactivo. Contacta al administrador.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if(userMatch.pass !== passInput) {
+    errEl.textContent = 'Contraseña incorrecta. Inténtalo de nuevo.';
+    errEl.style.display = 'block';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+    return;
+  }
 
-  const initials = (found.nombre[0] + (found.apellido ? found.apellido[0] : '')).toUpperCase();
+  const initials = (userMatch.nombre[0] + (userMatch.apellido ? userMatch.apellido[0] : '')).toUpperCase();
   APP.user = {
-    id: found.id,
-    login: found.login,
-    name: found.nombre + ' ' + found.apellido,
-    role: found.rol,
+    id: userMatch.id,
+    login: userMatch.login,
+    name: userMatch.nombre + ' ' + userMatch.apellido,
+    role: userMatch.rol,
     initials,
-    guardia: found.guardia,
+    guardia: userMatch.guardia,
   };
 
   document.getElementById('page-login').style.display = 'none';
   document.getElementById('page-app').style.display = 'flex';
   document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
   setupUI();
-  navigateTo(found.rol === 'operador' ? 'actividades' : 'dashboard');
+  navigateTo(userMatch.rol === 'operador' ? 'actividades' : 'dashboard');
 }
 
 function doLogout() {
@@ -1150,6 +1171,7 @@ function doLogout() {
   document.getElementById('page-app').style.display = 'none';
   document.getElementById('page-login').style.display = 'flex';
   document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
   document.getElementById('login-error').style.display = 'none';
 }
 
@@ -1585,30 +1607,29 @@ function renderRestricciones() {
 
 /* ===== RENDER USUARIOS ===== */
 function saveUsuario() {
-  const nombre = document.getElementById('usr-nombre').value.trim();
+  const nombre   = document.getElementById('usr-nombre').value.trim();
   const apellido = document.getElementById('usr-apellido').value.trim();
-  const login = document.getElementById('usr-login').value.trim().toLowerCase();
-  const rol = document.getElementById('usr-rol').value;
-  const guardia = document.getElementById('usr-guardia').value;
+  const login    = document.getElementById('usr-login').value.trim().toLowerCase();
+  const pass     = document.getElementById('usr-pass').value;
+  const rol      = document.getElementById('usr-rol').value;
+  const guardia  = document.getElementById('usr-guardia').value;
 
-  if(!nombre || !login) { showToast('Completa los campos obligatorios','error'); return; }
-
-  // Verificar login único
+  if(!nombre || !login || !pass) { showToast('Completa usuario, contraseña y nombre','error'); return; }
+  if(pass.length < 4) { showToast('La contraseña debe tener al menos 4 caracteres','error'); return; }
   if(APP.data.usuarios.find(u => u.login.toLowerCase() === login)) {
-    showToast('Ese nombre de usuario ya existe', 'error'); return;
+    showToast('Ese nombre de usuario ya existe','error'); return;
   }
 
-  const u = { id: Date.now(), nombre, apellido, login, rol, guardia, activo: true };
+  const u = { id: Date.now(), nombre, apellido, login, pass, rol, guardia, activo: true };
   APP.data.usuarios.push(u);
 
-  // Limpiar form
-  ['usr-nombre','usr-apellido','usr-login'].forEach(id => document.getElementById(id).value = '');
+  ['usr-nombre','usr-apellido','usr-login','usr-pass'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('usr-rol').value = 'operador';
   document.getElementById('usr-guardia').value = 'A';
 
   closeModal('modal-usuario');
   renderUsuarios();
-  showToast(`Usuario "${login}" creado con rol ${rol}`, 'success');
+  showToast(`Usuario "${login}" creado (contraseña: ${pass})`, 'success');
 }
 
 function renderUsuarios() {
@@ -1619,21 +1640,35 @@ function renderUsuarios() {
     gerencia:   'background:#f3e5f5;color:#6a1b9a',
     admin:      'background:#fff3e0;color:#e65100',
   };
+  // Update table header if needed
+  const thead = tbody.closest('table').querySelector('thead tr');
+  if(thead && thead.children.length === 6) {
+    thead.innerHTML = '<th>Usuario</th><th>Nombre completo</th><th>Contraseña</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th>';
+  }
   tbody.innerHTML = APP.data.usuarios.map(u => `
     <tr>
       <td><code style="font-size:13px;background:var(--surface-1);padding:2px 8px;border-radius:4px;color:var(--teal);font-weight:600">${u.login}</code></td>
       <td style="font-weight:500">${u.nombre} ${u.apellido}</td>
+      <td>
+        <span id="pass-${u.id}" style="font-family:monospace;font-size:13px;letter-spacing:2px">••••••</span>
+        <button onclick="togglePass(${u.id},'${u.pass}')" style="background:none;border:none;cursor:pointer;color:var(--text-m);padding:2px 6px;font-size:11px" title="Ver/ocultar contraseña">👁</button>
+      </td>
       <td><span class="badge" style="${rolColors[u.rol]||'background:var(--surface-2);color:var(--text-s)'};text-transform:capitalize">${u.rol}</span></td>
       <td>${u.guardia === 'ambas' ? 'A y B' : 'Guardia '+u.guardia}</td>
       <td><span class="badge ${u.activo ? 'badge-done' : 'badge-open'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
       <td style="white-space:nowrap">
         <button class="btn btn-outline btn-sm" style="font-size:12px;margin-right:4px" onclick="toggleUser(${u.id})">${u.activo ? 'Desactivar' : 'Activar'}</button>
-        <button class="btn btn-sm" style="padding:5px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteUsuario(${u.id})" title="Eliminar usuario permanentemente">
+        <button class="btn btn-sm" style="padding:5px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteUsuario(${u.id})">
           <svg viewBox="0 0 20 20" fill="none" width="13" height="13" style="margin-right:3px"><path d="M4 6h12M8 6V4h4v2M7 6v9a1 1 0 001 1h4a1 1 0 001-1V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Eliminar
         </button>
       </td>
     </tr>
   `).join('');
+}
+
+function togglePass(id, pass) {
+  const el = document.getElementById('pass-'+id);
+  el.textContent = el.textContent === '••••••' ? pass : '••••••';
 }
 
 function deleteUsuario(id) {
@@ -1852,6 +1887,9 @@ document.addEventListener('keydown', e => {
 
 // Enter en login
 document.getElementById('login-user').addEventListener('keydown', e => {
+  if(e.key === 'Enter') document.getElementById('login-pass').focus();
+});
+document.getElementById('login-pass').addEventListener('keydown', e => {
   if(e.key === 'Enter') doLogin();
 });
 </script>
