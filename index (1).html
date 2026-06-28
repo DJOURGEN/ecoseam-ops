@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a5c2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ECOSEAM Ops">
+<meta name="description" content="Sistema de gestión operativa ECOSEAM">
+<title>ECOSEAM Operations</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231a5c2a'/><text y='24' x='4' font-size='22' font-family='sans-serif' fill='%2300c853'>E</text></svg>">
+
+<style>
+/* ===== DESIGN TOKENS — ECOSEAM VERDE AMBIENTAL ===== */
+:root {
+  --navy:    #1a5c2a;   /* Verde oscuro principal */
+  --navy-l:  #0d3d1a;   /* Verde muy oscuro */
+  --accent:  #00c853;   /* Verde lima vibrante */
+  --accent-l:#69f0ae;   /* Verde lima claro */
+  --teal:    #00897b;   /* Verde azulado / teal ambiental */
+  --teal-l:  #26a69a;
+  --amber:   #f57f17;   /* Naranja ámbar para alertas */
+  --surface: #ffffff;
+  --surface-1:#f1f8f2;  /* Verde muy pálido de fondo */
+  --surface-2:#e3f0e5;  /* Verde pálido secundario */
+  --text:    #0d2414;   /* Verde muy oscuro para texto */
+  --text-s:  #3d6b45;   /* Verde medio */
+  --text-m:  #7a9e80;   /* Verde grisáceo */
+  --border:  #c8deca;   /* Verde pálido para bordes */
+  --success: #2e7d32;
+  --warning: #f57f17;
+  --danger:  #c62828;
+  --info:    #0277bd;
+  --radius:  12px;
+  --radius-s: 8px;
+  --shadow:  0 2px 16px rgba(26,92,42,.10);
+  --shadow-l:0 8px 32px rgba(26,92,42,.18);
+  --transition: 0.2s ease;
+  --sidebar-w: 240px;
+  --header-h:  60px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ===== RESET ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--surface-1);color:var(--text);line-height:1.5;min-height:100vh}
+button{cursor:pointer;border:none;background:none;font:inherit}
+input,select,textarea{font:inherit;border:none;outline:none}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+
+/* ===== LAYOUT ===== */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--navy);color:#fff;
+  display:flex;flex-direction:column;
+  transition:transform var(--transition);
+  z-index:100;
+}
+.sidebar-logo{
+  height:var(--header-h);
+  display:flex;align-items:center;gap:10px;
+  padding:0 20px;border-bottom:1px solid rgba(255,255,255,.1);
+}
+.logo-mark{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:16px;flex-shrink:0;color:#0d3d1a;
+}
+.logo-text{font-weight:600;font-size:14px;line-height:1.2}
+.logo-text span{display:block;font-size:10px;opacity:.6;font-weight:400}
+
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:10px;font-weight:600;opacity:.4;letter-spacing:.08em;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;font-size:14px;
+  cursor:pointer;transition:background var(--transition);
+  border-left:3px solid transparent;
+}
+.nav-item:hover{background:rgba(255,255,255,.08)}
+.nav-item.active{background:rgba(0,200,83,.15);border-left-color:var(--accent);color:var(--accent-l)}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px}
+
+.sidebar-user{
+  padding:16px 20px;border-top:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;gap:10px;
+}
+.user-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:600;font-size:14px;flex-shrink:0;
+}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;opacity:.5;text-transform:capitalize}
+
+/* Main content */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{
+  height:var(--header-h);background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  flex-shrink:0;
+}
+.topbar-title{font-size:18px;font-weight:600;flex:1}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.hamburger{display:none;padding:8px;border-radius:8px;cursor:pointer}
+.hamburger:hover{background:var(--surface-2)}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;margin:4px 0;transition:var(--transition)}
+
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* ===== COMPONENTS ===== */
+/* Cards */
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.card-sm{padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:600}
+.card-subtitle{font-size:13px;color:var(--text-s);margin-top:2px}
+
+/* Stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:16px 20px;box-shadow:var(--shadow);
+  border-left:4px solid var(--border);
+  transition:transform var(--transition),box-shadow var(--transition);
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-l)}
+.stat-card.accent{border-left-color:var(--accent)}
+.stat-card.teal{border-left-color:var(--teal)}
+.stat-card.amber{border-left-color:var(--amber)}
+.stat-card.success{border-left-color:var(--success)}
+.stat-card.info{border-left-color:var(--info)}
+.stat-label{font-size:12px;color:var(--text-s);font-weight:500;margin-bottom:6px}
+.stat-value{font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.stat-card.accent .stat-value{color:var(--accent)}
+.stat-card.teal .stat-value{color:var(--teal)}
+.stat-card.amber .stat-value{color:var(--amber)}
+.stat-card.success .stat-value{color:var(--success)}
+.stat-card.info .stat-value{color:var(--info)}
+.stat-sub{font-size:12px;color:var(--text-m)}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 20px;border-radius:var(--radius-s);
+  font-size:14px;font-weight:600;
+  transition:all var(--transition);cursor:pointer;
+}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:#0d3d1a;transform:translateY(-1px);box-shadow:0 4px 12px rgba(26,92,42,.35)}
+.btn-secondary{background:var(--surface-2);color:var(--text)}
+.btn-secondary:hover{background:var(--border)}
+.btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--navy);background:var(--surface-2)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#219a52}
+.btn-warning{background:var(--amber);color:#fff}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn-lg{padding:14px 28px;font-size:16px}
+.btn-icon{padding:8px;border-radius:var(--radius-s)}
+.btn-full{width:100%}
+
+/* Forms */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--text-s);margin-bottom:6px}
+.form-control{
+  width:100%;padding:10px 14px;
+  background:var(--surface-1);border:1.5px solid var(--border);
+  border-radius:var(--radius-s);font-size:14px;color:var(--text);
+  transition:border-color var(--transition),box-shadow var(--transition);
+}
+.form-control:focus{
+  border-color:var(--navy);outline:none;
+  box-shadow:0 0 0 3px rgba(15,52,96,.12);
+  background:var(--surface);
+}
+.form-control::placeholder{color:var(--text-m)}
+select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%235a5a7a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.form-hint{font-size:12px;color:var(--text-m);margin-top:4px}
+.form-calc{font-size:13px;color:var(--teal);font-weight:600;margin-top:6px;padding:8px 12px;background:rgba(15,123,108,.08);border-radius:6px}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-pending{background:#fef9e7;color:#b7770d}
+.badge-process{background:#ebf5fb;color:#1a6fa8}
+.badge-done{background:#eafaf1;color:#1e8449}
+.badge-open{background:#fdedec;color:#c0392b}
+.badge-closed{background:#eafaf1;color:#1e8449}
+.badge-approved{background:#eafaf1;color:#1e8449}
+.badge-observed{background:#fef9e7;color:#b7770d}
+.badge-guardia-a{background:#e8f4f8;color:#1a5276}
+.badge-guardia-b{background:#f9e8f4;color:#6c1a70}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:var(--radius-s)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{
+  padding:10px 14px;text-align:left;
+  font-size:12px;font-weight:600;color:var(--text-s);
+  background:var(--surface-1);white-space:nowrap;
+  border-bottom:1px solid var(--border);
+}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface-1)}
+
+/* Modals */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(15,52,96,.5);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:20px;z-index:1000;overflow-y:auto;
+  opacity:0;pointer-events:none;transition:opacity var(--transition);
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--surface);border-radius:var(--radius);
+  box-shadow:var(--shadow-l);width:100%;max-width:640px;
+  margin:auto;padding:28px;
+  transform:translateY(20px);transition:transform var(--transition);
+}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-title{font-size:18px;font-weight:700}
+.modal-close{padding:6px;border-radius:8px;cursor:pointer;color:var(--text-s)}
+.modal-close:hover{background:var(--surface-2);color:var(--text)}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+
+/* Charts */
+.chart-container{position:relative;width:100%;height:240px}
+
+/* ===== PAGE: LOGIN ===== */
+.login-page{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--navy-l) 0%,var(--navy) 55%,#2e7d32 100%);
+  padding:20px;
+}
+.login-card{
+  background:var(--surface);border-radius:20px;
+  box-shadow:var(--shadow-l);padding:40px;width:100%;max-width:420px;
+}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo-mark{
+  width:64px;height:64px;border-radius:16px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:28px;color:#fff;
+  margin:0 auto 12px;
+}
+.login-title{font-size:24px;font-weight:700;color:var(--navy)}
+.login-subtitle{font-size:14px;color:var(--text-s);margin-top:4px}
+.login-divider{text-align:center;color:var(--text-m);font-size:13px;margin:8px 0}
+
+/* ===== PAGE: DASHBOARD ===== */
+.grid-2{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.grid-equal{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+
+/* Mini chart bars */
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px}
+.bar{
+  flex:1;background:var(--navy);border-radius:4px 4px 0 0;
+  opacity:.8;transition:opacity var(--transition);min-width:8px;
+}
+.bar:hover{opacity:1}
+.bar.accent{background:var(--accent)}
+.bar.teal{background:var(--teal)}
+.bar.amber{background:var(--amber)}
+.bar-labels{display:flex;gap:4px;margin-top:4px}
+.bar-label{flex:1;font-size:10px;color:var(--text-m);text-align:center;min-width:8px}
+
+/* Donut chart */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut{width:120px;height:120px;flex-shrink:0}
+.donut-legend{flex:1}
+.donut-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px}
+.donut-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Activity list */
+.activity-list{display:flex;flex-direction:column;gap:0}
+.activity-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.activity-item:last-child{border-bottom:none}
+.activity-icon{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.activity-info{flex:1;min-width:0}
+.activity-title{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.activity-meta{font-size:12px;color:var(--text-s);margin-top:1px}
+.activity-right{text-align:right;flex-shrink:0}
+
+/* Restriction alert */
+.alert{
+  display:flex;gap:12px;padding:14px 16px;border-radius:var(--radius-s);
+  margin-bottom:12px;border-left:3px solid;
+}
+.alert-danger{background:#fdedec;border-color:var(--danger);color:#922b21}
+.alert-warning{background:#fef9e7;border-color:var(--amber);color:#7d6608}
+.alert-success{background:#eafaf1;border-color:var(--success);color:#1e8449}
+.alert-info{background:#ebf5fb;border-color:var(--info);color:#1a5276}
+.alert svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+
+/* Filters bar */
+.filters{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  padding:16px 0;margin-bottom:4px;
+}
+.filter-select{
+  padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-s);
+  font-size:13px;background:var(--surface);color:var(--text);cursor:pointer;
+  appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%235a5a7a'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;
+}
+.filter-select:focus{outline:none;border-color:var(--navy)}
+.filters-spacer{flex:1}
+
+/* ===== PAGE: ACTIVIDADES ===== */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:22px;font-weight:700}
+.page-subtitle{font-size:14px;color:var(--text-s);margin-top:2px}
+
+/* Operador quick form */
+.quick-form{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px}
+.quick-form-title{font-size:16px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* ===== TOAST ===== */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{
+  background:var(--text);color:#fff;
+  padding:12px 20px;border-radius:var(--radius-s);
+  font-size:14px;min-width:240px;
+  box-shadow:var(--shadow-l);
+  animation:slideIn .3s ease;
+}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.toast.warning{background:var(--amber)}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* ===== MOBILE ===== */
+.mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:8px 4px calc(8px + var(--safe-bottom));
+  z-index:200;
+  grid-template-columns:repeat(5,1fr);
+}
+.mobile-nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px;border-radius:8px;font-size:10px;color:var(--text-s);cursor:pointer;
+  transition:color var(--transition);
+}
+.mobile-nav-item.active{color:var(--accent)}
+.mobile-nav-item svg{width:22px;height:22px}
+
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+
+/* Responsive */
+@media(max-width:900px){
+  .grid-2,.grid-3,.grid-equal{grid-template-columns:1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;bottom:0;left:0;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay{display:block}
+  .hamburger{display:block}
+  .mobile-nav{display:grid}
+  .content{padding:16px;padding-bottom:90px}
+  .topbar{padding:0 16px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .modal-overlay{align-items:flex-end;padding:0}
+  .modal{border-radius:var(--radius) var(--radius) 0 0;max-height:90vh;overflow-y:auto}
+}
+@media(max-width:400px){
+  .stat-grid{grid-template-columns:1fr}
+  .logout-label{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div id="page-login" class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-mark" style="background:linear-gradient(135deg,#1a5c2a,#00c853);color:#fff;position:relative;overflow:hidden">
+        <svg viewBox="0 0 64 64" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32 8 C20 8 12 18 12 28 C12 40 24 50 32 56 C40 50 52 40 52 28 C52 18 44 8 32 8Z" fill="rgba(255,255,255,0.25)"/>
+          <path d="M32 14 C26 14 20 20 20 28 C20 36 26 44 32 50 C38 44 44 36 44 28 C44 20 38 14 32 14Z" fill="rgba(255,255,255,0.35)"/>
+          <text x="32" y="36" text-anchor="middle" font-size="20" font-weight="900" fill="#fff" font-family="sans-serif">E</text>
+        </svg>
+      </div>
+      <div style="margin-top:4px">
+        <div class="login-title">ECOSEAM</div>
+        <div style="font-size:12px;font-weight:600;color:var(--teal);letter-spacing:.05em;text-transform:uppercase;margin-top:2px">Ecología y Servicios Ambientales</div>
+        <div class="login-subtitle">Sistema de gestión operativa</div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface-1);border-radius:10px;padding:14px 16px;margin-bottom:20px;border:1.5px solid var(--border)">
+      <div style="font-size:12px;font-weight:600;color:var(--text-s);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">🌿 Ingresa tu nombre de usuario</div>
+      <input class="form-control" id="login-user" type="text" placeholder="Ej: juan.perez" autocomplete="username" autocapitalize="none" style="font-size:16px">
+      <div id="login-error" style="display:none;color:var(--danger);font-size:13px;margin-top:8px;font-weight:500"></div>
+    </div>
+
+    <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()" style="background:linear-gradient(135deg,#1a5c2a,#2e7d32);font-size:16px;letter-spacing:.02em">
+      <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M3 10h14M10 3l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Ingresar al sistema
+    </button>
+    <div class="login-divider" style="margin-top:20px;color:var(--text-m)">
+      🔒 Acceso restringido · ECOSEAM Operations v1.0
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP SHELL ==================== -->
+<div id="page-app" class="app" style="display:none">
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark" style="color:#0d3d1a;font-weight:900">E</div>
+      <div class="logo-text">ECOSEAM<span>Gestión Operativa</span></div>
+    </div>
+    <div class="sidebar-nav" id="sidebar-nav">
+      <!-- Nav items injected by JS based on role -->
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar-side">OP</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name-side">Operador</div>
+        <div class="user-role" id="user-role-side">operador</div>
+      </div>
+      <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
+        <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-actions">
+        <span id="topbar-date" style="font-size:13px;color:var(--text-s)"></span>
+        <button class="btn btn-primary btn-sm" id="btn-nueva-actividad" style="display:none" onclick="openModal('modal-actividad')">+ Nueva actividad</button>
+        <button onclick="doLogout()" id="btn-logout" title="Cerrar sesión" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:var(--surface-2);color:var(--text-s);font-size:13px;font-weight:600;border:1.5px solid var(--border);transition:all .2s" onmouseenter="this.style.background='var(--danger)';this.style.color='#fff';this.style.borderColor='var(--danger)'" onmouseleave="this.style.background='var(--surface-2)';this.style.color='var(--text-s)';this.style.borderColor='var(--border)'">
+          <svg viewBox="0 0 20 20" fill="none" width="15" height="15"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="logout-label">Salir</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Pages -->
+    <div class="content" id="content">
+
+      <!-- PAGE: DASHBOARD -->
+      <div id="view-dashboard" style="display:none">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Dashboard operativo</div>
+            <div class="page-subtitle" id="dash-subtitle">Resumen del día</div>
+          </div>
+          <div class="filters">
+            <select class="filter-select" onchange="updateDashboard()">
+              <option>Hoy</option><option>Esta semana</option><option>Este mes</option>
+            </select>
+            <select class="filter-select" id="filter-guardia-dash" onchange="updateDashboard()">
+              <option value="">Todas las guardias</option>
+              <option value="A">Guardia A</option>
+              <option value="B">Guardia B</option>
+            </select>
+            <select class="filter-select" onchange="updateDashboard()">
+              <option value="">Todas las áreas</option>
+              <option>4388</option><option>DEG</option>
+              <option>Plataforma de Armados</option><option>PPL</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="stat-grid">
+          <div class="stat-card accent">
+            <div class="stat-label">Horas hombre del día</div>
+            <div class="stat-value" id="kpi-hh">0</div>
+            <div class="stat-sub">↑ +12% vs ayer</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-label">Actividades finalizadas</div>
+            <div class="stat-value" id="kpi-done">0</div>
+            <div class="stat-sub" id="kpi-done-sub">de 0 registradas</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-label">Actividades pendientes</div>
+            <div class="stat-value" id="kpi-pend">0</div>
+            <div class="stat-sub">Requieren atención</div>
+          </div>
+          <div class="stat-card" style="border-left-color:var(--danger)">
+            <div class="stat-label">Horas perdidas</div>
+            <div class="stat-value" style="color:var(--danger)" id="kpi-lost">0</div>
+            <div class="stat-sub">Por restricciones</div>
+          </div>
+          <div class="stat-card" style="border-left-color:var(--danger)">
+            <div class="stat-label">Restricciones abiertas</div>
+            <div class="stat-value" style="color:var(--danger)" id="kpi-rest">0</div>
+            <div class="stat-sub">Sin resolver</div>
+          </div>
+          <div class="stat-card info">
+            <div class="stat-label">Personal activo</div>
+            <div class="stat-value" id="kpi-personal">0</div>
+            <div class="stat-sub">Personas en guardia</div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Horas hombre por área</div>
+                <div class="card-subtitle">Distribución del día</div>
+              </div>
+            </div>
+            <div id="chart-hh-area"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Estado de actividades</div>
+            </div>
+            <div id="chart-estado"></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Actividades por guardia</div>
+            </div>
+            <div id="chart-guardia"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Restricciones por tipo</div>
+            </div>
+            <div id="chart-restrict-tipo"></div>
+          </div>
+        </div>
+
+        <!-- Recent activities -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Actividades recientes</div>
+              <button class="btn btn-outline btn-sm" onclick="navigateTo('actividades')">Ver todas</button>
+            </div>
+            <div id="dash-recent-activities"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Restricciones activas</div>
+              <button class="btn btn-outline btn-sm" onclick="navigateTo('restricciones')">Ver todas</button>
+            </div>
+            <div id="dash-active-restrictions"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: ACTIVIDADES -->
+      <div id="view-actividades" style="display:none">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Registro de actividades</div>
+            <div class="page-subtitle">Control diario de operaciones</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-actividad')">
+            <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            Nueva actividad
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <input type="date" class="filter-select" id="filter-fecha-act" style="padding-right:12px">
+          <select class="filter-select" id="filter-guardia-act">
+            <option value="">Todas las guardias</option>
+            <option value="A">Guardia A</option>
+            <option value="B">Guardia B</option>
+          </select>
+          <select class="filter-select" id="filter-area-act">
+            <option value="">Todas las áreas</option>
+            <option>4388</option><option>DEG</option>
+            <option>Plataforma de Armados</option><option>PPL</option>
+          </select>
+          <select class="filter-select" id="filter-estado-act">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en proceso">En proceso</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+          <div class="filters-spacer"></div>
+          <button class="btn btn-outline btn-sm" onclick="exportToCSV('actividades')">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14"><path d="M3 16h14M10 4v9M7 10l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Exportar Excel
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="filterActividades()">Filtrar</button>
+        </div>
+
+        <div class="card" style="padding:0">
+          <div class="table-wrap">
+            <table id="tabla-actividades">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Guardia</th>
+                  <th>Operador</th>
+                  <th>Área</th>
+                  <th>Actividad</th>
+                  <th>Inicio</th>
+                  <th>Fin</th>
+                  <th>Duración</th>
+                  <th>Personas</th>
+                  <th>HH</th>
+                  <th>Estado</th>
+                  <th>Revisión</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-actividades">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: RESTRICCIONES -->
+      <div id="view-restricciones" style="display:none">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Restricciones operativas</div>
+            <div class="page-subtitle">Control de impedimentos y horas perdidas</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-restriccion')">
+            <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            Nueva restricción
+          </button>
+        </div>
+
+        <div class="filters">
+          <input type="date" class="filter-select" id="filter-fecha-rest" style="padding-right:12px">
+          <select class="filter-select" id="filter-area-rest">
+            <option value="">Todas las áreas</option>
+            <option>4388</option><option>DEG</option>
+            <option>Plataforma de Armados</option><option>PPL</option>
+          </select>
+          <select class="filter-select" id="filter-tipo-rest">
+            <option value="">Todos los tipos</option>
+            <option>Personal</option><option>Equipo</option><option>Logística</option>
+            <option>Clima</option><option>Seguridad</option><option>Cliente</option><option>Otro</option>
+          </select>
+          <select class="filter-select" id="filter-estado-rest">
+            <option value="">Todos los estados</option>
+            <option value="abierto">Abierto</option>
+            <option value="en proceso">En proceso</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+          <div class="filters-spacer"></div>
+          <button class="btn btn-outline btn-sm" onclick="exportToCSV('restricciones')">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14"><path d="M3 16h14M10 4v9M7 10l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Exportar Excel
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="filterRestricciones()">Filtrar</button>
+        </div>
+
+        <div class="card" style="padding:0">
+          <div class="table-wrap">
+            <table id="tabla-restricciones">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Área</th>
+                  <th>Tipo</th>
+                  <th>Descripción</th>
+                  <th>Inicio</th>
+                  <th>Fin</th>
+                  <th>Horas perdidas</th>
+                  <th>Responsable</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-restricciones">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: REPORTES -->
+      <div id="view-reportes" style="display:none">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Reportes y exportación</div>
+            <div class="page-subtitle">Integración Power BI y exportaciones</div>
+          </div>
+        </div>
+        <div class="grid-equal" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">🔗 Conexión Power BI</div></div>
+            <p style="font-size:14px;color:var(--text-s);margin-bottom:16px">Conecta este sistema con Microsoft Power BI usando el endpoint de datos:</p>
+            <div style="background:var(--surface-1);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:var(--navy);word-break:break-all;margin-bottom:16px">
+              GET /api/v1/ecoseam/actividades?format=json&desde=2024-01-01
+            </div>
+            <div class="alert alert-info">
+              <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M10 9v5M10 7h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <div>En Power BI Desktop: <strong>Obtener datos → Web → JSON</strong> y pega la URL del endpoint.</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Documentación de API copiada','success')">Copiar endpoint</button>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">📊 Exportar datos</div></div>
+            <p style="font-size:14px;color:var(--text-s);margin-bottom:16px">Descarga los datos en formato Excel para análisis externo:</p>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn btn-outline" onclick="exportToCSV('actividades')">
+                📋 Exportar Actividades (CSV/Excel)
+              </button>
+              <button class="btn btn-outline" onclick="exportToCSV('restricciones')">
+                🚧 Exportar Restricciones (CSV/Excel)
+              </button>
+              <button class="btn btn-outline" onclick="exportToCSV('resumen')">
+                📈 Exportar Resumen Ejecutivo
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🗄️ Arquitectura recomendada</div></div>
+          <div class="grid-3">
+            <div style="padding:16px;border-radius:10px;background:var(--surface-1);border:1.5px solid var(--border)">
+              <div style="font-size:20px;margin-bottom:8px">🥇</div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px">PWA + Supabase</div>
+              <div style="font-size:13px;color:var(--text-s)">PostgreSQL gratis, API REST automática, Power BI connector nativo. <strong>Recomendado.</strong></div>
+              <div style="margin-top:8px"><span class="badge badge-done">✓ Costo bajo</span></div>
+            </div>
+            <div style="padding:16px;border-radius:10px;background:var(--surface-1);border:1.5px solid var(--border)">
+              <div style="font-size:20px;margin-bottom:8px">🥈</div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px">Power Apps + SharePoint</div>
+              <div style="font-size:13px;color:var(--text-s)">Si ya tienen M365. Power BI integrado nativo. Sin código adicional.</div>
+              <div style="margin-top:8px"><span class="badge badge-observed">M365 requerido</span></div>
+            </div>
+            <div style="padding:16px;border-radius:10px;background:var(--surface-1);border:1.5px solid var(--border)">
+              <div style="font-size:20px;margin-bottom:8px">🥉</div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px">PWA + SQL Server</div>
+              <div style="font-size:13px;color:var(--text-s)">Si ya tienen infraestructura SQL Server on-premise o en Azure.</div>
+              <div style="margin-top:8px"><span class="badge badge-pending">Infraestructura previa</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: ADMIN -->
+      <div id="view-admin" style="display:none">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Administración</div>
+            <div class="page-subtitle">Gestión de usuarios y configuración</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-usuario')">+ Nuevo usuario</button>
+        </div>
+        <div class="card" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Usuario</th><th>Nombre completo</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="tbody-usuarios"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+  <!-- Mobile nav -->
+  <nav class="mobile-nav" id="mobile-nav">
+    <div class="mobile-nav-item" id="mn-dashboard" onclick="navigateTo('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span>Inicio</span>
+    </div>
+    <div class="mobile-nav-item" id="mn-actividades" onclick="navigateTo('actividades')">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Actividades</span>
+    </div>
+    <div class="mobile-nav-item" id="mn-restricciones" onclick="navigateTo('restricciones')">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Restricciones</span>
+    </div>
+    <div class="mobile-nav-item" id="mn-reportes" onclick="navigateTo('reportes')">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M4 20h16M6 20V12M10 20V8M14 20V4M18 20V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Reportes</span>
+    </div>
+    <div class="mobile-nav-item" id="mn-admin" onclick="navigateTo('admin')">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Admin</span>
+    </div>
+  </nav>
+</div><!-- /page-app -->
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Modal: Nueva actividad -->
+<div class="modal-overlay" id="modal-actividad">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-actividad-title">Nueva actividad</div>
+      <button class="modal-close" onclick="closeModal('modal-actividad')">
+        <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <input type="hidden" id="act-edit-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fecha</label>
+        <input class="form-control" id="act-fecha" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Guardia</label>
+        <select class="form-control" id="act-guardia">
+          <option value="A">Guardia A</option>
+          <option value="B">Guardia B</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nombre del operador</label>
+      <input class="form-control" id="act-operador" type="text" placeholder="Nombre y apellido del operador">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Área / Patio</label>
+      <select class="form-control" id="act-area">
+        <option value="">Seleccionar área</option>
+        <option>4388</option>
+        <option>DEG</option>
+        <option>Plataforma de Armados</option>
+        <option>PPL</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Actividad realizada</label>
+      <input class="form-control" id="act-actividad" type="text" placeholder="Descripción de la actividad">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Hora inicio</label>
+        <input class="form-control" id="act-inicio" type="time" oninput="calcActDuration()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hora fin</label>
+        <input class="form-control" id="act-fin" type="time" oninput="calcActDuration()">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cantidad de personas involucradas</label>
+      <input class="form-control" id="act-personas" type="number" min="1" placeholder="Ej: 4" oninput="calcActDuration()">
+      <div id="act-calc-result" class="form-calc" style="display:none"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observación</label>
+      <textarea class="form-control" id="act-obs" rows="2" placeholder="Observación breve..." style="resize:vertical"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Estado</label>
+      <select class="form-control" id="act-estado">
+        <option value="pendiente">Pendiente</option>
+        <option value="en proceso">En proceso</option>
+        <option value="finalizado">Finalizado</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-actividad')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveActividad()">Guardar actividad</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nueva restricción -->
+<div class="modal-overlay" id="modal-restriccion">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-rest-title">Nueva restricción</div>
+      <button class="modal-close" onclick="closeModal('modal-restriccion')">
+        <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <input type="hidden" id="rest-edit-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fecha</label>
+        <input class="form-control" id="rest-fecha" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Área</label>
+        <select class="form-control" id="rest-area">
+          <option value="">Seleccionar área</option>
+          <option>4388</option><option>DEG</option>
+          <option>Plataforma de Armados</option><option>PPL</option><option>Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo de restricción</label>
+      <select class="form-control" id="rest-tipo">
+        <option value="">Seleccionar tipo</option>
+        <option>Personal</option><option>Equipo</option><option>Logística</option>
+        <option>Clima</option><option>Seguridad</option><option>Cliente</option><option>Otro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <input class="form-control" id="rest-desc" type="text" placeholder="Descripción de la restricción">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Hora inicio</label>
+        <input class="form-control" id="rest-inicio" type="time" oninput="calcRestDuration()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hora fin</label>
+        <input class="form-control" id="rest-fin" type="time" oninput="calcRestDuration()">
+      </div>
+    </div>
+    <div class="form-group">
+      <div id="rest-calc-result" class="form-calc" style="display:none"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Responsable</label>
+      <input class="form-control" id="rest-responsable" type="text" placeholder="Nombre del responsable">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Estado</label>
+      <select class="form-control" id="rest-estado">
+        <option value="abierto">Abierto</option>
+        <option value="en proceso">En proceso</option>
+        <option value="cerrado">Cerrado</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-restriccion')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveRestriccion()">Guardar restricción</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Revisar actividad (Supervisor) -->
+<div class="modal-overlay" id="modal-revisar">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Revisar actividad</div>
+      <button class="modal-close" onclick="closeModal('modal-revisar')">
+        <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <input type="hidden" id="rev-act-id">
+    <div id="rev-detail" style="background:var(--surface-1);border-radius:10px;padding:16px;margin-bottom:16px;font-size:14px"></div>
+    <div class="form-group">
+      <label class="form-label">Decisión del supervisor</label>
+      <select class="form-control" id="rev-decision">
+        <option value="aprobado">✅ Aprobar registro</option>
+        <option value="observado">⚠️ Observar registro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Comentario de revisión</label>
+      <textarea class="form-control" id="rev-comment" rows="3" placeholder="Agrega un comentario de revisión..." style="resize:vertical"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-revisar')">Cancelar</button>
+      <button class="btn btn-success" onclick="saveRevision()">Guardar revisión</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nuevo usuario -->
+<div class="modal-overlay" id="modal-usuario">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🌿 Nuevo usuario</div>
+      <button class="modal-close" onclick="closeModal('modal-usuario')">
+        <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre *</label>
+        <input class="form-control" id="usr-nombre" type="text" placeholder="Juan">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Apellido</label>
+        <input class="form-control" id="usr-apellido" type="text" placeholder="Pérez">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Usuario (login) *</label>
+      <input class="form-control" id="usr-login" type="text" placeholder="juan.perez" autocapitalize="none">
+      <div class="form-hint">Este es el nombre con el que el usuario ingresará al sistema. Sin espacios, sin mayúsculas.</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Rol</label>
+        <select class="form-control" id="usr-rol">
+          <option value="operador">👷 Operador</option>
+          <option value="supervisor">🔍 Supervisor</option>
+          <option value="gerencia">📊 Gerencia</option>
+          <option value="admin">⚙️ Administrador</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Guardia</label>
+        <select class="form-control" id="usr-guardia">
+          <option value="A">Guardia A</option>
+          <option value="B">Guardia B</option>
+          <option value="ambas">Ambas</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-usuario')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveUsuario()">Crear usuario</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+/* ===== STATE ===== */
+const APP = {
+  user: null,
+  currentView: 'dashboard',
+  data: {
+    actividades: [],
+    restricciones: [],
+    usuarios: []
+  }
+};
+
+/* ===== SAMPLE DATA ===== */
+function initSampleData() {
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
+
+  APP.data.actividades = [
+    {id:1,fecha:today,guardia:'A',operador:'Juan Pérez',area:'4388',actividad:'Inspección de válvulas de control',inicio:'07:00',fin:'09:30',personas:3,obs:'Sin novedades, válvulas en buen estado',estado:'finalizado',revision:'aprobado',comentario_rev:'Buen registro, completo.',calc:{duracion:2.5,hh:7.5}},
+    {id:2,fecha:today,guardia:'A',operador:'María García',area:'DEG',actividad:'Mantenimiento preventivo bomba B-201',inicio:'08:00',fin:'11:00',personas:4,obs:'Se detectó vibración leve, monitorear',estado:'finalizado',revision:'observado',comentario_rev:'Revisar vibración en próxima guardia.',calc:{duracion:3,hh:12}},
+    {id:3,fecha:today,guardia:'B',operador:'Carlos López',area:'Plataforma de Armados',actividad:'Ensamble de módulo estructural M-05',inicio:'14:00',fin:'18:00',personas:6,obs:'Trabajo completado sin incidentes',estado:'finalizado',revision:null,comentario_rev:'',calc:{duracion:4,hh:24}},
+    {id:4,fecha:today,guardia:'B',operador:'Ana Ramírez',area:'PPL',actividad:'Verificación de tuberías proceso PPL-3',inicio:'15:30',fin:'17:00',personas:2,obs:'Pendiente aprobación de P&ID revisado',estado:'en proceso',revision:null,comentario_rev:'',calc:{duracion:1.5,hh:3}},
+    {id:5,fecha:today,guardia:'A',operador:'Pedro Silva',area:'4388',actividad:'Calibración de instrumentos',inicio:'09:00',fin:'',personas:2,obs:'En espera de herramienta especial',estado:'pendiente',revision:null,comentario_rev:'',calc:{duracion:0,hh:0}},
+    {id:6,fecha:yesterday,guardia:'A',operador:'Juan Pérez',area:'DEG',actividad:'Limpieza de intercambiadores',inicio:'07:00',fin:'12:00',personas:5,obs:'Completado satisfactoriamente',estado:'finalizado',revision:'aprobado',comentario_rev:'',calc:{duracion:5,hh:25}},
+    {id:7,fecha:yesterday,guardia:'B',operador:'Carlos López',area:'PPL',actividad:'Soldadura de bridas flange 4"',inicio:'16:00',fin:'20:00',personas:3,obs:'Requirió recalentamiento',estado:'finalizado',revision:'aprobado',comentario_rev:'',calc:{duracion:4,hh:12}},
+  ];
+
+  APP.data.restricciones = [
+    {id:1,fecha:today,area:'4388',tipo:'Equipo',descripcion:'Grúa puente fuera de servicio por mantenimiento correctivo',inicio:'06:00',fin:'12:00',responsable:'Jefe Mantenimiento',estado:'cerrado',calc:{horas_perdidas:6}},
+    {id:2,fecha:today,area:'DEG',tipo:'Personal',descripcion:'Falta de personal calificado para soldadura ASME',inicio:'07:00',fin:'',responsable:'RRHH',estado:'abierto',calc:{horas_perdidas:0}},
+    {id:3,fecha:today,area:'Plataforma de Armados',tipo:'Logística',descripcion:'Retraso en entrega de materiales tubería 6"',inicio:'08:00',fin:'14:00',responsable:'Logística',estado:'en proceso',calc:{horas_perdidas:6}},
+    {id:4,fecha:today,area:'PPL',tipo:'Seguridad',descripcion:'Área bloqueada por simulacro de emergencia HSSE',inicio:'10:00',fin:'11:00',responsable:'HSSE',estado:'cerrado',calc:{horas_perdidas:1}},
+    {id:5,fecha:yesterday,area:'DEG',tipo:'Clima',descripcion:'Suspensión de actividades por lluvia intensa y vientos',inicio:'15:00',fin:'18:00',responsable:'Supervisor',estado:'cerrado',calc:{horas_perdidas:3}},
+  ];
+
+  APP.data.usuarios = [
+    {id:1,login:'operador1',nombre:'Juan',apellido:'Pérez',rol:'operador',guardia:'A',activo:true},
+    {id:2,login:'operador2',nombre:'María',apellido:'García',rol:'operador',guardia:'A',activo:true},
+    {id:3,login:'operador3',nombre:'Carlos',apellido:'López',rol:'operador',guardia:'B',activo:true},
+    {id:4,login:'supervisor1',nombre:'Roberto',apellido:'Torres',rol:'supervisor',guardia:'ambas',activo:true},
+    {id:5,login:'gerencia1',nombre:'Alejandro',apellido:'Castro',rol:'gerencia',guardia:'ambas',activo:true},
+    {id:6,login:'admin',nombre:'Admin',apellido:'Sistema',rol:'admin',guardia:'ambas',activo:true},
+  ];
+}
+
+/* ===== AUTH ===== */
+function doLogin() {
+  const loginInput = document.getElementById('login-user').value.trim().toLowerCase();
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  if(!loginInput) {
+    errEl.textContent = 'Ingresa tu nombre de usuario.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const found = APP.data.usuarios.find(u => u.login.toLowerCase() === loginInput && u.activo);
+  if(!found) {
+    const inactivo = APP.data.usuarios.find(u => u.login.toLowerCase() === loginInput);
+    errEl.textContent = inactivo
+      ? 'Usuario inactivo. Contacta al administrador.'
+      : 'Usuario no encontrado. Verifica el nombre de usuario.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const initials = (found.nombre[0] + (found.apellido ? found.apellido[0] : '')).toUpperCase();
+  APP.user = {
+    id: found.id,
+    login: found.login,
+    name: found.nombre + ' ' + found.apellido,
+    role: found.rol,
+    initials,
+    guardia: found.guardia,
+  };
+
+  document.getElementById('page-login').style.display = 'none';
+  document.getElementById('page-app').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  setupUI();
+  navigateTo(found.rol === 'operador' ? 'actividades' : 'dashboard');
+}
+
+function doLogout() {
+  APP.user = null;
+  document.getElementById('page-app').style.display = 'none';
+  document.getElementById('page-login').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+/* ===== UI SETUP ===== */
+const NAV_CONFIG = {
+  all: [
+    {id:'dashboard',label:'Dashboard',icon:'grid'},
+    {id:'actividades',label:'Actividades',icon:'list'},
+    {id:'restricciones',label:'Restricciones',icon:'alert'},
+    {id:'reportes',label:'Reportes',icon:'chart'},
+    {id:'admin',label:'Administración',icon:'user'},
+  ],
+  operador: ['actividades'],
+  supervisor: ['dashboard','actividades','restricciones'],
+  gerencia: ['dashboard','actividades','restricciones','reportes'],
+  admin: ['dashboard','actividades','restricciones','reportes','admin'],
+};
+
+const ICONS = {
+  grid: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>`,
+  list: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 8h6M7 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  alert: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M10 7v4M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  chart: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M3 16h14M5 16V11M9 16V7M13 16V3M17 16V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  user: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 18c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+};
+
+const VIEW_TITLES = {
+  dashboard:'Dashboard operativo',
+  actividades:'Registro de actividades',
+  restricciones:'Restricciones operativas',
+  reportes:'Reportes y exportación',
+  admin:'Administración',
+};
+
+function setupUI() {
+  const u = APP.user;
+  document.getElementById('user-avatar-side').textContent = u.initials;
+  document.getElementById('user-name-side').textContent = u.name;
+  document.getElementById('user-role-side').textContent = u.role;
+
+  // Update topbar date
+  const now = new Date();
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('es-PE',{weekday:'short',day:'numeric',month:'short'});
+
+  // Render sidebar nav
+  const allowed = NAV_CONFIG[u.role] || NAV_CONFIG.operador;
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = '';
+
+  NAV_CONFIG.all.forEach(item => {
+    if(!allowed.includes(item.id)) return;
+    const el = document.createElement('div');
+    el.className = 'nav-item';
+    el.id = 'nav-'+item.id;
+    el.innerHTML = ICONS[item.icon] + '<span>' + item.label + '</span>';
+    el.onclick = () => navigateTo(item.id);
+    nav.appendChild(el);
+  });
+
+  // Mobile nav visibility
+  document.querySelectorAll('.mobile-nav-item').forEach(el => {
+    const id = el.id.replace('mn-','');
+    el.style.display = allowed.includes(id) ? 'flex' : 'none';
+  });
+
+  // Show nueva actividad button for operators
+  const btnNueva = document.getElementById('btn-nueva-actividad');
+  if(u.role === 'operador') btnNueva.style.display = 'inline-flex';
+  else btnNueva.style.display = 'none';
+
+  // Set default date inputs
+  const today = new Date().toISOString().split('T')[0];
+  ['act-fecha','rest-fecha','filter-fecha-act','filter-fecha-rest'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = today;
+  });
+
+  // Prefill operator name
+  if(u.role === 'operador') {
+    document.getElementById('act-operador').value = u.name;
+  }
+}
+
+/* ===== NAVIGATION ===== */
+function navigateTo(view) {
+  APP.currentView = view;
+
+  // Hide all views
+  document.querySelectorAll('[id^="view-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('view-' + view).style.display = 'block';
+
+  // Update topbar
+  document.getElementById('topbar-title').textContent = VIEW_TITLES[view] || view;
+
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const activeNav = document.getElementById('nav-' + view);
+  if(activeNav) activeNav.classList.add('active');
+
+  document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+  const activeMn = document.getElementById('mn-' + view);
+  if(activeMn) activeMn.classList.add('active');
+
+  // Load view data
+  closeSidebar();
+  if(view === 'dashboard') updateDashboard();
+  if(view === 'actividades') renderActividades();
+  if(view === 'restricciones') renderRestricciones();
+  if(view === 'admin') renderUsuarios();
+}
+
+/* ===== SIDEBAR MOBILE ===== */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').style.display = 
+    document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').style.display = 'none';
+}
+
+/* ===== MODALS ===== */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if(e.target === el) closeModal(el.id); });
+});
+
+/* ===== DURATION CALC ===== */
+function calcTime(start, end) {
+  if(!start || !end) return 0;
+  const [sh,sm] = start.split(':').map(Number);
+  const [eh,em] = end.split(':').map(Number);
+  let diff = (eh*60+em) - (sh*60+sm);
+  if(diff < 0) diff += 24*60;
+  return Math.round(diff*100/60)/100;
+}
+
+function calcActDuration() {
+  const s = document.getElementById('act-inicio').value;
+  const e = document.getElementById('act-fin').value;
+  const p = parseInt(document.getElementById('act-personas').value)||0;
+  const dur = calcTime(s,e);
+  const hh = Math.round(dur*p*100)/100;
+  const div = document.getElementById('act-calc-result');
+  if(dur > 0 || p > 0) {
+    div.style.display = 'block';
+    div.innerHTML = `⏱ Duración: <strong>${dur} h</strong> × ${p} personas = <strong>${hh} horas hombre</strong>`;
+  } else {
+    div.style.display = 'none';
+  }
+}
+
+function calcRestDuration() {
+  const s = document.getElementById('rest-inicio').value;
+  const e = document.getElementById('rest-fin').value;
+  const dur = calcTime(s,e);
+  const div = document.getElementById('rest-calc-result');
+  if(dur > 0) {
+    div.style.display = 'block';
+    div.innerHTML = `⏱ Horas perdidas: <strong>${dur} horas</strong>`;
+  } else {
+    div.style.display = 'none';
+  }
+}
+
+/* ===== SAVE ACTIVIDAD ===== */
+function saveActividad() {
+  const fields = {
+    fecha: document.getElementById('act-fecha').value,
+    guardia: document.getElementById('act-guardia').value,
+    operador: document.getElementById('act-operador').value,
+    area: document.getElementById('act-area').value,
+    actividad: document.getElementById('act-actividad').value,
+    inicio: document.getElementById('act-inicio').value,
+    fin: document.getElementById('act-fin').value,
+    personas: parseInt(document.getElementById('act-personas').value)||1,
+    obs: document.getElementById('act-obs').value,
+    estado: document.getElementById('act-estado').value,
+  };
+  if(!fields.fecha||!fields.operador||!fields.area||!fields.actividad) {
+    showToast('Completa los campos obligatorios','error'); return;
+  }
+  const dur = calcTime(fields.inicio, fields.fin);
+  fields.calc = {duracion:dur, hh:Math.round(dur*fields.personas*100)/100};
+  fields.revision = null; fields.comentario_rev = '';
+
+  const editId = document.getElementById('act-edit-id').value;
+  if(editId) {
+    const idx = APP.data.actividades.findIndex(a=>a.id==editId);
+    if(idx>=0) APP.data.actividades[idx] = {...APP.data.actividades[idx],...fields};
+    showToast('Actividad actualizada','success');
+  } else {
+    fields.id = Date.now();
+    APP.data.actividades.unshift(fields);
+    showToast('Actividad registrada correctamente','success');
+  }
+  closeModal('modal-actividad');
+  resetActForm();
+  if(APP.currentView==='actividades') renderActividades();
+  if(APP.currentView==='dashboard') updateDashboard();
+}
+
+function resetActForm() {
+  ['act-edit-id','act-operador','act-area','act-actividad','act-inicio','act-fin','act-obs'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('act-personas').value='';
+  document.getElementById('act-estado').value='pendiente';
+  document.getElementById('act-calc-result').style.display='none';
+  document.getElementById('modal-actividad-title').textContent='Nueva actividad';
+  document.getElementById('act-fecha').value=new Date().toISOString().split('T')[0];
+  if(APP.user&&APP.user.role==='operador') document.getElementById('act-operador').value=APP.user.name;
+}
+
+function editActividad(id) {
+  const a = APP.data.actividades.find(x=>x.id==id);
+  if(!a) return;
+  document.getElementById('act-edit-id').value=a.id;
+  document.getElementById('act-fecha').value=a.fecha;
+  document.getElementById('act-guardia').value=a.guardia;
+  document.getElementById('act-operador').value=a.operador;
+  document.getElementById('act-area').value=a.area;
+  document.getElementById('act-actividad').value=a.actividad;
+  document.getElementById('act-inicio').value=a.inicio;
+  document.getElementById('act-fin').value=a.fin;
+  document.getElementById('act-personas').value=a.personas;
+  document.getElementById('act-obs').value=a.obs;
+  document.getElementById('act-estado').value=a.estado;
+  document.getElementById('modal-actividad-title').textContent='Editar actividad';
+  calcActDuration();
+  openModal('modal-actividad');
+}
+
+function deleteActividad(id) {
+  if(!confirm('¿Eliminar esta actividad?')) return;
+  APP.data.actividades = APP.data.actividades.filter(a=>a.id!=id);
+  renderActividades();
+  showToast('Actividad eliminada','warning');
+}
+
+/* ===== SAVE RESTRICCION ===== */
+function saveRestriccion() {
+  const fields = {
+    fecha: document.getElementById('rest-fecha').value,
+    area: document.getElementById('rest-area').value,
+    tipo: document.getElementById('rest-tipo').value,
+    descripcion: document.getElementById('rest-desc').value,
+    inicio: document.getElementById('rest-inicio').value,
+    fin: document.getElementById('rest-fin').value,
+    responsable: document.getElementById('rest-responsable').value,
+    estado: document.getElementById('rest-estado').value,
+  };
+  if(!fields.fecha||!fields.area||!fields.tipo||!fields.descripcion) {
+    showToast('Completa los campos obligatorios','error'); return;
+  }
+  const dur = calcTime(fields.inicio, fields.fin);
+  fields.calc = {horas_perdidas: dur};
+
+  const editId = document.getElementById('rest-edit-id').value;
+  if(editId) {
+    const idx = APP.data.restricciones.findIndex(r=>r.id==editId);
+    if(idx>=0) APP.data.restricciones[idx]={...APP.data.restricciones[idx],...fields};
+    showToast('Restricción actualizada','success');
+  } else {
+    fields.id = Date.now();
+    APP.data.restricciones.unshift(fields);
+    showToast('Restricción registrada correctamente','success');
+  }
+  closeModal('modal-restriccion');
+  resetRestForm();
+  if(APP.currentView==='restricciones') renderRestricciones();
+  if(APP.currentView==='dashboard') updateDashboard();
+}
+
+function resetRestForm() {
+  ['rest-edit-id','rest-area','rest-tipo','rest-desc','rest-inicio','rest-fin','rest-responsable'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('rest-estado').value='abierto';
+  document.getElementById('rest-calc-result').style.display='none';
+  document.getElementById('rest-fecha').value=new Date().toISOString().split('T')[0];
+}
+
+function editRestriccion(id) {
+  const r = APP.data.restricciones.find(x=>x.id==id);
+  if(!r) return;
+  document.getElementById('rest-edit-id').value=r.id;
+  document.getElementById('rest-fecha').value=r.fecha;
+  document.getElementById('rest-area').value=r.area;
+  document.getElementById('rest-tipo').value=r.tipo;
+  document.getElementById('rest-desc').value=r.descripcion;
+  document.getElementById('rest-inicio').value=r.inicio;
+  document.getElementById('rest-fin').value=r.fin;
+  document.getElementById('rest-responsable').value=r.responsable;
+  document.getElementById('rest-estado').value=r.estado;
+  calcRestDuration();
+  openModal('modal-restriccion');
+}
+
+function deleteRestriccion(id) {
+  if(!confirm('¿Eliminar esta restricción?')) return;
+  APP.data.restricciones = APP.data.restricciones.filter(r=>r.id!=id);
+  renderRestricciones();
+  showToast('Restricción eliminada','warning');
+}
+
+/* ===== REVISION SUPERVISOR ===== */
+function openRevision(id) {
+  const a = APP.data.actividades.find(x=>x.id==id);
+  if(!a) return;
+  document.getElementById('rev-act-id').value=a.id;
+  document.getElementById('rev-detail').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><span style="color:var(--text-s);font-size:12px">Operador</span><br><strong>${a.operador}</strong></div>
+      <div><span style="color:var(--text-s);font-size:12px">Área</span><br><strong>${a.area}</strong></div>
+      <div><span style="color:var(--text-s);font-size:12px">Actividad</span><br><strong>${a.actividad}</strong></div>
+      <div><span style="color:var(--text-s);font-size:12px">Horas hombre</span><br><strong style="color:var(--teal)">${a.calc.hh} HH</strong></div>
+      <div><span style="color:var(--text-s);font-size:12px">Horario</span><br><strong>${a.inicio||'—'} → ${a.fin||'—'}</strong></div>
+      <div><span style="color:var(--text-s);font-size:12px">Personas</span><br><strong>${a.personas}</strong></div>
+    </div>
+    ${a.obs?`<div style="margin-top:10px;padding:8px;background:var(--surface);border-radius:6px;font-size:13px"><span style="color:var(--text-s)">Obs:</span> ${a.obs}</div>`:''}
+  `;
+  document.getElementById('rev-decision').value = a.revision || 'aprobado';
+  document.getElementById('rev-comment').value = a.comentario_rev || '';
+  openModal('modal-revisar');
+}
+
+function saveRevision() {
+  const id = document.getElementById('rev-act-id').value;
+  const decision = document.getElementById('rev-decision').value;
+  const comment = document.getElementById('rev-comment').value;
+  const idx = APP.data.actividades.findIndex(a=>a.id==id);
+  if(idx>=0) {
+    APP.data.actividades[idx].revision = decision;
+    APP.data.actividades[idx].comentario_rev = comment;
+  }
+  closeModal('modal-revisar');
+  showToast('Revisión guardada correctamente','success');
+  if(APP.currentView==='actividades') renderActividades();
+}
+
+/* ===== RENDER ACTIVIDADES ===== */
+function filterActividades() { renderActividades(); }
+
+function renderActividades() {
+  const fecha = document.getElementById('filter-fecha-act').value;
+  const guardia = document.getElementById('filter-guardia-act').value;
+  const area = document.getElementById('filter-area-act').value;
+  const estado = document.getElementById('filter-estado-act').value;
+
+  let data = [...APP.data.actividades];
+  if(fecha) data = data.filter(a=>a.fecha===fecha);
+  if(guardia) data = data.filter(a=>a.guardia===guardia);
+  if(area) data = data.filter(a=>a.area===area);
+  if(estado) data = data.filter(a=>a.estado===estado);
+
+  const role = APP.user.role;
+  const tbody = document.getElementById('tbody-actividades');
+  if(!data.length) {
+    tbody.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:32px;color:var(--text-m)">Sin actividades registradas para los filtros seleccionados</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(a=>`
+    <tr>
+      <td>${formatDate(a.fecha)}</td>
+      <td><span class="badge badge-guardia-${a.guardia.toLowerCase()}">${a.guardia}</span></td>
+      <td style="white-space:nowrap">${a.operador}</td>
+      <td><span style="font-size:12px;font-weight:600">${a.area}</span></td>
+      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${a.actividad}">${a.actividad}</td>
+      <td>${a.inicio||'—'}</td>
+      <td>${a.fin||'—'}</td>
+      <td>${a.calc.duracion?a.calc.duracion+' h':'—'}</td>
+      <td style="text-align:center">${a.personas}</td>
+      <td style="font-weight:600;color:var(--teal)">${a.calc.hh||'—'}</td>
+      <td><span class="badge badge-${a.estado.replace(' ','-')}">${a.estado}</span></td>
+      <td>${a.revision?`<span class="badge badge-${a.revision}">${a.revision}</span>`:'<span style="color:var(--text-m);font-size:12px">Sin revisar</span>'}</td>
+      <td style="white-space:nowrap">
+        ${(role==='supervisor'||role==='admin')?`<button class="btn btn-sm" style="padding:4px 10px;background:var(--teal);color:#fff;font-size:12px" onclick="openRevision(${a.id})">Revisar</button> `:''}
+        ${(role==='supervisor'||role==='admin'||role==='operador')?`<button class="btn btn-outline btn-sm" style="font-size:12px" onclick="editActividad(${a.id})">Editar</button>`:''}
+        ${(role==='admin')?` <button class="btn btn-sm" style="padding:4px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteActividad(${a.id})">×</button>`:''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ===== RENDER RESTRICCIONES ===== */
+function filterRestricciones() { renderRestricciones(); }
+
+function renderRestricciones() {
+  const fecha = document.getElementById('filter-fecha-rest').value;
+  const area = document.getElementById('filter-area-rest').value;
+  const tipo = document.getElementById('filter-tipo-rest').value;
+  const estado = document.getElementById('filter-estado-rest').value;
+
+  let data = [...APP.data.restricciones];
+  if(fecha) data = data.filter(r=>r.fecha===fecha);
+  if(area) data = data.filter(r=>r.area===area);
+  if(tipo) data = data.filter(r=>r.tipo===tipo);
+  if(estado) data = data.filter(r=>r.estado===estado);
+
+  const role = APP.user.role;
+  const tbody = document.getElementById('tbody-restricciones');
+  if(!data.length) {
+    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-m)">Sin restricciones para los filtros seleccionados</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(r=>`
+    <tr>
+      <td>${formatDate(r.fecha)}</td>
+      <td><strong>${r.area}</strong></td>
+      <td><span class="badge" style="background:var(--surface-2);color:var(--text-s)">${r.tipo}</span></td>
+      <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.descripcion}">${r.descripcion}</td>
+      <td>${r.inicio||'—'}</td>
+      <td>${r.fin||'—'}</td>
+      <td style="font-weight:600;color:var(--danger)">${r.calc.horas_perdidas?r.calc.horas_perdidas+' h':'—'}</td>
+      <td>${r.responsable}</td>
+      <td><span class="badge badge-${r.estado.replace(' ','-')}">${r.estado}</span></td>
+      <td style="white-space:nowrap">
+        ${(role!=='gerencia')?`<button class="btn btn-outline btn-sm" style="font-size:12px" onclick="editRestriccion(${r.id})">Editar</button>`:''}
+        ${(role==='admin')?` <button class="btn btn-sm" style="padding:4px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteRestriccion(${r.id})">×</button>`:''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ===== RENDER USUARIOS ===== */
+function saveUsuario() {
+  const nombre = document.getElementById('usr-nombre').value.trim();
+  const apellido = document.getElementById('usr-apellido').value.trim();
+  const login = document.getElementById('usr-login').value.trim().toLowerCase();
+  const rol = document.getElementById('usr-rol').value;
+  const guardia = document.getElementById('usr-guardia').value;
+
+  if(!nombre || !login) { showToast('Completa los campos obligatorios','error'); return; }
+
+  // Verificar login único
+  if(APP.data.usuarios.find(u => u.login.toLowerCase() === login)) {
+    showToast('Ese nombre de usuario ya existe', 'error'); return;
+  }
+
+  const u = { id: Date.now(), nombre, apellido, login, rol, guardia, activo: true };
+  APP.data.usuarios.push(u);
+
+  // Limpiar form
+  ['usr-nombre','usr-apellido','usr-login'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('usr-rol').value = 'operador';
+  document.getElementById('usr-guardia').value = 'A';
+
+  closeModal('modal-usuario');
+  renderUsuarios();
+  showToast(`Usuario "${login}" creado con rol ${rol}`, 'success');
+}
+
+function renderUsuarios() {
+  const tbody = document.getElementById('tbody-usuarios');
+  const rolColors = {
+    operador:   'background:#e3f0e5;color:#1a5c2a',
+    supervisor: 'background:#e3f2fd;color:#0d47a1',
+    gerencia:   'background:#f3e5f5;color:#6a1b9a',
+    admin:      'background:#fff3e0;color:#e65100',
+  };
+  tbody.innerHTML = APP.data.usuarios.map(u => `
+    <tr>
+      <td><code style="font-size:13px;background:var(--surface-1);padding:2px 8px;border-radius:4px;color:var(--teal);font-weight:600">${u.login}</code></td>
+      <td style="font-weight:500">${u.nombre} ${u.apellido}</td>
+      <td><span class="badge" style="${rolColors[u.rol]||'background:var(--surface-2);color:var(--text-s)'};text-transform:capitalize">${u.rol}</span></td>
+      <td>${u.guardia === 'ambas' ? 'A y B' : 'Guardia '+u.guardia}</td>
+      <td><span class="badge ${u.activo ? 'badge-done' : 'badge-open'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline btn-sm" style="font-size:12px;margin-right:4px" onclick="toggleUser(${u.id})">${u.activo ? 'Desactivar' : 'Activar'}</button>
+        <button class="btn btn-sm" style="padding:5px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteUsuario(${u.id})" title="Eliminar usuario permanentemente">
+          <svg viewBox="0 0 20 20" fill="none" width="13" height="13" style="margin-right:3px"><path d="M4 6h12M8 6V4h4v2M7 6v9a1 1 0 001 1h4a1 1 0 001-1V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Eliminar
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function deleteUsuario(id) {
+  const u = APP.data.usuarios.find(x => x.id === id);
+  if(!u) return;
+  if(APP.user && APP.user.id === id) { showToast('No puedes eliminar tu propia cuenta', 'error'); return; }
+  if(!confirm(`¿Eliminar al usuario "${u.nombre} ${u.apellido}" (${u.login})?\n\nEsta acción no se puede deshacer.`)) return;
+  APP.data.usuarios = APP.data.usuarios.filter(x => x.id !== id);
+  renderUsuarios();
+  showToast(`Usuario "${u.login}" eliminado`, 'warning');
+}
+
+function toggleUser(id) {
+  const u = APP.data.usuarios.find(x => x.id === id);
+  if(u) { u.activo = !u.activo; renderUsuarios(); showToast('Usuario actualizado', 'success'); }
+}
+
+/* ===== DASHBOARD ===== */
+function updateDashboard() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayActs = APP.data.actividades.filter(a=>a.fecha===today);
+  const todayRest = APP.data.restricciones.filter(r=>r.fecha===today);
+
+  const hhTotal = todayActs.reduce((s,a)=>s+(a.calc.hh||0),0);
+  const done = todayActs.filter(a=>a.estado==='finalizado').length;
+  const pend = todayActs.filter(a=>a.estado==='pendiente').length;
+  const horasLost = todayRest.reduce((s,r)=>s+(r.calc.horas_perdidas||0),0);
+  const openRest = todayRest.filter(r=>r.estado==='abierto').length;
+  const personal = todayActs.reduce((s,a)=>s+a.personas,0);
+
+  document.getElementById('kpi-hh').textContent = hhTotal;
+  document.getElementById('kpi-done').textContent = done;
+  document.getElementById('kpi-done-sub').textContent = `de ${todayActs.length} registradas`;
+  document.getElementById('kpi-pend').textContent = pend;
+  document.getElementById('kpi-lost').textContent = horasLost;
+  document.getElementById('kpi-rest').textContent = openRest;
+  document.getElementById('kpi-personal').textContent = personal;
+
+  const today_str = new Date().toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('dash-subtitle').textContent = 'Resumen — ' + today_str;
+
+  renderDashCharts(todayActs, todayRest);
+  renderRecentActivities();
+  renderActiveRestrictions();
+}
+
+function renderDashCharts(acts, rests) {
+  // HH por área
+  const areas = ['4388','DEG','Plataforma de Armados','PPL'];
+  const hhByArea = areas.map(a=>acts.filter(x=>x.area===a).reduce((s,x)=>s+(x.calc.hh||0),0));
+  const maxHH = Math.max(...hhByArea,1);
+  document.getElementById('chart-hh-area').innerHTML=`
+    <div class="bar-chart">${hhByArea.map((v,i)=>`<div class="bar teal" style="height:${Math.max(v/maxHH*100,4)}%;opacity:${0.5+i*0.15}" title="${areas[i]}: ${v} HH"></div>`).join('')}</div>
+    <div class="bar-labels">${areas.map((a,i)=>`<div class="bar-label" style="font-size:10px">${a.split(' ')[0]}<br><strong>${hhByArea[i]}</strong></div>`).join('')}</div>
+  `;
+
+  // Estado de actividades (donut-style)
+  const fin = acts.filter(a=>a.estado==='finalizado').length;
+  const proc = acts.filter(a=>a.estado==='en proceso').length;
+  const pen = acts.filter(a=>a.estado==='pendiente').length;
+  const total = fin+proc+pen||1;
+  const fPct = Math.round(fin/total*100);
+  const prPct = Math.round(proc/total*100);
+  const pePct = 100-fPct-prPct;
+  const r=50,cx=60,cy=60,circ=2*Math.PI*r;
+  const s1=circ*fPct/100, s2=circ*prPct/100, s3=circ*pePct/100;
+  document.getElementById('chart-estado').innerHTML=`
+    <div class="donut-wrap">
+      <svg class="donut" viewBox="0 0 120 120">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="18"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#27ae60" stroke-width="18" stroke-dasharray="${s1} ${circ-s1}" stroke-dashoffset="${circ*0.25}" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#3498db" stroke-width="18" stroke-dasharray="${s2} ${circ-s2}" stroke-dashoffset="${circ*0.25-s1}" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f39c12" stroke-width="18" stroke-dasharray="${s3} ${circ-s3}" stroke-dashoffset="${circ*0.25-s1-s2}" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+        <text x="60" y="56" text-anchor="middle" font-size="20" font-weight="700" fill="var(--text)">${total}</text>
+        <text x="60" y="70" text-anchor="middle" font-size="10" fill="var(--text-m)">actividades</text>
+      </svg>
+      <div class="donut-legend">
+        <div class="donut-item"><div class="donut-dot" style="background:#27ae60"></div>${fin} Finalizadas (${fPct}%)</div>
+        <div class="donut-item"><div class="donut-dot" style="background:#3498db"></div>${proc} En proceso (${prPct}%)</div>
+        <div class="donut-item"><div class="donut-dot" style="background:#f39c12"></div>${pen} Pendientes (${pePct}%)</div>
+      </div>
+    </div>
+  `;
+
+  // Actividades por guardia
+  const gA = acts.filter(a=>a.guardia==='A').length;
+  const gB = acts.filter(a=>a.guardia==='B').length;
+  const maxG = Math.max(gA,gB,1);
+  document.getElementById('chart-guardia').innerHTML=`
+    <div style="display:flex;gap:24px;align-items:flex-end;height:120px;padding:0 20px">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+        <span style="font-size:20px;font-weight:700;color:#1a5276">${gA}</span>
+        <div style="width:100%;height:${Math.max(gA/maxG*70,6)}px;background:#e8f4f8;border-radius:6px 6px 0 0;border:2px solid #1a5276"></div>
+        <span class="badge badge-guardia-a">Guardia A</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+        <span style="font-size:20px;font-weight:700;color:#6c1a70">${gB}</span>
+        <div style="width:100%;height:${Math.max(gB/maxG*70,6)}px;background:#f9e8f4;border-radius:6px 6px 0 0;border:2px solid #6c1a70"></div>
+        <span class="badge badge-guardia-b">Guardia B</span>
+      </div>
+    </div>
+  `;
+
+  // Restricciones por tipo
+  const tipos = ['Equipo','Personal','Logística','Clima','Seguridad','Cliente','Otro'];
+  const restCounts = tipos.map(t=>rests.filter(r=>r.tipo===t).length);
+  const maxR = Math.max(...restCounts,1);
+  const colors = ['#e94560','#f39c12','#3498db','#27ae60','#9b59b6','#e67e22','#95a5a6'];
+  document.getElementById('chart-restrict-tipo').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${tipos.map((t,i)=>restCounts[i]>0?`
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+          <span style="min-width:80px;color:var(--text-s)">${t}</span>
+          <div style="flex:1;background:var(--surface-1);border-radius:4px;height:18px;overflow:hidden">
+            <div style="width:${restCounts[i]/maxR*100}%;height:100%;background:${colors[i]};border-radius:4px;transition:width .5s"></div>
+          </div>
+          <span style="min-width:20px;font-weight:600">${restCounts[i]}</span>
+        </div>
+      `:'').join('')}
+      ${!rests.length?'<div style="color:var(--text-m);font-size:13px;padding:8px">Sin restricciones hoy</div>':''}
+    </div>
+  `;
+}
+
+function renderRecentActivities() {
+  const items = APP.data.actividades.slice(0,5);
+  const container = document.getElementById('dash-recent-activities');
+  if(!items.length) {container.innerHTML='<p style="color:var(--text-m);font-size:14px;padding:16px 0">Sin actividades registradas</p>';return;}
+  const colors = {finalizado:'#27ae60','en proceso':'#3498db',pendiente:'#f39c12'};
+  container.innerHTML = '<div class="activity-list">' + items.map(a=>`
+    <div class="activity-item">
+      <div class="activity-icon" style="background:${colors[a.estado]}20">
+        <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="10" r="7" stroke="${colors[a.estado]}" stroke-width="1.8"/><path d="M7 10l2 2 4-4" stroke="${colors[a.estado]}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="activity-info">
+        <div class="activity-title">${a.actividad}</div>
+        <div class="activity-meta">${a.operador} · ${a.area} · Guardia ${a.guardia}</div>
+      </div>
+      <div class="activity-right">
+        <span class="badge badge-${a.estado.replace(' ','-')}" style="font-size:11px">${a.estado}</span>
+        <div style="font-size:12px;color:var(--text-m);margin-top:2px">${a.calc.hh||'—'} HH</div>
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+function renderActiveRestrictions() {
+  const items = APP.data.restricciones.filter(r=>r.estado!=='cerrado').slice(0,4);
+  const container = document.getElementById('dash-active-restrictions');
+  if(!items.length) {container.innerHTML='<div class="alert alert-success"><svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M5 10l4 4L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Sin restricciones activas. ¡Todo en orden!</div></div>';return;}
+  container.innerHTML = items.map(r=>`
+    <div class="alert alert-${r.estado==='abierto'?'danger':'warning'}">
+      <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M10 7v4M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div>
+        <div style="font-weight:600;font-size:13px">${r.tipo} — ${r.area}</div>
+        <div style="font-size:12px;margin-top:2px">${r.descripcion}</div>
+        <div style="font-size:11px;margin-top:4px;opacity:.8">${r.estado} · ${r.inicio||'sin hora'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ===== EXPORT ===== */
+function exportToCSV(type) {
+  let rows, headers, filename;
+  if(type==='actividades') {
+    headers = ['Fecha','Guardia','Operador','Área','Actividad','Inicio','Fin','Duración (h)','Personas','HH','Observación','Estado','Revisión','Comentario'];
+    rows = APP.data.actividades.map(a=>[a.fecha,a.guardia,a.operador,a.area,a.actividad,a.inicio,a.fin,a.calc.duracion,a.personas,a.calc.hh,a.obs,a.estado,a.revision||'',a.comentario_rev||'']);
+    filename = 'ECOSEAM_Actividades_'+new Date().toISOString().split('T')[0]+'.csv';
+  } else if(type==='restricciones') {
+    headers = ['Fecha','Área','Tipo','Descripción','Inicio','Fin','Horas Perdidas','Responsable','Estado'];
+    rows = APP.data.restricciones.map(r=>[r.fecha,r.area,r.tipo,r.descripcion,r.inicio,r.fin,r.calc.horas_perdidas,r.responsable,r.estado]);
+    filename = 'ECOSEAM_Restricciones_'+new Date().toISOString().split('T')[0]+'.csv';
+  } else {
+    showToast('Exportando resumen ejecutivo...','success'); return;
+  }
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Archivo exportado correctamente','success');
+}
+
+/* ===== UTILS ===== */
+function formatDate(d) {
+  if(!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function showToast(msg, type='success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(()=>toast.remove(), 3500);
+}
+
+/* ===== PWA INSTALL ===== */
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+/* ===== INIT ===== */
+initSampleData();
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+// Enter en login
+document.getElementById('login-user').addEventListener('keydown', e => {
+  if(e.key === 'Enter') doLogin();
+});
+</script>
+
+<!-- Service Worker registration -->
+<script>
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', ()=>{
+    // Inline service worker as data URL
+    const sw = `
+      const CACHE = 'ecoseam-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+      });
+    `;
+    const blob = new Blob([sw], {type:'application/javascript'});
+    const url = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
