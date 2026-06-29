@@ -494,15 +494,19 @@ tbody tr:hover{background:var(--surface-1)}
             <div class="page-subtitle" id="dash-subtitle">Resumen del día</div>
           </div>
           <div class="filters">
-            <select class="filter-select" onchange="updateDashboard()">
-              <option>Hoy</option><option>Esta semana</option><option>Este mes</option>
+            <select class="filter-select" id="filter-periodo-dash" onchange="toggleDashboardDateInputs(); updateDashboard()">
+              <option value="hoy">Hoy</option>
+              <option value="mes">Este mes</option>
+              <option value="rango">Rango específico</option>
             </select>
+            <input type="date" class="filter-select" id="filter-desde-dash" onchange="updateDashboard()" style="padding-right:12px;display:none">
+            <input type="date" class="filter-select" id="filter-hasta-dash" onchange="updateDashboard()" style="padding-right:12px;display:none">
             <select class="filter-select" id="filter-guardia-dash" onchange="updateDashboard()">
               <option value="">Todas las guardias</option>
               <option value="A">Guardia A</option>
               <option value="B">Guardia B</option>
             </select>
-            <select class="filter-select" onchange="updateDashboard()">
+            <select class="filter-select" id="filter-area-dash" onchange="updateDashboard()">
               <option value="">Todas las áreas</option>
               <option>4388</option><option>DEG</option>
               <option>Plataforma de Armados</option><option>PPL</option>
@@ -650,8 +654,7 @@ tbody tr:hover{background:var(--surface-1)}
                   <th>Inicio</th>
                   <th>Fin</th>
                   <th>Duración</th>
-                  <th>Personas</th>
-                  <th>HH</th>
+                  <th>HH Individual</th>
                   <th>Estado</th>
                   <th>Revisión</th>
                   <th>Acciones</th>
@@ -893,8 +896,6 @@ tbody tr:hover{background:var(--surface-1)}
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Cantidad de personas involucradas</label>
-      <input class="form-control" id="act-personas" type="number" min="1" placeholder="Ej: 4" oninput="calcActDuration()">
       <div id="act-calc-result" class="form-calc" style="display:none"></div>
     </div>
     <div class="form-group">
@@ -1089,13 +1090,13 @@ function initSampleData() {
   const yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
 
   APP.data.actividades = [
-    {id:1,fecha:today,guardia:'A',operador:'Juan Pérez',area:'4388',actividad:'Inspección de válvulas de control',inicio:'07:00',fin:'09:30',personas:3,obs:'Sin novedades, válvulas en buen estado',estado:'finalizado',revision:'aprobado',comentario_rev:'Buen registro, completo.',calc:{duracion:2.5,hh:7.5}},
-    {id:2,fecha:today,guardia:'A',operador:'María García',area:'DEG',actividad:'Mantenimiento preventivo bomba B-201',inicio:'08:00',fin:'11:00',personas:4,obs:'Se detectó vibración leve, monitorear',estado:'finalizado',revision:'observado',comentario_rev:'Revisar vibración en próxima guardia.',calc:{duracion:3,hh:12}},
-    {id:3,fecha:today,guardia:'B',operador:'Carlos López',area:'Plataforma de Armados',actividad:'Ensamble de módulo estructural M-05',inicio:'14:00',fin:'18:00',personas:6,obs:'Trabajo completado sin incidentes',estado:'finalizado',revision:null,comentario_rev:'',calc:{duracion:4,hh:24}},
-    {id:4,fecha:today,guardia:'B',operador:'Ana Ramírez',area:'PPL',actividad:'Verificación de tuberías proceso PPL-3',inicio:'15:30',fin:'17:00',personas:2,obs:'Pendiente aprobación de P&ID revisado',estado:'en proceso',revision:null,comentario_rev:'',calc:{duracion:1.5,hh:3}},
-    {id:5,fecha:today,guardia:'A',operador:'Pedro Silva',area:'4388',actividad:'Calibración de instrumentos',inicio:'09:00',fin:'',personas:2,obs:'En espera de herramienta especial',estado:'pendiente',revision:null,comentario_rev:'',calc:{duracion:0,hh:0}},
-    {id:6,fecha:yesterday,guardia:'A',operador:'Juan Pérez',area:'DEG',actividad:'Limpieza de intercambiadores',inicio:'07:00',fin:'12:00',personas:5,obs:'Completado satisfactoriamente',estado:'finalizado',revision:'aprobado',comentario_rev:'',calc:{duracion:5,hh:25}},
-    {id:7,fecha:yesterday,guardia:'B',operador:'Carlos López',area:'PPL',actividad:'Soldadura de bridas flange 4"',inicio:'16:00',fin:'20:00',personas:3,obs:'Requirió recalentamiento',estado:'finalizado',revision:'aprobado',comentario_rev:'',calc:{duracion:4,hh:12}},
+    {id:1,fecha:today,guardia:'A',operador:'Juan Pérez',operadorLogin:'operador1',area:'4388',actividad:'Inspección de válvulas de control',inicio:'07:00',fin:'09:30',obs:'Sin novedades, válvulas en buen estado',estado:'finalizado',revision:'aprobado',comentario_rev:'Buen registro, completo.',calc:{duracion:2.5,hh:2.5}},
+    {id:2,fecha:today,guardia:'A',operador:'María García',operadorLogin:'operador2',area:'DEG',actividad:'Mantenimiento preventivo bomba B-201',inicio:'08:00',fin:'11:00',obs:'Se detectó vibración leve, monitorear',estado:'finalizado',revision:'observado',comentario_rev:'Revisar vibración en próxima guardia.',calc:{duracion:3,hh:3}},
+    {id:3,fecha:today,guardia:'B',operador:'Carlos López',operadorLogin:'operador3',area:'Plataforma de Armados',actividad:'Ensamble de módulo estructural M-05',inicio:'14:00',fin:'18:00',obs:'Trabajo completado sin incidentes',estado:'finalizado',revision:null,comentario_rev:'',calc:{duracion:4,hh:4}},
+    {id:4,fecha:today,guardia:'B',operador:'Ana Ramírez',operadorLogin:'',area:'PPL',actividad:'Verificación de tuberías proceso PPL-3',inicio:'15:30',fin:'17:00',obs:'Pendiente aprobación de P&ID revisado',estado:'en proceso',revision:null,comentario_rev:'',calc:{duracion:1.5,hh:1.5}},
+    {id:5,fecha:today,guardia:'A',operador:'Pedro Silva',operadorLogin:'',area:'4388',actividad:'Calibración de instrumentos',inicio:'09:00',fin:'',obs:'En espera de herramienta especial',estado:'pendiente',revision:null,comentario_rev:'',calc:{duracion:0,hh:0}},
+    {id:6,fecha:yesterday,guardia:'A',operador:'Juan Pérez',operadorLogin:'operador1',area:'DEG',actividad:'Limpieza de intercambiadores',inicio:'07:00',fin:'12:00',obs:'Completado satisfactoriamente',estado:'finalizado',revision:'aprobado',comentario_rev:'',calc:{duracion:5,hh:5}},
+    {id:7,fecha:yesterday,guardia:'B',operador:'Carlos López',operadorLogin:'operador3',area:'PPL',actividad:'Soldadura de bridas flange 4"',inicio:'16:00',fin:'20:00',obs:'Requirió recalentamiento',estado:'finalizado',revision:'aprobado',comentario_rev:'',calc:{duracion:4,hh:4}},
   ];
 
   APP.data.restricciones = [
@@ -1244,7 +1245,7 @@ function setupUI() {
 
   // Set default date inputs
   const today = new Date().toISOString().split('T')[0];
-  ['act-fecha','rest-fecha','filter-fecha-act','filter-fecha-rest'].forEach(id => {
+  ['act-fecha','rest-fecha','filter-fecha-act','filter-fecha-rest','filter-desde-dash','filter-hasta-dash'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.value = today;
   });
@@ -1252,7 +1253,14 @@ function setupUI() {
   // Prefill operator name
   if(u.role === 'operador') {
     document.getElementById('act-operador').value = u.name;
+    document.getElementById('act-operador').readOnly = true;
+    document.getElementById('act-guardia').value = u.guardia === 'ambas' ? 'A' : u.guardia;
+    document.getElementById('act-guardia').disabled = u.guardia !== 'ambas';
+  } else {
+    document.getElementById('act-operador').readOnly = false;
+    document.getElementById('act-guardia').disabled = false;
   }
+  toggleDashboardDateInputs();
 }
 
 /* ===== NAVIGATION ===== */
@@ -1320,13 +1328,11 @@ function calcTime(start, end) {
 function calcActDuration() {
   const s = document.getElementById('act-inicio').value;
   const e = document.getElementById('act-fin').value;
-  const p = parseInt(document.getElementById('act-personas').value)||0;
   const dur = calcTime(s,e);
-  const hh = Math.round(dur*p*100)/100;
   const div = document.getElementById('act-calc-result');
-  if(dur > 0 || p > 0) {
+  if(dur > 0) {
     div.style.display = 'block';
-    div.innerHTML = `⏱ Duración: <strong>${dur} h</strong> × ${p} personas = <strong>${hh} horas hombre</strong>`;
+    div.innerHTML = `⏱ Duración / HH individual: <strong>${dur} h</strong>`;
   } else {
     div.style.display = 'none';
   }
@@ -1347,15 +1353,16 @@ function calcRestDuration() {
 
 /* ===== SAVE ACTIVIDAD ===== */
 function saveActividad() {
+  const isOperador = APP.user && APP.user.role === 'operador';
   const fields = {
     fecha: document.getElementById('act-fecha').value,
-    guardia: document.getElementById('act-guardia').value,
-    operador: document.getElementById('act-operador').value,
+    guardia: isOperador && APP.user.guardia !== 'ambas' ? APP.user.guardia : document.getElementById('act-guardia').value,
+    operador: isOperador ? APP.user.name : document.getElementById('act-operador').value,
+    operadorLogin: isOperador ? APP.user.login : (document.getElementById('act-operador').dataset.login || ''),
     area: document.getElementById('act-area').value,
     actividad: document.getElementById('act-actividad').value,
     inicio: document.getElementById('act-inicio').value,
     fin: document.getElementById('act-fin').value,
-    personas: parseInt(document.getElementById('act-personas').value)||1,
     obs: document.getElementById('act-obs').value,
     estado: document.getElementById('act-estado').value,
   };
@@ -1363,7 +1370,7 @@ function saveActividad() {
     showToast('Completa los campos obligatorios','error'); return;
   }
   const dur = calcTime(fields.inicio, fields.fin);
-  fields.calc = {duracion:dur, hh:Math.round(dur*fields.personas*100)/100};
+  fields.calc = {duracion:dur, hh:dur};
   fields.revision = null; fields.comentario_rev = '';
 
   const editId = document.getElementById('act-edit-id').value;
@@ -1376,6 +1383,7 @@ function saveActividad() {
     APP.data.actividades.unshift(fields);
     showToast('Actividad registrada correctamente','success');
   }
+  saveData();
   closeModal('modal-actividad');
   resetActForm();
   if(APP.currentView==='actividades') renderActividades();
@@ -1386,17 +1394,26 @@ function resetActForm() {
   ['act-edit-id','act-operador','act-area','act-actividad','act-inicio','act-fin','act-obs'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
-  document.getElementById('act-personas').value='';
   document.getElementById('act-estado').value='pendiente';
   document.getElementById('act-calc-result').style.display='none';
   document.getElementById('modal-actividad-title').textContent='Nueva actividad';
   document.getElementById('act-fecha').value=new Date().toISOString().split('T')[0];
-  if(APP.user&&APP.user.role==='operador') document.getElementById('act-operador').value=APP.user.name;
+  if(APP.user&&APP.user.role==='operador') {
+    document.getElementById('act-operador').value=APP.user.name;
+    document.getElementById('act-guardia').value=APP.user.guardia === 'ambas' ? 'A' : APP.user.guardia;
+    document.getElementById('act-guardia').disabled = APP.user.guardia !== 'ambas';
+  } else {
+    document.getElementById('act-guardia').disabled = false;
+  }
 }
 
 function editActividad(id) {
   const a = APP.data.actividades.find(x=>x.id==id);
   if(!a) return;
+  if(APP.user && APP.user.role === 'operador' && a.operadorLogin && a.operadorLogin !== APP.user.login) {
+    showToast('No puedes editar actividades de otro operador','error');
+    return;
+  }
   document.getElementById('act-edit-id').value=a.id;
   document.getElementById('act-fecha').value=a.fecha;
   document.getElementById('act-guardia').value=a.guardia;
@@ -1405,7 +1422,6 @@ function editActividad(id) {
   document.getElementById('act-actividad').value=a.actividad;
   document.getElementById('act-inicio').value=a.inicio;
   document.getElementById('act-fin').value=a.fin;
-  document.getElementById('act-personas').value=a.personas;
   document.getElementById('act-obs').value=a.obs;
   document.getElementById('act-estado').value=a.estado;
   document.getElementById('modal-actividad-title').textContent='Editar actividad';
@@ -1416,6 +1432,7 @@ function editActividad(id) {
 function deleteActividad(id) {
   if(!confirm('¿Eliminar esta actividad?')) return;
   APP.data.actividades = APP.data.actividades.filter(a=>a.id!=id);
+  saveData();
   renderActividades();
   showToast('Actividad eliminada','warning');
 }
@@ -1448,6 +1465,7 @@ function saveRestriccion() {
     APP.data.restricciones.unshift(fields);
     showToast('Restricción registrada correctamente','success');
   }
+  saveData();
   closeModal('modal-restriccion');
   resetRestForm();
   if(APP.currentView==='restricciones') renderRestricciones();
@@ -1482,6 +1500,7 @@ function editRestriccion(id) {
 function deleteRestriccion(id) {
   if(!confirm('¿Eliminar esta restricción?')) return;
   APP.data.restricciones = APP.data.restricciones.filter(r=>r.id!=id);
+  saveData();
   renderRestricciones();
   showToast('Restricción eliminada','warning');
 }
@@ -1498,7 +1517,6 @@ function openRevision(id) {
       <div><span style="color:var(--text-s);font-size:12px">Actividad</span><br><strong>${a.actividad}</strong></div>
       <div><span style="color:var(--text-s);font-size:12px">Horas hombre</span><br><strong style="color:var(--teal)">${a.calc.hh} HH</strong></div>
       <div><span style="color:var(--text-s);font-size:12px">Horario</span><br><strong>${a.inicio||'—'} → ${a.fin||'—'}</strong></div>
-      <div><span style="color:var(--text-s);font-size:12px">Personas</span><br><strong>${a.personas}</strong></div>
     </div>
     ${a.obs?`<div style="margin-top:10px;padding:8px;background:var(--surface);border-radius:6px;font-size:13px"><span style="color:var(--text-s)">Obs:</span> ${a.obs}</div>`:''}
   `;
@@ -1516,6 +1534,7 @@ function saveRevision() {
     APP.data.actividades[idx].revision = decision;
     APP.data.actividades[idx].comentario_rev = comment;
   }
+  saveData();
   closeModal('modal-revisar');
   showToast('Revisión guardada correctamente','success');
   if(APP.currentView==='actividades') renderActividades();
@@ -1535,11 +1554,14 @@ function renderActividades() {
   if(guardia) data = data.filter(a=>a.guardia===guardia);
   if(area) data = data.filter(a=>a.area===area);
   if(estado) data = data.filter(a=>a.estado===estado);
+  if(APP.user && APP.user.role === 'operador') {
+    data = data.filter(a => (a.operadorLogin && a.operadorLogin === APP.user.login) || (!a.operadorLogin && a.operador === APP.user.name));
+  }
 
   const role = APP.user.role;
   const tbody = document.getElementById('tbody-actividades');
   if(!data.length) {
-    tbody.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:32px;color:var(--text-m)">Sin actividades registradas para los filtros seleccionados</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text-m)">Sin actividades registradas para los filtros seleccionados</td></tr>`;
     return;
   }
   tbody.innerHTML = data.map(a=>`
@@ -1552,7 +1574,6 @@ function renderActividades() {
       <td>${a.inicio||'—'}</td>
       <td>${a.fin||'—'}</td>
       <td>${a.calc.duracion?a.calc.duracion+' h':'—'}</td>
-      <td style="text-align:center">${a.personas}</td>
       <td style="font-weight:600;color:var(--teal)">${a.calc.hh||'—'}</td>
       <td><span class="badge badge-${a.estado.replace(' ','-')}">${a.estado}</span></td>
       <td>${a.revision?`<span class="badge badge-${a.revision}">${a.revision}</span>`:'<span style="color:var(--text-m);font-size:12px">Sin revisar</span>'}</td>
@@ -1627,6 +1648,7 @@ function saveUsuario() {
   document.getElementById('usr-rol').value = 'operador';
   document.getElementById('usr-guardia').value = 'A';
 
+  saveData();
   closeModal('modal-usuario');
   renderUsuarios();
   showToast(`Usuario "${login}" creado (contraseña: ${pass})`, 'success');
@@ -1677,27 +1699,75 @@ function deleteUsuario(id) {
   if(APP.user && APP.user.id === id) { showToast('No puedes eliminar tu propia cuenta', 'error'); return; }
   if(!confirm(`¿Eliminar al usuario "${u.nombre} ${u.apellido}" (${u.login})?\n\nEsta acción no se puede deshacer.`)) return;
   APP.data.usuarios = APP.data.usuarios.filter(x => x.id !== id);
+  saveData();
   renderUsuarios();
   showToast(`Usuario "${u.login}" eliminado`, 'warning');
 }
 
 function toggleUser(id) {
   const u = APP.data.usuarios.find(x => x.id === id);
-  if(u) { u.activo = !u.activo; renderUsuarios(); showToast('Usuario actualizado', 'success'); }
+  if(u) { u.activo = !u.activo; saveData(); renderUsuarios(); showToast('Usuario actualizado', 'success'); }
 }
 
 /* ===== DASHBOARD ===== */
-function updateDashboard() {
+function toggleDashboardDateInputs() {
+  const periodo = document.getElementById('filter-periodo-dash')?.value || 'hoy';
+  const desde = document.getElementById('filter-desde-dash');
+  const hasta = document.getElementById('filter-hasta-dash');
+  if(!desde || !hasta) return;
+  const show = periodo === 'rango';
+  desde.style.display = show ? 'inline-block' : 'none';
+  hasta.style.display = show ? 'inline-block' : 'none';
+}
+
+function getDashboardFilteredData() {
+  const periodo = document.getElementById('filter-periodo-dash')?.value || 'hoy';
+  const desde = document.getElementById('filter-desde-dash')?.value;
+  const hasta = document.getElementById('filter-hasta-dash')?.value;
+  const guardia = document.getElementById('filter-guardia-dash')?.value || '';
+  const area = document.getElementById('filter-area-dash')?.value || '';
+
   const today = new Date().toISOString().split('T')[0];
-  const todayActs = APP.data.actividades.filter(a=>a.fecha===today);
-  const todayRest = APP.data.restricciones.filter(r=>r.fecha===today);
+  const currentMonth = today.slice(0,7);
+
+  let acts = [...APP.data.actividades];
+  let rests = [...APP.data.restricciones];
+
+  if(periodo === 'hoy') {
+    acts = acts.filter(a => a.fecha === today);
+    rests = rests.filter(r => r.fecha === today);
+  }
+  if(periodo === 'mes') {
+    acts = acts.filter(a => a.fecha && a.fecha.startsWith(currentMonth));
+    rests = rests.filter(r => r.fecha && r.fecha.startsWith(currentMonth));
+  }
+  if(periodo === 'rango' && desde && hasta) {
+    acts = acts.filter(a => a.fecha >= desde && a.fecha <= hasta);
+    rests = rests.filter(r => r.fecha >= desde && r.fecha <= hasta);
+  }
+  if(guardia) acts = acts.filter(a => a.guardia === guardia);
+  if(area) {
+    acts = acts.filter(a => a.area === area);
+    rests = rests.filter(r => r.area === area);
+  }
+
+  if(APP.user && APP.user.role === 'operador') {
+    acts = acts.filter(a => (a.operadorLogin && a.operadorLogin === APP.user.login) || (!a.operadorLogin && a.operador === APP.user.name));
+  }
+
+  return { acts, rests, periodo, desde, hasta };
+}
+
+function updateDashboard() {
+  toggleDashboardDateInputs();
+  const { acts: todayActs, rests: todayRest, periodo, desde, hasta } = getDashboardFilteredData();
 
   const hhTotal = todayActs.reduce((s,a)=>s+(a.calc.hh||0),0);
   const done = todayActs.filter(a=>a.estado==='finalizado').length;
   const pend = todayActs.filter(a=>a.estado==='pendiente').length;
   const horasLost = todayRest.reduce((s,r)=>s+(r.calc.horas_perdidas||0),0);
   const openRest = todayRest.filter(r=>r.estado==='abierto').length;
-  const personal = todayActs.reduce((s,a)=>s+a.personas,0);
+  const personal = new Set(todayActs.map(a => a.operadorLogin || a.operador).filter(Boolean)).size;
 
   document.getElementById('kpi-hh').textContent = hhTotal;
   document.getElementById('kpi-done').textContent = done;
@@ -1707,12 +1777,15 @@ function updateDashboard() {
   document.getElementById('kpi-rest').textContent = openRest;
   document.getElementById('kpi-personal').textContent = personal;
 
-  const today_str = new Date().toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
-  document.getElementById('dash-subtitle').textContent = 'Resumen — ' + today_str;
+  let subtitle = 'Resumen filtrado';
+  if(periodo === 'hoy') subtitle = 'Resumen de hoy';
+  if(periodo === 'mes') subtitle = 'Resumen del mes actual';
+  if(periodo === 'rango') subtitle = desde && hasta ? `Resumen del ${formatDate(desde)} al ${formatDate(hasta)}` : 'Selecciona fecha inicial y final';
+  document.getElementById('dash-subtitle').textContent = subtitle;
 
   renderDashCharts(todayActs, todayRest);
-  renderRecentActivities();
-  renderActiveRestrictions();
+  renderRecentActivities(todayActs);
+  renderActiveRestrictions(todayRest);
 }
 
 function renderDashCharts(acts, rests) {
@@ -1793,8 +1866,8 @@ function renderDashCharts(acts, rests) {
   `;
 }
 
-function renderRecentActivities() {
-  const items = APP.data.actividades.slice(0,5);
+function renderRecentActivities(data) {
+  const items = (data || APP.data.actividades).slice(0,5);
   const container = document.getElementById('dash-recent-activities');
   if(!items.length) {container.innerHTML='<p style="color:var(--text-m);font-size:14px;padding:16px 0">Sin actividades registradas</p>';return;}
   const colors = {finalizado:'#27ae60','en proceso':'#3498db',pendiente:'#f39c12'};
@@ -1815,8 +1888,8 @@ function renderRecentActivities() {
   `).join('') + '</div>';
 }
 
-function renderActiveRestrictions() {
-  const items = APP.data.restricciones.filter(r=>r.estado!=='cerrado').slice(0,4);
+function renderActiveRestrictions(data) {
+  const items = (data || APP.data.restricciones).filter(r=>r.estado!=='cerrado').slice(0,4);
   const container = document.getElementById('dash-active-restrictions');
   if(!items.length) {container.innerHTML='<div class="alert alert-success"><svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M5 10l4 4L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Sin restricciones activas. ¡Todo en orden!</div></div>';return;}
   container.innerHTML = items.map(r=>`
@@ -1835,8 +1908,8 @@ function renderActiveRestrictions() {
 function exportToCSV(type) {
   let rows, headers, filename;
   if(type==='actividades') {
-    headers = ['Fecha','Guardia','Operador','Área','Actividad','Inicio','Fin','Duración (h)','Personas','HH','Observación','Estado','Revisión','Comentario'];
-    rows = APP.data.actividades.map(a=>[a.fecha,a.guardia,a.operador,a.area,a.actividad,a.inicio,a.fin,a.calc.duracion,a.personas,a.calc.hh,a.obs,a.estado,a.revision||'',a.comentario_rev||'']);
+    headers = ['Fecha','Guardia','Operador','Área','Actividad','Inicio','Fin','Duración / HH individual','Observación','Estado','Revisión','Comentario'];
+    rows = APP.data.actividades.map(a=>[a.fecha,a.guardia,a.operador,a.area,a.actividad,a.inicio,a.fin,a.calc.duracion,a.obs,a.estado,a.revision||'',a.comentario_rev||'']);
     filename = 'ECOSEAM_Actividades_'+new Date().toISOString().split('T')[0]+'.csv';
   } else if(type==='restricciones') {
     headers = ['Fecha','Área','Tipo','Descripción','Inicio','Fin','Horas Perdidas','Responsable','Estado'];
@@ -1877,8 +1950,43 @@ window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
 });
 
+/* ===== STORAGE LOCAL ===== */
+const STORAGE_KEY = 'ecoseam_ops_data_v2';
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(APP.data));
+}
+
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved) {
+    try {
+      APP.data = JSON.parse(saved);
+      APP.data.actividades = APP.data.actividades || [];
+      APP.data.restricciones = APP.data.restricciones || [];
+      APP.data.usuarios = APP.data.usuarios || [];
+      migrateData();
+      return;
+    } catch(e) {
+      console.warn('No se pudo leer almacenamiento local. Se cargará data inicial.', e);
+    }
+  }
+  initSampleData();
+  migrateData();
+  saveData();
+}
+
+function migrateData() {
+  APP.data.actividades.forEach(a => {
+    a.operadorLogin = a.operadorLogin || '';
+    if(!a.calc) a.calc = {duracion: calcTime(a.inicio, a.fin), hh: calcTime(a.inicio, a.fin)};
+    a.calc.duracion = a.calc.duracion || calcTime(a.inicio, a.fin);
+    a.calc.hh = a.calc.duracion || 0;
+  });
+}
+
 /* ===== INIT ===== */
-initSampleData();
+loadData();
 
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
