@@ -402,17 +402,22 @@ tbody tr:hover{background:var(--surface-1)}
 <div id="page-login" class="login-page">
   <div class="login-card">
     <div class="login-logo">
-      <div class="login-logo-mark" style="background:linear-gradient(135deg,#1a5c2a,#00c853);color:#fff;position:relative;overflow:hidden">
-        <svg viewBox="0 0 64 64" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M32 8 C20 8 12 18 12 28 C12 40 24 50 32 56 C40 50 52 40 52 28 C52 18 44 8 32 8Z" fill="rgba(255,255,255,0.25)"/>
-          <path d="M32 14 C26 14 20 20 20 28 C20 36 26 44 32 50 C38 44 44 36 44 28 C44 20 38 14 32 14Z" fill="rgba(255,255,255,0.35)"/>
-          <text x="32" y="36" text-anchor="middle" font-size="20" font-weight="900" fill="#fff" font-family="sans-serif">E</text>
-        </svg>
+      <div class="login-logo-mark"
+        style="background:none;
+          box-shadow:none;
+          width:auto;
+          height:auto;
+          display:flex;
+          justify-content:center;
+          align-items:center;">
+        <img src="logo-ecoseam.png"
+          alt="ECOSEAM"
+          style="width:320px;height:auto;">
       </div>
       <div style="margin-top:4px">
-        <div class="login-title">ECOSEAM</div>
-        <div style="font-size:12px;font-weight:600;color:var(--teal);letter-spacing:.05em;text-transform:uppercase;margin-top:2px">Ecología y Servicios Ambientales</div>
-        <div class="login-subtitle">Sistema de gestión operativa</div>
+        <div class="login-title"
+            style="margin-top:15px;font-size:18px;font-weight:500;">
+        Sistema de gestión operativa
       </div>
     </div>
 
@@ -446,9 +451,17 @@ tbody tr:hover{background:var(--surface-1)}
 
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-mark" style="color:#0d3d1a;font-weight:900">E</div>
-      <div class="logo-text">ECOSEAM<span>Gestión Operativa</span></div>
+    <div class="sidebar-logo"
+     style="display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:18px 10px;
+            border-bottom:1px solid rgba(255,255,255,.15);">
+
+    <img src="logo-ecoseam.png"
+         alt="ECOSEAM"
+         style="width:190px;
+                height:auto;">
     </div>
     <div class="sidebar-nav" id="sidebar-nav">
       <!-- Nav items injected by JS based on role -->
