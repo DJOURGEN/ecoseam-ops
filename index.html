@@ -1072,6 +1072,7 @@ tbody tr:hover{background:var(--surface-1)}
 <div class="toast-container" id="toast-container"></div>
 
 <!-- ==================== JAVASCRIPT ==================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ===== STATE ===== */
 const APP = {
@@ -1083,6 +1084,107 @@ const APP = {
     usuarios: []
   }
 };
+
+/* ===== SUPABASE CONFIG =====
+   IMPORTANTE:
+   - SUPABASE_URL debe ir sin /rest/v1/ al final.
+   - La Publishable Key puede estar en el navegador.
+   - No pegues nunca la Secret Key aquí.
+*/
+const SUPABASE_URL = 'https://zqkutwiwiyiydhhrxcqs.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JT1RBs8d7onfnpe_caak7A_JgYWnddt';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function dbActividadToApp(row) {
+  return {
+    id: row.id,
+    fecha: row.fecha,
+    guardia: row.guardia || '',
+    operador: row.operador || '',
+    operadorLogin: row.operador_login || '',
+    area: row.area || '',
+    actividad: row.actividad || '',
+    inicio: row.inicio ? String(row.inicio).slice(0,5) : '',
+    fin: row.fin ? String(row.fin).slice(0,5) : '',
+    obs: row.obs || '',
+    estado: row.estado || 'pendiente',
+    revision: row.revision || null,
+    comentario_rev: row.comentario_rev || '',
+    calc: {
+      duracion: Number(row.duracion || 0),
+      hh: Number(row.hh || 0)
+    }
+  };
+}
+
+function appActividadToDb(a) {
+  return {
+    fecha: a.fecha,
+    guardia: a.guardia,
+    operador: a.operador,
+    operador_login: a.operadorLogin || '',
+    area: a.area,
+    actividad: a.actividad,
+    inicio: a.inicio || null,
+    fin: a.fin || null,
+    duracion: a.calc?.duracion || 0,
+    hh: a.calc?.hh || 0,
+    obs: a.obs || '',
+    estado: a.estado || 'pendiente',
+    revision: a.revision || null,
+    comentario_rev: a.comentario_rev || ''
+  };
+}
+
+function dbRestriccionToApp(row) {
+  return {
+    id: row.id,
+    fecha: row.fecha,
+    area: row.area || '',
+    tipo: row.tipo || '',
+    descripcion: row.descripcion || '',
+    inicio: row.inicio ? String(row.inicio).slice(0,5) : '',
+    fin: row.fin ? String(row.fin).slice(0,5) : '',
+    responsable: row.responsable || '',
+    estado: row.estado || 'abierto',
+    calc: { horas_perdidas: Number(row.horas_perdidas || 0) }
+  };
+}
+
+function appRestriccionToDb(r) {
+  return {
+    fecha: r.fecha,
+    area: r.area,
+    tipo: r.tipo,
+    descripcion: r.descripcion,
+    inicio: r.inicio || null,
+    fin: r.fin || null,
+    horas_perdidas: r.calc?.horas_perdidas || 0,
+    responsable: r.responsable || '',
+    estado: r.estado || 'abierto'
+  };
+}
+
+async function loadAllData() {
+  const [actRes, restRes, userRes] = await Promise.all([
+    db.from('actividades').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
+    db.from('restricciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
+    db.from('usuarios').select('*').order('id', { ascending: true })
+  ]);
+
+  if(actRes.error) console.error('Error cargando actividades:', actRes.error);
+  if(restRes.error) console.error('Error cargando restricciones:', restRes.error);
+  if(userRes.error) console.error('Error cargando usuarios:', userRes.error);
+
+  APP.data.actividades = (actRes.data || []).map(dbActividadToApp);
+  APP.data.restricciones = (restRes.data || []).map(dbRestriccionToApp);
+  APP.data.usuarios = userRes.data || [];
+
+  if(APP.currentView === 'actividades') renderActividades();
+  if(APP.currentView === 'restricciones') renderRestricciones();
+  if(APP.currentView === 'admin') renderUsuarios();
+  if(APP.currentView === 'dashboard') updateDashboard();
+}
 
 /* ===== SAMPLE DATA ===== */
 function initSampleData() {
@@ -1118,7 +1220,7 @@ function initSampleData() {
 }
 
 /* ===== AUTH ===== */
-function doLogin() {
+async function doLogin() {
   const loginInput = document.getElementById('login-user').value.trim().toLowerCase();
   const passInput  = document.getElementById('login-pass').value;
   const errEl      = document.getElementById('login-error');
@@ -1130,30 +1232,35 @@ function doLogin() {
     return;
   }
 
-  const userMatch = APP.data.usuarios.find(u => u.login.toLowerCase() === loginInput);
+  const { data, error } = await db
+    .from('usuarios')
+    .select('*')
+    .eq('login', loginInput)
+    .eq('pass', passInput)
+    .eq('activo', true)
+    .limit(1);
+
+  if(error) {
+    console.error(error);
+    errEl.textContent = 'No se pudo conectar con Supabase. Revisa la URL, la key o las políticas RLS.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const userMatch = data?.[0];
   if(!userMatch) {
-    errEl.textContent = 'Usuario no encontrado. Verifica tus datos.';
-    errEl.style.display = 'block';
-    return;
-  }
-  if(!userMatch.activo) {
-    errEl.textContent = 'Usuario inactivo. Contacta al administrador.';
-    errEl.style.display = 'block';
-    return;
-  }
-  if(userMatch.pass !== passInput) {
-    errEl.textContent = 'Contraseña incorrecta. Inténtalo de nuevo.';
+    errEl.textContent = 'Usuario o contraseña incorrectos.';
     errEl.style.display = 'block';
     document.getElementById('login-pass').value = '';
     document.getElementById('login-pass').focus();
     return;
   }
 
-  const initials = (userMatch.nombre[0] + (userMatch.apellido ? userMatch.apellido[0] : '')).toUpperCase();
+  const initials = ((userMatch.nombre || 'U')[0] + (userMatch.apellido ? userMatch.apellido[0] : '')).toUpperCase();
   APP.user = {
     id: userMatch.id,
     login: userMatch.login,
-    name: userMatch.nombre + ' ' + userMatch.apellido,
+    name: `${userMatch.nombre || ''} ${userMatch.apellido || ''}`.trim(),
     role: userMatch.rol,
     initials,
     guardia: userMatch.guardia,
@@ -1163,9 +1270,11 @@ function doLogin() {
   document.getElementById('page-app').style.display = 'flex';
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
+
+  await loadAllData();
   setupUI();
   navigateTo(userMatch.rol === 'operador' ? 'actividades' : 'dashboard');
-}
+} 
 
 function doLogout() {
   APP.user = null;
@@ -1352,7 +1461,7 @@ function calcRestDuration() {
 }
 
 /* ===== SAVE ACTIVIDAD ===== */
-function saveActividad() {
+async function saveActividad() {
   const isOperador = APP.user && APP.user.role === 'operador';
   const fields = {
     fecha: document.getElementById('act-fecha').value,
@@ -1371,24 +1480,27 @@ function saveActividad() {
   }
   const dur = calcTime(fields.inicio, fields.fin);
   fields.calc = {duracion:dur, hh:dur};
-  fields.revision = null; fields.comentario_rev = '';
 
   const editId = document.getElementById('act-edit-id').value;
+  let res;
   if(editId) {
-    const idx = APP.data.actividades.findIndex(a=>a.id==editId);
-    if(idx>=0) APP.data.actividades[idx] = {...APP.data.actividades[idx],...fields};
-    showToast('Actividad actualizada','success');
+    res = await db.from('actividades').update(appActividadToDb(fields)).eq('id', editId).select().single();
   } else {
-    fields.id = Date.now();
-    APP.data.actividades.unshift(fields);
-    showToast('Actividad registrada correctamente','success');
+    fields.revision = null; fields.comentario_rev = '';
+    res = await db.from('actividades').insert([appActividadToDb(fields)]).select().single();
   }
-  saveData();
+
+  if(res.error) {
+    console.error(res.error);
+    showToast('Error al guardar actividad en Supabase','error');
+    return;
+  }
+
+  showToast(editId ? 'Actividad actualizada' : 'Actividad registrada correctamente','success');
   closeModal('modal-actividad');
   resetActForm();
-  if(APP.currentView==='actividades') renderActividades();
-  if(APP.currentView==='dashboard') updateDashboard();
-}
+  await loadAllData();
+} 
 
 function resetActForm() {
   ['act-edit-id','act-operador','act-area','act-actividad','act-inicio','act-fin','act-obs'].forEach(id=>{
@@ -1429,16 +1541,16 @@ function editActividad(id) {
   openModal('modal-actividad');
 }
 
-function deleteActividad(id) {
+async function deleteActividad(id) {
   if(!confirm('¿Eliminar esta actividad?')) return;
-  APP.data.actividades = APP.data.actividades.filter(a=>a.id!=id);
-  saveData();
-  renderActividades();
+  const { error } = await db.from('actividades').delete().eq('id', id);
+  if(error) { console.error(error); showToast('Error al eliminar actividad','error'); return; }
+  await loadAllData();
   showToast('Actividad eliminada','warning');
-}
+} 
 
 /* ===== SAVE RESTRICCION ===== */
-function saveRestriccion() {
+async function saveRestriccion() {
   const fields = {
     fecha: document.getElementById('rest-fecha').value,
     area: document.getElementById('rest-area').value,
@@ -1456,21 +1568,20 @@ function saveRestriccion() {
   fields.calc = {horas_perdidas: dur};
 
   const editId = document.getElementById('rest-edit-id').value;
+  let res;
   if(editId) {
-    const idx = APP.data.restricciones.findIndex(r=>r.id==editId);
-    if(idx>=0) APP.data.restricciones[idx]={...APP.data.restricciones[idx],...fields};
-    showToast('Restricción actualizada','success');
+    res = await db.from('restricciones').update(appRestriccionToDb(fields)).eq('id', editId).select().single();
   } else {
-    fields.id = Date.now();
-    APP.data.restricciones.unshift(fields);
-    showToast('Restricción registrada correctamente','success');
+    res = await db.from('restricciones').insert([appRestriccionToDb(fields)]).select().single();
   }
-  saveData();
+
+  if(res.error) { console.error(res.error); showToast('Error al guardar restricción en Supabase','error'); return; }
+
+  showToast(editId ? 'Restricción actualizada' : 'Restricción registrada correctamente','success');
   closeModal('modal-restriccion');
   resetRestForm();
-  if(APP.currentView==='restricciones') renderRestricciones();
-  if(APP.currentView==='dashboard') updateDashboard();
-}
+  await loadAllData();
+} 
 
 function resetRestForm() {
   ['rest-edit-id','rest-area','rest-tipo','rest-desc','rest-inicio','rest-fin','rest-responsable'].forEach(id=>{
@@ -1497,13 +1608,13 @@ function editRestriccion(id) {
   openModal('modal-restriccion');
 }
 
-function deleteRestriccion(id) {
+async function deleteRestriccion(id) {
   if(!confirm('¿Eliminar esta restricción?')) return;
-  APP.data.restricciones = APP.data.restricciones.filter(r=>r.id!=id);
-  saveData();
-  renderRestricciones();
+  const { error } = await db.from('restricciones').delete().eq('id', id);
+  if(error) { console.error(error); showToast('Error al eliminar restricción','error'); return; }
+  await loadAllData();
   showToast('Restricción eliminada','warning');
-}
+} 
 
 /* ===== REVISION SUPERVISOR ===== */
 function openRevision(id) {
@@ -1525,20 +1636,23 @@ function openRevision(id) {
   openModal('modal-revisar');
 }
 
-function saveRevision() {
+async function saveRevision() {
   const id = document.getElementById('rev-act-id').value;
   const decision = document.getElementById('rev-decision').value;
   const comment = document.getElementById('rev-comment').value;
-  const idx = APP.data.actividades.findIndex(a=>a.id==id);
-  if(idx>=0) {
-    APP.data.actividades[idx].revision = decision;
-    APP.data.actividades[idx].comentario_rev = comment;
-  }
-  saveData();
+
+  const { error } = await db
+    .from('actividades')
+    .update({ revision: decision, comentario_rev: comment })
+    .eq('id', id);
+
+  if(error) { console.error(error); showToast('Error al guardar revisión','error'); return; }
+
   closeModal('modal-revisar');
-  showToast('Revisión guardada correctamente','success');
-  if(APP.currentView==='actividades') renderActividades();
-}
+  document.getElementById('rev-comment').value='';
+  await loadAllData();
+  showToast('Revisión guardada','success');
+} 
 
 /* ===== RENDER ACTIVIDADES ===== */
 function filterActividades() { renderActividades(); }
@@ -1627,7 +1741,7 @@ function renderRestricciones() {
 }
 
 /* ===== RENDER USUARIOS ===== */
-function saveUsuario() {
+async function saveUsuario() {
   const nombre   = document.getElementById('usr-nombre').value.trim();
   const apellido = document.getElementById('usr-apellido').value.trim();
   const login    = document.getElementById('usr-login').value.trim().toLowerCase();
@@ -1637,22 +1751,22 @@ function saveUsuario() {
 
   if(!nombre || !login || !pass) { showToast('Completa usuario, contraseña y nombre','error'); return; }
   if(pass.length < 4) { showToast('La contraseña debe tener al menos 4 caracteres','error'); return; }
-  if(APP.data.usuarios.find(u => u.login.toLowerCase() === login)) {
-    showToast('Ese nombre de usuario ya existe','error'); return;
-  }
 
-  const u = { id: Date.now(), nombre, apellido, login, pass, rol, guardia, activo: true };
-  APP.data.usuarios.push(u);
+  const { data: exists, error: checkError } = await db.from('usuarios').select('id').eq('login', login).limit(1);
+  if(checkError) { console.error(checkError); showToast('Error validando usuario','error'); return; }
+  if(exists && exists.length) { showToast('Ese nombre de usuario ya existe','error'); return; }
+
+  const { error } = await db.from('usuarios').insert([{ nombre, apellido, login, pass, rol, guardia, activo: true }]);
+  if(error) { console.error(error); showToast('Error al crear usuario','error'); return; }
 
   ['usr-nombre','usr-apellido','usr-login','usr-pass'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('usr-rol').value = 'operador';
   document.getElementById('usr-guardia').value = 'A';
 
-  saveData();
   closeModal('modal-usuario');
-  renderUsuarios();
-  showToast(`Usuario "${login}" creado (contraseña: ${pass})`, 'success');
-}
+  await loadAllData();
+  showToast(`Usuario "${login}" creado`, 'success');
+} 
 
 function renderUsuarios() {
   const tbody = document.getElementById('tbody-usuarios');
@@ -1693,21 +1807,27 @@ function togglePass(id, pass) {
   el.textContent = el.textContent === '••••••' ? pass : '••••••';
 }
 
-function deleteUsuario(id) {
+async function deleteUsuario(id) {
   const u = APP.data.usuarios.find(x => x.id === id);
   if(!u) return;
   if(APP.user && APP.user.id === id) { showToast('No puedes eliminar tu propia cuenta', 'error'); return; }
-  if(!confirm(`¿Eliminar al usuario "${u.nombre} ${u.apellido}" (${u.login})?\n\nEsta acción no se puede deshacer.`)) return;
-  APP.data.usuarios = APP.data.usuarios.filter(x => x.id !== id);
-  saveData();
-  renderUsuarios();
-  showToast(`Usuario "${u.login}" eliminado`, 'warning');
-}
+  if(!confirm(`¿Eliminar al usuario "${u.nombre} ${u.apellido}" (${u.login})?
 
-function toggleUser(id) {
+Esta acción no se puede deshacer.`)) return;
+  const { error } = await db.from('usuarios').delete().eq('id', id);
+  if(error) { console.error(error); showToast('Error al eliminar usuario','error'); return; }
+  await loadAllData();
+  showToast(`Usuario "${u.login}" eliminado`, 'warning');
+} 
+
+async function toggleUser(id) {
   const u = APP.data.usuarios.find(x => x.id === id);
-  if(u) { u.activo = !u.activo; saveData(); renderUsuarios(); showToast('Usuario actualizado', 'success'); }
-}
+  if(!u) return;
+  const { error } = await db.from('usuarios').update({ activo: !u.activo }).eq('id', id);
+  if(error) { console.error(error); showToast('Error al actualizar usuario','error'); return; }
+  await loadAllData();
+  showToast('Usuario actualizado', 'success');
+} 
 
 /* ===== DASHBOARD ===== */
 function toggleDashboardDateInputs() {
@@ -1950,44 +2070,9 @@ window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
 });
 
-/* ===== STORAGE LOCAL ===== */
-const STORAGE_KEY = 'ecoseam_ops_data_v2';
-
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(APP.data));
-}
-
-function loadData() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(saved) {
-    try {
-      APP.data = JSON.parse(saved);
-      APP.data.actividades = APP.data.actividades || [];
-      APP.data.restricciones = APP.data.restricciones || [];
-      APP.data.usuarios = APP.data.usuarios || [];
-      migrateData();
-      return;
-    } catch(e) {
-      console.warn('No se pudo leer almacenamiento local. Se cargará data inicial.', e);
-    }
-  }
-  initSampleData();
-  migrateData();
-  saveData();
-}
-
-function migrateData() {
-  APP.data.actividades.forEach(a => {
-    a.operadorLogin = a.operadorLogin || '';
-    if(!a.calc) a.calc = {duracion: calcTime(a.inicio, a.fin), hh: calcTime(a.inicio, a.fin)};
-    a.calc.duracion = a.calc.duracion || calcTime(a.inicio, a.fin);
-    a.calc.hh = a.calc.duracion || 0;
-  });
-}
-
 /* ===== INIT ===== */
-loadData();
-
+// La información ya no se carga desde localStorage.
+// Ahora se carga desde Supabase después de iniciar sesión.
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
