@@ -645,7 +645,7 @@ tbody tr:hover{background:var(--surface-1)}
             <div class="page-title">Registro de actividades</div>
             <div class="page-subtitle">Control diario de operaciones</div>
           </div>
-          <button class="btn btn-primary" onclick="openModal('modal-actividad')">
+          <button class="btn btn-primary" id="btn-nueva-actividad-page" onclick="openModal('modal-actividad')">
             <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
             Nueva actividad
           </button>
@@ -803,10 +803,10 @@ tbody tr:hover{background:var(--surface-1)}
         </div>
 
         <div class="patio-chart-grid">
-          <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Tipo de residuo</div><div class="card-subtitle">Distribución del tonelaje: pesado y liviano</div></div></div><canvas id="chart-patio-residuo"></canvas></div>
+          <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Tipo de residuo</div><div class="card-subtitle">Distribución del tonelaje ingresado: pesado y liviano</div></div></div><canvas id="chart-patio-residuo"></canvas></div>
           <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Ingresos por día</div><div class="card-subtitle">Toneladas ingresadas por fecha</div></div></div><canvas id="chart-patio-ingresos"></canvas></div>
         </div>
-        <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Toneladas por gerencia</div><div class="card-subtitle">Pirámide invertida, ordenada de mayor a menor tonelaje</div></div></div><div id="chart-patio-gerencia" class="pyramid-chart"></div></div>
+        <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Toneladas por gerencia</div><div class="card-subtitle">Solo ingresos · ordenada de mayor a menor tonelaje</div></div></div><div id="chart-patio-gerencia" class="pyramid-chart"></div></div>
 
         <div class="card" style="padding:0">
           <div class="table-wrap">
@@ -1477,7 +1477,7 @@ const NAV_CONFIG = {
     {id:'admin',label:'Administración',icon:'user'},
   ],
   operador: ['actividades'],
-  controlador: ['patios'],
+  controlador: ['actividades','patios'],
   supervisor: ['dashboard','actividades','restricciones','patios','resumen'],
   gerencia: ['dashboard','actividades','restricciones','patios','reportes'],
   admin: ['dashboard','actividades','restricciones','patios','reportes','resumen','admin'],
@@ -1496,6 +1496,7 @@ const ICONS = {
 const VIEW_TITLES = {
   dashboard:'Dashboard operativo',
   actividades:'Registro de actividades',
+  patios:'Control de patios',
   restricciones:'Restricciones operativas',
   reportes:'Reportes y exportación',
   resumen:'Resumen visual WhatsApp',
@@ -1535,8 +1536,10 @@ function setupUI() {
 
   // Show nueva actividad button for operators
   const btnNueva = document.getElementById('btn-nueva-actividad');
-  if(u.role === 'operador') btnNueva.style.display = 'inline-flex';
-  else btnNueva.style.display = 'none';
+  const puedeRegistrarActividad = ['operador','controlador','admin'].includes(u.role);
+  btnNueva.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
+  const btnNuevaPage = document.getElementById('btn-nueva-actividad-page');
+  if(btnNuevaPage) btnNuevaPage.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
 
   // Set default date inputs
   const today = new Date().toISOString().split('T')[0];
@@ -1546,7 +1549,7 @@ function setupUI() {
   });
 
   // Prefill operator name
-  if(u.role === 'operador') {
+  if(['operador','controlador'].includes(u.role)) {
     document.getElementById('act-operador').value = u.name;
     document.getElementById('act-operador').readOnly = true;
     document.getElementById('act-guardia').value = u.guardia === 'ambas' ? 'A' : u.guardia;
@@ -1650,12 +1653,12 @@ function calcRestDuration() {
 
 /* ===== SAVE ACTIVIDAD ===== */
 async function saveActividad() {
-  const isOperador = APP.user && APP.user.role === 'operador';
+  const isPersonalOperativo = APP.user && ['operador','controlador'].includes(APP.user.role);
   const fields = {
     fecha: document.getElementById('act-fecha').value,
-    guardia: isOperador && APP.user.guardia !== 'ambas' ? APP.user.guardia : document.getElementById('act-guardia').value,
-    operador: isOperador ? APP.user.name : document.getElementById('act-operador').value,
-    operadorLogin: isOperador ? APP.user.login : (document.getElementById('act-operador').dataset.login || ''),
+    guardia: isPersonalOperativo && APP.user.guardia !== 'ambas' ? APP.user.guardia : document.getElementById('act-guardia').value,
+    operador: isPersonalOperativo ? APP.user.name : document.getElementById('act-operador').value,
+    operadorLogin: isPersonalOperativo ? APP.user.login : (document.getElementById('act-operador').dataset.login || ''),
     area: document.getElementById('act-area').value,
     actividad: document.getElementById('act-actividad').value,
     inicio: document.getElementById('act-inicio').value,
@@ -1698,7 +1701,7 @@ function resetActForm() {
   document.getElementById('act-calc-result').style.display='none';
   document.getElementById('modal-actividad-title').textContent='Nueva actividad';
   document.getElementById('act-fecha').value=new Date().toISOString().split('T')[0];
-  if(APP.user&&APP.user.role==='operador') {
+  if(APP.user&&['operador','controlador'].includes(APP.user.role)) {
     document.getElementById('act-operador').value=APP.user.name;
     document.getElementById('act-guardia').value=APP.user.guardia === 'ambas' ? 'A' : APP.user.guardia;
     document.getElementById('act-guardia').disabled = APP.user.guardia !== 'ambas';
@@ -1710,7 +1713,7 @@ function resetActForm() {
 function editActividad(id) {
   const a = APP.data.actividades.find(x=>x.id==id);
   if(!a) return;
-  if(APP.user && APP.user.role === 'operador' && a.operadorLogin && a.operadorLogin !== APP.user.login) {
+  if(APP.user && ['operador','controlador'].includes(APP.user.role) && a.operadorLogin && a.operadorLogin !== APP.user.login) {
     showToast('No puedes editar actividades de otro operador','error');
     return;
   }
@@ -1856,7 +1859,7 @@ function renderActividades() {
   if(guardia) data = data.filter(a=>a.guardia===guardia);
   if(area) data = data.filter(a=>a.area===area);
   if(estado) data = data.filter(a=>a.estado===estado);
-  if(APP.user && APP.user.role === 'operador') {
+  if(APP.user && ['operador','controlador'].includes(APP.user.role)) {
     data = data.filter(a => (a.operadorLogin && a.operadorLogin === APP.user.login) || (!a.operadorLogin && a.operador === APP.user.name));
   }
 
@@ -1881,7 +1884,7 @@ function renderActividades() {
       <td>${a.revision?`<span class="badge badge-${a.revision}">${a.revision}</span>`:'<span style="color:var(--text-m);font-size:12px">Sin revisar</span>'}</td>
       <td style="white-space:nowrap">
         ${(role==='supervisor'||role==='admin')?`<button class="btn btn-sm" style="padding:4px 10px;background:var(--teal);color:#fff;font-size:12px" onclick="openRevision(${a.id})">Revisar</button> `:''}
-        ${(role==='supervisor'||role==='admin'||role==='operador')?`<button class="btn btn-outline btn-sm" style="font-size:12px" onclick="editActividad(${a.id})">Editar</button>`:''}
+        ${(role==='admin'||role==='operador'||role==='controlador')?`<button class="btn btn-outline btn-sm" style="font-size:12px" onclick="editActividad(${a.id})">Editar</button>`:''}
         ${(role==='admin')?` <button class="btn btn-sm" style="padding:4px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteActividad(${a.id})">×</button>`:''}
       </td>
     </tr>
@@ -1993,6 +1996,10 @@ function getPatioFilteredData(){
   const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', t=document.getElementById('patio-tipo-mov')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'';
   return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||m.movimiento===t)&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
 }
+function getPatioChartData(){
+  const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'';
+  return APP.data.movimientos.filter(m=>m.movimiento==='ingreso'&&(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
+}
 function renderPatios(){
   const data=getPatioFilteredData(); const editable=canEditPatios();
   const btn=document.getElementById('btn-nuevo-movimiento'); if(btn) btn.style.display=editable?'inline-flex':'none';
@@ -2005,16 +2012,17 @@ function renderPatios(){
   document.getElementById('patio-kpi-balance').textContent=(tnIn-tnOut).toFixed(2);
   const tbody=document.getElementById('tbody-movimientos');
   tbody.innerHTML=data.length?data.map(m=>`<tr><td>${formatDate(m.fecha)}</td><td><span class="badge mov-${m.movimiento}">${m.movimiento}</span></td><td>${m.subclase}</td><td>${m.clase}</td><td>${m.tipoResiduo}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${m.vehiculo}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${m.gerencia}</td><td>${m.inicio||'—'}</td><td>${m.fin||'—'}</td><td>${m.registradoPor||'—'}</td><td style="white-space:nowrap">${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?` <button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`).join(''):`<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--text-m)">No hay movimientos para los filtros seleccionados</td></tr>`;
-  renderPatioCharts(data);
+  renderPatioCharts(getPatioChartData());
 }
 function renderPatioCharts(data){
-  const byResiduo={Pesado:0,Liviano:0}; data.forEach(m=>byResiduo[m.tipoResiduo]=(byResiduo[m.tipoResiduo]||0)+m.peso);
+  const ingresos=data.filter(m=>m.movimiento==='ingreso');
+  const byResiduo={Pesado:0,Liviano:0}; ingresos.forEach(m=>byResiduo[m.tipoResiduo]=(byResiduo[m.tipoResiduo]||0)+m.peso);
   if(patioPieChart)patioPieChart.destroy();
   patioPieChart=new Chart(document.getElementById('chart-patio-residuo'),{type:'doughnut',data:{labels:Object.keys(byResiduo),datasets:[{data:Object.values(byResiduo),backgroundColor:['#1a5c2a','#69f0ae'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>`${c.label}: ${Number(c.raw).toFixed(2)} tn`}}}}});
-  const byDay={}; data.filter(m=>m.movimiento==='ingreso').forEach(m=>byDay[m.fecha]=(byDay[m.fecha]||0)+m.peso); const days=Object.keys(byDay).sort();
+  const byDay={}; ingresos.forEach(m=>byDay[m.fecha]=(byDay[m.fecha]||0)+m.peso); const days=Object.keys(byDay).sort();
   if(patioBarChart)patioBarChart.destroy();
   patioBarChart=new Chart(document.getElementById('chart-patio-ingresos'),{type:'bar',data:{labels:days.map(formatDate),datasets:[{label:'Toneladas',data:days.map(d=>byDay[d]),backgroundColor:'#2e7d32',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'Toneladas'}}},plugins:{legend:{display:false}}}});
-  const byGer={}; data.forEach(m=>byGer[m.gerencia]=(byGer[m.gerencia]||0)+m.peso); const arr=Object.entries(byGer).sort((a,b)=>b[1]-a[1]); const max=arr[0]?.[1]||1;
+  const byGer={}; ingresos.forEach(m=>byGer[m.gerencia]=(byGer[m.gerencia]||0)+m.peso); const arr=Object.entries(byGer).sort((a,b)=>b[1]-a[1]); const max=arr[0]?.[1]||1;
   document.getElementById('chart-patio-gerencia').innerHTML=arr.length?arr.map(([g,v])=>`<div class="pyramid-row" style="width:${Math.max(30,(v/max)*96)}%" title="${v.toFixed(3)} tn">${g}: ${v.toFixed(2)} tn</div>`).join(''):'<div class="wa-empty">Sin datos para mostrar</div>';
 }
 function clearPatioFilters(){['patio-desde','patio-hasta','patio-tipo-mov','patio-subclase','patio-gerencia'].forEach(id=>document.getElementById(id).value='');renderPatios();}
@@ -2158,7 +2166,7 @@ function getDashboardFilteredData() {
     rests = rests.filter(r => r.area === area);
   }
 
-  if(APP.user && APP.user.role === 'operador') {
+  if(APP.user && ['operador','controlador'].includes(APP.user.role)) {
     acts = acts.filter(a => (a.operadorLogin && a.operadorLogin === APP.user.login) || (!a.operadorLogin && a.operador === APP.user.name));
   }
 
