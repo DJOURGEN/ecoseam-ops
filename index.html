@@ -409,6 +409,15 @@ tbody tr:hover{background:var(--surface-1)}
 .copro-move-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 @media(max-width:520px){.copro-stock-grid{grid-template-columns:1fr}.copro-move-actions .btn{flex:1}}
 
+
+/* ===== ALERTAS Y CATÁLOGO PDF DE COPRODUCTOS ===== */
+.copro-alert-banner{display:none;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:10px;background:#fff4e5;border:1.5px solid #f5a623;color:#7a4100;margin-bottom:18px}
+.copro-alert-banner.show{display:flex}.copro-alert-banner strong{display:block;margin-bottom:2px}.copro-alert-icon{font-size:22px;line-height:1}
+.copro-card.evacuation-alert{border:2px solid #f57f17;box-shadow:0 6px 24px rgba(245,127,23,.18)}
+.copro-evac-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#fff3e0;color:#b45309;font-size:11px;font-weight:800;animation:coproPulse 1.8s infinite}
+@keyframes coproPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,127,23,.25)}50%{box-shadow:0 0 0 6px rgba(245,127,23,0)}}
+.copro-stock-progress{height:8px;background:#e5eee7;border-radius:999px;overflow:hidden;margin-top:8px}.copro-stock-progress span{display:block;height:100%;background:var(--success);border-radius:999px}.copro-card.evacuation-alert .copro-stock-progress span{background:var(--warning)}
+
 /* ===== MOBILE ===== */
 .mobile-nav{
   display:none;
@@ -857,11 +866,18 @@ tbody tr:hover{background:var(--surface-1)}
             <div class="page-title">Catálogo 3D de coproductos</div>
             <div class="page-subtitle">Control de inventario, ingresos, salidas, composición y modelos 3D opcionales</div>
           </div>
-          <button class="btn btn-primary" id="btn-nuevo-coproducto" onclick="openCoproductoModal()">+ Nuevo coproducto</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="downloadCoproductosPDF()">📄 Descargar catálogo PDF</button>
+            <button class="btn btn-primary" id="btn-nuevo-coproducto" onclick="openCoproductoModal()">+ Nuevo coproducto</button>
+          </div>
         </div>
 
         <div id="copro-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
           Vista de consulta: puedes visualizar los modelos y la información. Solo los perfiles autorizados pueden registrar, editar o eliminar información; únicamente el administrador puede subir modelos 3D.
+        </div>
+        <div id="copro-alert-banner" class="copro-alert-banner">
+          <div class="copro-alert-icon">⚠️</div>
+          <div><strong>Alerta de evacuación</strong><span id="copro-alert-text">Hay coproductos que superan las 25 tn almacenadas.</span></div>
         </div>
 
         <div class="card" style="margin-bottom:20px">
@@ -880,6 +896,7 @@ tbody tr:hover{background:var(--surface-1)}
           <div class="stat-card accent"><div class="stat-label">Tipos registrados</div><div class="stat-value" id="copro-kpi-tipos">0</div><div class="stat-sub">coproductos</div></div>
           <div class="stat-card teal"><div class="stat-label">Tonelaje almacenado</div><div class="stat-value" id="copro-kpi-tonelaje">0</div><div class="stat-sub">tn</div></div>
           <div class="stat-card success"><div class="stat-label">Valor estimado total</div><div class="stat-value" id="copro-kpi-valor">S/ 0</div><div class="stat-sub">referencial</div></div>
+          <div class="stat-card amber"><div class="stat-label">Requieren evacuación</div><div class="stat-value" id="copro-kpi-alertas">0</div><div class="stat-sub">stock mayor a 25 tn</div></div>
         </div>
 
         <div id="coproductos-grid" class="copro-grid"></div>
@@ -1351,6 +1368,7 @@ tbody tr:hover{background:var(--surface-1)}
 
 <!-- ==================== JAVASCRIPT ==================== -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2685,14 +2703,22 @@ function renderCoproductos(){
   document.getElementById('copro-kpi-tonelaje').textContent=totalStock.toFixed(2);
   const totalValor=rows.reduce((sum,c)=>sum+(getCoproStock(c).stock*c.valorTn),0);
   document.getElementById('copro-kpi-valor').textContent='S/ '+totalValor.toLocaleString('es-PE',{maximumFractionDigits:0});
+  const alertRows=rows.filter(c=>getCoproStock(c).stock>25);
+  const alertKpi=document.getElementById('copro-kpi-alertas'); if(alertKpi) alertKpi.textContent=alertRows.length;
+  const alertBanner=document.getElementById('copro-alert-banner');
+  const alertText=document.getElementById('copro-alert-text');
+  if(alertBanner){alertBanner.classList.toggle('show',alertRows.length>0);}
+  if(alertText&&alertRows.length){alertText.textContent=`${alertRows.length} coproducto${alertRows.length===1?'':'s'} supera${alertRows.length===1?'':'n'} las 25 tn: ${alertRows.map(c=>c.nombre+' ('+getCoproStock(c).stock.toFixed(2)+' tn)').join(', ')}. Se recomienda programar evacuación.`;}
   if(!rows.length){grid.innerHTML='<div class="card" style="grid-column:1/-1;text-align:center;color:var(--text-s)">No hay coproductos registrados. Puedes registrarlos sin modelo 3D y cargar el archivo posteriormente.</div>';renderCoproMovimientos();return;}
   grid.innerHTML=rows.map(c=>{
     const st=getCoproStock(c);
     const viewer=c.modeloUrl?`<model-viewer src="${escapeHtml(c.modeloUrl)}" alt="Modelo 3D de ${escapeHtml(c.nombre)}" camera-controls auto-rotate shadow-intensity="1" exposure="1" loading="lazy"></model-viewer>`:`<div class="copro-placeholder"><svg viewBox="0 0 64 64" fill="none"><path d="M32 6l22 12v28L32 58 10 46V18L32 6z" stroke="currentColor" stroke-width="3"/><path d="M11 19l21 12 21-12M32 31v26" stroke="currentColor" stroke-width="3"/></svg><b>Modelo 3D pendiente</b><span>El registro funciona sin archivo 3D.</span></div>`;
     const total=st.stock*c.valorTn;
-    return `<article class="copro-card"><div class="copro-viewer">${viewer}</div><div class="copro-body">
-      <div class="copro-head"><div><div class="copro-name">${escapeHtml(c.nombre)}</div><div class="copro-type">${escapeHtml(c.tipo)}${c.ubicacion?' · '+escapeHtml(c.ubicacion):''}</div></div><span class="badge badge-done">Mayor valor</span></div>
-      <div class="copro-stock-grid"><div class="copro-stock-item in"><span>Ingresos</span><strong>${st.ingresos.toFixed(3)} tn</strong></div><div class="copro-stock-item out"><span>Salidas</span><strong>${st.salidas.toFixed(3)} tn</strong></div><div class="copro-stock-item"><span>Stock actual</span><strong>${st.stock.toFixed(3)} tn</strong></div></div>
+    const needsEvac=st.stock>25;
+    const progress=Math.min(100,(st.stock/25)*100);
+    return `<article class="copro-card ${needsEvac?'evacuation-alert':''}"><div class="copro-viewer">${viewer}</div><div class="copro-body">
+      <div class="copro-head"><div><div class="copro-name">${escapeHtml(c.nombre)}</div><div class="copro-type">${escapeHtml(c.tipo)}${c.ubicacion?' · '+escapeHtml(c.ubicacion):''}</div></div>${needsEvac?'<span class="copro-evac-badge">⚠ Evacuar</span>':'<span class="badge badge-done">Stock controlado</span>'}</div>
+      <div class="copro-stock-grid"><div class="copro-stock-item in"><span>Ingresos</span><strong>${st.ingresos.toFixed(3)} tn</strong></div><div class="copro-stock-item out"><span>Salidas</span><strong>${st.salidas.toFixed(3)} tn</strong></div><div class="copro-stock-item"><span>Stock actual</span><strong>${st.stock.toFixed(3)} tn</strong></div></div><div class="copro-stock-progress" title="Umbral de evacuación: 25 tn"><span style="width:${progress}%"></span></div><div style="font-size:10px;color:${needsEvac?'var(--warning)':'var(--text-m)'};margin-top:4px;font-weight:${needsEvac?'700':'500'}">${needsEvac?'Supera el umbral de 25 tn - programar evacuación':'Umbral de evacuación: 25 tn'}</div>
       <div class="copro-metrics"><div class="copro-metric"><span>Valor estimado actual</span><strong>S/ ${total.toLocaleString('es-PE',{maximumFractionDigits:0})}</strong></div><div class="copro-metric"><span>Valor por tn</span><strong>S/ ${c.valorTn.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div></div>
       <div class="copro-detail"><b>Composición:</b> ${escapeHtml(c.composicion)}</div><div class="copro-detail"><b>Característica:</b> ${escapeHtml(c.caracteristica)}</div>
       ${editable?`<div class="copro-move-actions"><button class="btn btn-success btn-sm" onclick="openCoproMovimientoModal(${c.id},'ingreso')">+ Ingreso</button><button class="btn btn-warning btn-sm" onclick="openCoproMovimientoModal(${c.id},'salida')">− Salida</button><button class="btn btn-outline btn-sm" onclick="editCoproducto(${c.id})">Editar</button>${deletable?`<button class="btn btn-sm" style="background:#fdedec;color:var(--danger)" onclick="deleteCoproducto(${c.id})">Eliminar</button>`:''}</div>`:''}
@@ -2796,6 +2822,58 @@ async function deleteCoproducto(id){
   if(error){showToast('No se pudo eliminar','error');return;} await loadAllData(); showToast('Coproducto eliminado','success');
 }
 
+
+async function downloadCoproductosPDF(){
+  if(!window.jspdf?.jsPDF){showToast('No se pudo cargar el generador PDF','error');return;}
+  const rows=[...APP.data.coproductos].sort((a,b)=>getCoproStock(b).stock-getCoproStock(a).stock);
+  if(!rows.length){showToast('No hay coproductos para generar el catálogo','warning');return;}
+  showToast('Generando catálogo ejecutivo...','success');
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,H=297,M=14;
+  const green=[26,92,42],dark=[13,61,26],light=[241,248,242],orange=[245,127,23],gray=[92,112,98];
+  const safe=(v)=>String(v??'').replace(/[\u2013\u2014]/g,'-');
+  const money=(v)=>'S/ '+Number(v||0).toLocaleString('es-PE',{maximumFractionDigits:0});
+  const line=(txt,x,y,maxW,size=9,style='normal',color=[25,40,29])=>{pdf.setFont('helvetica',style);pdf.setFontSize(size);pdf.setTextColor(...color);const lines=pdf.splitTextToSize(safe(txt),maxW);pdf.text(lines,x,y);return y+lines.length*(size*0.38+1.2);};
+  const totalStock=rows.reduce((s,c)=>s+getCoproStock(c).stock,0);
+  const totalIngresos=rows.reduce((s,c)=>s+getCoproStock(c).ingresos,0);
+  const totalSalidas=rows.reduce((s,c)=>s+getCoproStock(c).salidas,0);
+  const totalValor=rows.reduce((s,c)=>s+getCoproStock(c).stock*c.valorTn,0);
+  const alertas=rows.filter(c=>getCoproStock(c).stock>25);
+  // Portada
+  pdf.setFillColor(...dark);pdf.rect(0,0,W,58,'F');
+  pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(24);pdf.text('CATALOGO TECNICO',M,25);pdf.setFontSize(18);pdf.text('COPRODUCTOS 3D',M,37);
+  pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.text('Inventario valorizado y control de evacuacion',M,47);
+  pdf.setTextColor(...green);pdf.setFont('helvetica','bold');pdf.setFontSize(13);pdf.text('ECOSEAM Operations',M,72);
+  pdf.setTextColor(...gray);pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.text('Fecha de emision: '+new Date().toLocaleDateString('es-PE'),M,80);
+  const metrics=[['Tipos',rows.length],['Stock actual',totalStock.toFixed(2)+' tn'],['Ingresos',totalIngresos.toFixed(2)+' tn'],['Salidas',totalSalidas.toFixed(2)+' tn'],['Valor estimado',money(totalValor)],['Alertas >25 tn',alertas.length]];
+  let mx=M,my=94;metrics.forEach((it,i)=>{const col=i%2,row=Math.floor(i/2);const x=mx+col*92,y=my+row*28;pdf.setFillColor(...light);pdf.roundedRect(x,y,86,21,3,3,'F');pdf.setTextColor(...gray);pdf.setFontSize(8);pdf.setFont('helvetica','normal');pdf.text(it[0],x+5,y+7);pdf.setTextColor(...(it[0].startsWith('Alertas')&&alertas.length?orange:green));pdf.setFont('helvetica','bold');pdf.setFontSize(14);pdf.text(String(it[1]),x+5,y+16);});
+  let yy=187;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(12);pdf.text('Resumen ejecutivo',M,yy);yy+=8;
+  yy=line(`El catalogo consolida ${rows.length} tipos de coproductos de mayor valor. El stock acumulado es ${totalStock.toFixed(2)} tn, con un valor referencial de ${money(totalValor)}.`,M,yy,180,10,'normal',gray);
+  if(alertas.length){yy+=5;pdf.setFillColor(255,244,229);pdf.roundedRect(M,yy,182,25,3,3,'F');pdf.setTextColor(...orange);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('ALERTA DE EVACUACION',M+5,yy+8);pdf.setFont('helvetica','normal');pdf.setFontSize(8.5);pdf.text(pdf.splitTextToSize(alertas.map(c=>`${c.nombre}: ${getCoproStock(c).stock.toFixed(2)} tn`).join(' | '),172),M+5,yy+15);}
+  pdf.setTextColor(...gray);pdf.setFontSize(8);pdf.text('Documento generado automaticamente desde ECOSEAM Operations.',M,H-12);
+  // Fichas
+  rows.forEach((c,idx)=>{
+    pdf.addPage();const st=getCoproStock(c);const needs=st.stock>25;
+    pdf.setFillColor(...dark);pdf.rect(0,0,W,32,'F');pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(16);pdf.text(safe(c.nombre),M,19);pdf.setFontSize(8);pdf.setFont('helvetica','normal');pdf.text(`Ficha tecnica ${idx+1} de ${rows.length}`,W-M-34,19);
+    pdf.setFillColor(...(needs?orange:green));pdf.roundedRect(W-59,38,45,10,3,3,'F');pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(8);pdf.text(needs?'EVACUAR > 25 TN':'STOCK CONTROLADO',W-56,44.5);
+    let y=45;pdf.setTextColor(...dark);pdf.setFontSize(10);pdf.text('Identificacion y clasificacion',M,y);y+=7;
+    y=line('Tipo: '+(c.tipo||'-'),M,y,85,9,'normal',gray);y=line('Ubicacion: '+(c.ubicacion||'-'),M,y,85,9,'normal',gray);y=line('Modelo 3D: '+(c.modeloUrl?'Disponible':'Pendiente / no requerido'),M,y,85,9,'normal',gray);
+    pdf.setFillColor(...light);pdf.roundedRect(108,50,88,54,3,3,'F');pdf.setTextColor(...gray);pdf.setFontSize(8);pdf.text('INVENTARIO',113,59);pdf.setTextColor(...green);pdf.setFont('helvetica','bold');pdf.setFontSize(19);pdf.text(st.stock.toFixed(3)+' tn',113,72);pdf.setFontSize(8);pdf.setTextColor(...gray);pdf.setFont('helvetica','normal');pdf.text(`Ingresos: ${st.ingresos.toFixed(3)} tn`,113,83);pdf.text(`Salidas: ${st.salidas.toFixed(3)} tn`,113,91);pdf.text(`Valor stock: ${money(st.stock*c.valorTn)}`,113,99);
+    y=Math.max(y,118);pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Composicion',M,y);y+=7;y=line(c.composicion||'No registrada',M,y,182,9,'normal',gray);
+    y+=5;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Caracteristicas tecnicas',M,y);y+=7;y=line(c.caracteristica||'No registrada',M,y,182,9,'normal',gray);
+    y+=7;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Nivel de almacenamiento',M,y);y+=8;
+    pdf.setFillColor(225,236,228);pdf.roundedRect(M,y,182,8,4,4,'F');pdf.setFillColor(...(needs?orange:green));pdf.roundedRect(M,y,Math.min(182,182*(st.stock/25)),8,4,4,'F');y+=15;
+    pdf.setFont('helvetica','normal');pdf.setFontSize(8.5);pdf.setTextColor(...(needs?orange:gray));pdf.text(needs?`Supera el umbral en ${(st.stock-25).toFixed(2)} tn. Programar evacuacion.`:`Disponible antes del umbral: ${(25-st.stock).toFixed(2)} tn.`,M,y);
+    y+=12;pdf.setDrawColor(205,222,208);pdf.line(M,y,W-M,y);y+=10;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Trazabilidad de movimientos',M,y);y+=8;
+    const movs=APP.data.coproMovimientos.filter(m=>m.coproductoId===c.id).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))).slice(0,8);
+    if(!movs.length){y=line('Sin movimientos registrados.',M,y,182,9,'normal',gray);}else{pdf.setFontSize(8);movs.forEach(m=>{if(y>272){pdf.addPage();y=20;}pdf.setTextColor(...gray);pdf.text(formatDate(m.fecha),M,y);pdf.setTextColor(...(m.movimiento==='ingreso'?green:orange));pdf.setFont('helvetica','bold');pdf.text(m.movimiento.toUpperCase(),48,y);pdf.setTextColor(...dark);pdf.text(m.tonelaje.toFixed(3)+' tn',78,y);pdf.setFont('helvetica','normal');pdf.setTextColor(...gray);pdf.text(pdf.splitTextToSize(safe(m.observacion||'-'),96)[0],108,y);y+=7;});}
+    pdf.setTextColor(...gray);pdf.setFontSize(7.5);pdf.text(`ECOSEAM Operations | Catalogo de coproductos | ${idx+1}/${rows.length}`,M,H-9);
+  });
+  pdf.save('ECOSEAM_Catalogo_Coproductos_'+new Date().toISOString().slice(0,10)+'.pdf');
+  showToast('Catálogo PDF generado correctamente','success');
+}
+
 /* ===== EXPORT ===== */
 function exportToCSV(type) {
   let rows, headers, filename;
@@ -2880,4 +2958,4 @@ if('serviceWorker' in navigator) {
 }
 </script>
 </body>
-</html
+</html>
