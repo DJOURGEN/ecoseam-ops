@@ -377,6 +377,29 @@ tbody tr:hover{background:var(--surface-1)}
 @media(max-width:980px){.patio-kpis{grid-template-columns:repeat(2,1fr)}.patio-chart-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.patio-kpis{grid-template-columns:1fr}.patio-chart-box{min-height:270px}}
 
+
+/* ===== MÓDULO COPRODUCTOS 3D ===== */
+.copro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.copro-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.copro-viewer{height:290px;background:linear-gradient(135deg,#eef7ef,#dceade);position:relative}
+.copro-viewer model-viewer{width:100%;height:100%;background:transparent}
+.copro-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text-s);text-align:center;padding:24px}
+.copro-placeholder svg{width:58px;height:58px;opacity:.45}
+.copro-body{padding:18px}
+.copro-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.copro-name{font-size:18px;font-weight:700;color:var(--navy)}
+.copro-type{font-size:12px;color:var(--text-s);margin-top:2px}
+.copro-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.copro-metric{background:var(--surface-1);border:1px solid var(--border);border-radius:9px;padding:10px}
+.copro-metric span{display:block;font-size:11px;color:var(--text-s);font-weight:600}
+.copro-metric strong{display:block;font-size:18px;color:var(--navy);margin-top:2px}
+.copro-detail{font-size:13px;color:var(--text-s);margin-top:10px}
+.copro-detail b{color:var(--text)}
+.copro-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.upload-box{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;background:var(--surface-1)}
+.upload-box input{width:100%}
+@media(max-width:520px){.copro-grid{grid-template-columns:1fr}.copro-viewer{height:240px}.copro-metrics{grid-template-columns:1fr}}
+
 /* ===== MOBILE ===== */
 .mobile-nav{
   display:none;
@@ -818,6 +841,41 @@ tbody tr:hover{background:var(--surface-1)}
         </div>
       </div>
 
+      <!-- PAGE: COPRODUCTOS 3D -->
+      <div id="view-coproductos" style="display:none">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Catálogo 3D de coproductos</div>
+            <div class="page-subtitle">Visualización de materiales de mayor valor, composición, tonelaje almacenado y valorización estimada</div>
+          </div>
+          <button class="btn btn-primary" id="btn-nuevo-coproducto" onclick="openCoproductoModal()">+ Nuevo coproducto</button>
+        </div>
+
+        <div id="copro-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
+          Vista de consulta: puedes visualizar los modelos y la información, pero no registrar ni editar coproductos.
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <div class="filters" style="padding:0;margin:0">
+            <input class="filter-select" id="copro-buscar" type="search" placeholder="Buscar coproducto..." oninput="renderCoproductos()" style="min-width:220px">
+            <select class="filter-select" id="copro-filtro-tipo" onchange="renderCoproductos()">
+              <option value="">Todos los tipos</option>
+              <option>Cables</option><option>Motores</option><option>Transformadores</option><option>Componentes eléctricos</option><option>Componentes mecánicos</option><option>Otros</option>
+            </select>
+            <div class="filters-spacer"></div>
+            <button class="btn btn-outline btn-sm" onclick="clearCoproFilters()">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="stat-grid" style="margin-bottom:20px">
+          <div class="stat-card accent"><div class="stat-label">Tipos registrados</div><div class="stat-value" id="copro-kpi-tipos">0</div><div class="stat-sub">coproductos</div></div>
+          <div class="stat-card teal"><div class="stat-label">Tonelaje almacenado</div><div class="stat-value" id="copro-kpi-tonelaje">0</div><div class="stat-sub">tn</div></div>
+          <div class="stat-card success"><div class="stat-label">Valor estimado total</div><div class="stat-value" id="copro-kpi-valor">S/ 0</div><div class="stat-sub">referencial</div></div>
+        </div>
+
+        <div id="coproductos-grid" class="copro-grid"></div>
+      </div>
+
       <!-- PAGE: REPORTES -->
       <div id="view-reportes" style="display:none">
         <div class="page-header">
@@ -1165,6 +1223,44 @@ tbody tr:hover{background:var(--surface-1)}
   </div>
 </div>
 
+<!-- Modal: Coproducto 3D -->
+<div class="modal-overlay" id="modal-coproducto">
+  <div class="modal" style="max-width:860px">
+    <div class="modal-header">
+      <div class="modal-title" id="copro-modal-title">Registrar coproducto</div>
+      <button class="modal-close" onclick="closeModal('modal-coproducto')">×</button>
+    </div>
+    <input type="hidden" id="copro-id">
+    <input type="hidden" id="copro-modelo-url">
+    <input type="hidden" id="copro-modelo-path">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nombre del coproducto *</label><input class="form-control" id="copro-nombre" type="text" placeholder="Ej.: Cable de cobre, motor eléctrico"></div>
+      <div class="form-group"><label class="form-label">Tipo *</label><select class="form-control" id="copro-tipo"><option value="">Seleccionar</option><option>Cables</option><option>Motores</option><option>Transformadores</option><option>Componentes eléctricos</option><option>Componentes mecánicos</option><option>Otros</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Composición *</label><textarea class="form-control" id="copro-composicion" rows="3" placeholder="Ej.: cobre 70 %, PVC 20 %, acero 10 %"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tonelaje almacenado (tn) *</label><input class="form-control" id="copro-tonelaje" type="number" min="0" step="0.001" placeholder="0.000"></div>
+      <div class="form-group"><label class="form-label">Valor estimado por tonelada (S/) *</label><input class="form-control" id="copro-valor-tn" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Característica principal *</label><input class="form-control" id="copro-caracteristica" type="text" placeholder="Ej.: alto contenido de cobre, reutilizable"></div>
+      <div class="form-group"><label class="form-label">Ubicación / patio</label><input class="form-control" id="copro-ubicacion" type="text" placeholder="Ej.: Patio 4388"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Modelo 3D (.glb o .gltf)</label>
+      <div class="upload-box">
+        <input id="copro-modelo-file" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json">
+        <div class="form-hint">El archivo se guardará en Supabase Storage, bucket <b>coproductos-3d</b>. Recomendado: formato GLB.</div>
+        <div id="copro-upload-status" class="form-hint" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-coproducto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCoproducto()">Guardar coproducto</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Nuevo usuario -->
 <div class="modal-overlay" id="modal-usuario">
   <div class="modal">
@@ -1226,6 +1322,7 @@ tbody tr:hover{background:var(--surface-1)}
 <!-- ==================== JAVASCRIPT ==================== -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ===== STATE ===== */
@@ -1236,7 +1333,8 @@ const APP = {
     actividades: [],
     restricciones: [],
     usuarios: [],
-    movimientos: []
+    movimientos: [],
+    coproductos: []
   }
 };
 
@@ -1341,29 +1439,50 @@ function appMovimientoToDb(m) {
   };
 }
 
+function dbCoproductoToApp(row) {
+  return {
+    id: row.id, nombre: row.nombre || '', tipo: row.tipo || '', composicion: row.composicion || '',
+    tonelaje: Number(row.tonelaje_almacenado || 0), valorTn: Number(row.valor_por_tn || 0),
+    caracteristica: row.caracteristica || '', ubicacion: row.ubicacion || '',
+    modeloUrl: row.modelo_url || '', modeloPath: row.modelo_path || '',
+    registradoPor: row.registrado_por || '', createdAt: row.created_at || ''
+  };
+}
+function appCoproductoToDb(c) {
+  return {
+    nombre:c.nombre, tipo:c.tipo, composicion:c.composicion, tonelaje_almacenado:c.tonelaje,
+    valor_por_tn:c.valorTn, caracteristica:c.caracteristica, ubicacion:c.ubicacion || '',
+    modelo_url:c.modeloUrl || '', modelo_path:c.modeloPath || '', registrado_por:c.registradoPor || ''
+  };
+}
+
 async function loadAllData() {
-  const [actRes, restRes, userRes, movRes] = await Promise.all([
+  const [actRes, restRes, userRes, movRes, coproRes] = await Promise.all([
     db.from('actividades').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('restricciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('usuarios').select('*').order('id', { ascending: true }),
-    db.from('movimientos_material').select('*').order('fecha', { ascending: false }).order('id', { ascending: false })
+    db.from('movimientos_material').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
+    db.from('coproductos').select('*').order('id', { ascending: false })
   ]);
 
   if(actRes.error) console.error('Error cargando actividades:', actRes.error);
   if(restRes.error) console.error('Error cargando restricciones:', restRes.error);
   if(userRes.error) console.error('Error cargando usuarios:', userRes.error);
   if(movRes.error) console.error('Error cargando movimientos:', movRes.error);
+  if(coproRes.error) console.error('Error cargando coproductos:', coproRes.error);
 
   APP.data.actividades = (actRes.data || []).map(dbActividadToApp);
   APP.data.restricciones = (restRes.data || []).map(dbRestriccionToApp);
   APP.data.usuarios = userRes.data || [];
   APP.data.movimientos = (movRes.data || []).map(dbMovimientoToApp);
+  APP.data.coproductos = (coproRes.data || []).map(dbCoproductoToApp);
 
   if(APP.currentView === 'actividades') renderActividades();
   if(APP.currentView === 'restricciones') renderRestricciones();
   if(APP.currentView === 'admin') renderUsuarios();
   if(APP.currentView === 'dashboard') updateDashboard();
   if(APP.currentView === 'patios') renderPatios();
+  if(APP.currentView === 'coproductos') renderCoproductos();
 }
 
 /* ===== SAMPLE DATA ===== */
@@ -1471,16 +1590,17 @@ const NAV_CONFIG = {
     {id:'dashboard',label:'Dashboard',icon:'grid'},
     {id:'actividades',label:'Actividades',icon:'list'},
     {id:'patios',label:'Control de patios',icon:'truck'},
+    {id:'coproductos',label:'Coproductos 3D',icon:'cube'},
     {id:'restricciones',label:'Restricciones',icon:'alert'},
     {id:'reportes',label:'Reportes',icon:'chart'},
     {id:'resumen',label:'Resumen WhatsApp',icon:'image'},
     {id:'admin',label:'Administración',icon:'user'},
   ],
   operador: ['actividades'],
-  controlador: ['actividades','patios'],
-  supervisor: ['dashboard','actividades','restricciones','patios','resumen'],
-  gerencia: ['dashboard','actividades','restricciones','patios','reportes'],
-  admin: ['dashboard','actividades','restricciones','patios','reportes','resumen','admin'],
+  controlador: ['actividades','patios','coproductos'],
+  supervisor: ['dashboard','actividades','restricciones','patios','coproductos','resumen'],
+  gerencia: ['dashboard','actividades','restricciones','patios','coproductos','reportes'],
+  admin: ['dashboard','actividades','restricciones','patios','coproductos','reportes','resumen','admin'],
 };
 
 const ICONS = {
@@ -1489,6 +1609,7 @@ const ICONS = {
   alert: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M10 7v4M10 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   chart: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M3 16h14M5 16V11M9 16V7M13 16V3M17 16V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   truck: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M2 5h10v9H2zM12 8h3l3 3v3h-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6" cy="15" r="1.5" stroke="currentColor"/><circle cx="15" cy="15" r="1.5" stroke="currentColor"/></svg>`,
+  cube: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M10 2.5l6.5 3.6v7.8L10 17.5l-6.5-3.6V6.1L10 2.5z" stroke="currentColor" stroke-width="1.7"/><path d="M3.8 6.3L10 9.8l6.2-3.5M10 9.8v7.4" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>`,
   user: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 18c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   image: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M6 13l3-3 2 2 2-3 2 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>`,
 };
@@ -1497,6 +1618,7 @@ const VIEW_TITLES = {
   dashboard:'Dashboard operativo',
   actividades:'Registro de actividades',
   patios:'Control de patios',
+  coproductos:'Coproductos 3D',
   restricciones:'Restricciones operativas',
   reportes:'Reportes y exportación',
   resumen:'Resumen visual WhatsApp',
@@ -1540,6 +1662,9 @@ function setupUI() {
   btnNueva.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
   const btnNuevaPage = document.getElementById('btn-nueva-actividad-page');
   if(btnNuevaPage) btnNuevaPage.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
+  const btnCopro = document.getElementById('btn-nuevo-coproducto');
+  if(btnCopro) btnCopro.style.display = ['controlador','admin'].includes(u.role) ? 'inline-flex' : 'none';
+
 
   // Set default date inputs
   const today = new Date().toISOString().split('T')[0];
@@ -1588,6 +1713,7 @@ function navigateTo(view) {
   if(view === 'restricciones') renderRestricciones();
   if(view === 'admin') renderUsuarios();
   if(view === 'patios') renderPatios();
+  if(view === 'coproductos') renderCoproductos();
   if(view === 'resumen') renderResumenWhatsapp();
 }
 
@@ -2486,6 +2612,111 @@ async function shareResumenWhatsapp() {
     console.error(err);
     showToast('No se pudo compartir. Descarga la imagen y adjúntala en WhatsApp.', 'warning');
   }
+}
+
+/* ===== COPRODUCTOS 3D ===== */
+function canEditCoproductos(){ return ['controlador','admin'].includes(APP.user?.role); }
+
+function clearCoproFilters(){
+  document.getElementById('copro-buscar').value='';
+  document.getElementById('copro-filtro-tipo').value='';
+  renderCoproductos();
+}
+
+function renderCoproductos(){
+  const grid=document.getElementById('coproductos-grid');
+  if(!grid) return;
+  const editable=canEditCoproductos();
+  const note=document.getElementById('copro-readonly-note');
+  if(note) note.style.display=editable?'none':'block';
+  const btn=document.getElementById('btn-nuevo-coproducto');
+  if(btn) btn.style.display=editable?'inline-flex':'none';
+
+  const q=(document.getElementById('copro-buscar')?.value||'').trim().toLowerCase();
+  const tipo=document.getElementById('copro-filtro-tipo')?.value||'';
+  const rows=APP.data.coproductos.filter(c=>(!tipo||c.tipo===tipo)&&(!q||[c.nombre,c.tipo,c.composicion,c.caracteristica,c.ubicacion].join(' ').toLowerCase().includes(q)));
+
+  document.getElementById('copro-kpi-tipos').textContent=rows.length;
+  document.getElementById('copro-kpi-tonelaje').textContent=rows.reduce((s,c)=>s+c.tonelaje,0).toFixed(2);
+  const totalValor=rows.reduce((s,c)=>s+(c.tonelaje*c.valorTn),0);
+  document.getElementById('copro-kpi-valor').textContent='S/ '+totalValor.toLocaleString('es-PE',{maximumFractionDigits:0});
+
+  if(!rows.length){
+    grid.innerHTML='<div class="card" style="grid-column:1/-1;text-align:center;color:var(--text-s)">No hay coproductos registrados todavía. Cuando tengas los modelos 3D, podrás cargarlos desde “Nuevo coproducto”.</div>';
+    return;
+  }
+  grid.innerHTML=rows.map(c=>{
+    const viewer=c.modeloUrl?`<model-viewer src="${escapeHtml(c.modeloUrl)}" alt="Modelo 3D de ${escapeHtml(c.nombre)}" camera-controls auto-rotate shadow-intensity="1" exposure="1" loading="lazy"></model-viewer>`:`<div class="copro-placeholder"><svg viewBox="0 0 64 64" fill="none"><path d="M32 6l22 12v28L32 58 10 46V18L32 6z" stroke="currentColor" stroke-width="3"/><path d="M11 19l21 12 21-12M32 31v26" stroke="currentColor" stroke-width="3"/></svg><b>Modelo 3D pendiente</b><span>Podrás cargar un archivo GLB o GLTF.</span></div>`;
+    const total=c.tonelaje*c.valorTn;
+    return `<article class="copro-card">
+      <div class="copro-viewer">${viewer}</div>
+      <div class="copro-body">
+        <div class="copro-head"><div><div class="copro-name">${escapeHtml(c.nombre)}</div><div class="copro-type">${escapeHtml(c.tipo)}${c.ubicacion?' · '+escapeHtml(c.ubicacion):''}</div></div><span class="badge badge-done">Mayor valor</span></div>
+        <div class="copro-metrics"><div class="copro-metric"><span>Almacenado</span><strong>${c.tonelaje.toFixed(3)} tn</strong></div><div class="copro-metric"><span>Valor estimado</span><strong>S/ ${total.toLocaleString('es-PE',{maximumFractionDigits:0})}</strong></div></div>
+        <div class="copro-detail"><b>Composición:</b> ${escapeHtml(c.composicion)}</div>
+        <div class="copro-detail"><b>Valor por tn:</b> S/ ${c.valorTn.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+        <div class="copro-detail"><b>Característica:</b> ${escapeHtml(c.caracteristica)}</div>
+        ${editable?`<div class="copro-actions"><button class="btn btn-outline btn-sm" onclick="editCoproducto(${c.id})">Editar</button>${APP.user.role==='admin'?`<button class="btn btn-sm" style="background:#fdedec;color:var(--danger)" onclick="deleteCoproducto(${c.id})">Eliminar</button>`:''}</div>`:''}
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function openCoproductoModal(){
+  if(!canEditCoproductos()){showToast('No tienes permiso para registrar coproductos','error');return;}
+  ['copro-id','copro-nombre','copro-composicion','copro-tonelaje','copro-valor-tn','copro-caracteristica','copro-ubicacion','copro-modelo-url','copro-modelo-path'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('copro-tipo').value='';
+  document.getElementById('copro-modelo-file').value='';
+  document.getElementById('copro-upload-status').textContent='';
+  document.getElementById('copro-modal-title').textContent='Registrar coproducto';
+  openModal('modal-coproducto');
+}
+
+function editCoproducto(id){
+  if(!canEditCoproductos()) return;
+  const c=APP.data.coproductos.find(x=>x.id===id); if(!c) return;
+  document.getElementById('copro-id').value=c.id; document.getElementById('copro-nombre').value=c.nombre;
+  document.getElementById('copro-tipo').value=c.tipo; document.getElementById('copro-composicion').value=c.composicion;
+  document.getElementById('copro-tonelaje').value=c.tonelaje; document.getElementById('copro-valor-tn').value=c.valorTn;
+  document.getElementById('copro-caracteristica').value=c.caracteristica; document.getElementById('copro-ubicacion').value=c.ubicacion;
+  document.getElementById('copro-modelo-url').value=c.modeloUrl; document.getElementById('copro-modelo-path').value=c.modeloPath;
+  document.getElementById('copro-modelo-file').value=''; document.getElementById('copro-upload-status').textContent=c.modeloUrl?'Modelo 3D actualmente cargado. Selecciona otro archivo para reemplazarlo.':'';
+  document.getElementById('copro-modal-title').textContent='Editar coproducto'; openModal('modal-coproducto');
+}
+
+async function uploadCoproductoModel(file){
+  if(!file) return {url:document.getElementById('copro-modelo-url').value,path:document.getElementById('copro-modelo-path').value};
+  const ext=(file.name.split('.').pop()||'glb').toLowerCase();
+  if(!['glb','gltf'].includes(ext)) throw new Error('Solo se permiten archivos GLB o GLTF.');
+  const safe=(document.getElementById('copro-nombre').value||'coproducto').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const path=`${Date.now()}-${safe}.${ext}`;
+  const {error}=await db.storage.from('coproductos-3d').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type||undefined});
+  if(error) throw error;
+  const {data}=db.storage.from('coproductos-3d').getPublicUrl(path);
+  return {url:data.publicUrl,path};
+}
+
+async function saveCoproducto(){
+  if(!canEditCoproductos()){showToast('No tienes permiso','error');return;}
+  const id=Number(document.getElementById('copro-id').value)||null;
+  const c={nombre:document.getElementById('copro-nombre').value.trim(),tipo:document.getElementById('copro-tipo').value,composicion:document.getElementById('copro-composicion').value.trim(),tonelaje:Number(document.getElementById('copro-tonelaje').value),valorTn:Number(document.getElementById('copro-valor-tn').value),caracteristica:document.getElementById('copro-caracteristica').value.trim(),ubicacion:document.getElementById('copro-ubicacion').value.trim(),modeloUrl:document.getElementById('copro-modelo-url').value,modeloPath:document.getElementById('copro-modelo-path').value,registradoPor:APP.user.login};
+  if(!c.nombre||!c.tipo||!c.composicion||!c.caracteristica||!Number.isFinite(c.tonelaje)||c.tonelaje<0||!Number.isFinite(c.valorTn)||c.valorTn<0){showToast('Completa los campos obligatorios','warning');return;}
+  const status=document.getElementById('copro-upload-status');
+  try{
+    const file=document.getElementById('copro-modelo-file').files[0];
+    if(file){status.textContent='Subiendo modelo 3D...';const uploaded=await uploadCoproductoModel(file);c.modeloUrl=uploaded.url;c.modeloPath=uploaded.path;}
+    const query=id?db.from('coproductos').update(appCoproductoToDb(c)).eq('id',id):db.from('coproductos').insert([appCoproductoToDb(c)]);
+    const {error}=await query; if(error) throw error;
+    closeModal('modal-coproducto'); await loadAllData(); showToast(id?'Coproducto actualizado':'Coproducto registrado','success');
+  }catch(err){console.error(err);status.textContent='';showToast('Error al guardar: '+(err.message||'verifica tabla, bucket y políticas'),'error');}
+}
+
+async function deleteCoproducto(id){
+  if(APP.user?.role!=='admin') return;
+  const c=APP.data.coproductos.find(x=>x.id===id); if(!c||!confirm(`¿Eliminar ${c.nombre}?`)) return;
+  if(c.modeloPath) await db.storage.from('coproductos-3d').remove([c.modeloPath]);
+  const {error}=await db.from('coproductos').delete().eq('id',id);
+  if(error){showToast('No se pudo eliminar','error');return;} await loadAllData(); showToast('Coproducto eliminado','success');
 }
 
 /* ===== EXPORT ===== */
