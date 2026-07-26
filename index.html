@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- ECOSEAM BUILD v6 CORREGIDO: IA coproductos + sincronización Drive -->
+  <!-- ECOSEAM BUILD v11: coproductos sin IA + fotos + catálogo PDF + Drive -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1a5c2a">
@@ -537,7 +537,7 @@ tbody tr:hover{background:var(--surface-1)}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v10 · IA real general profesional</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v11 · Sin IA · Catálogo profesional</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1273,17 +1273,14 @@ tbody tr:hover{background:var(--surface-1)}
       <div class="form-group"><label class="form-label">Tipo *</label><select class="form-control" id="copro-tipo"><option value="">Seleccionar</option><option>Cables</option><option>Motores</option><option>Transformadores</option><option>Componentes eléctricos</option><option>Componentes mecánicos</option><option>Otros</option></select></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Descripción técnica para análisis inteligente (opcional)</label>
-      <textarea class="form-control" id="copro-descripcion-ia" rows="5" placeholder="Describe código del material, metraje, diámetro, peso, cantidad de caucho, acero, cobre, uso anterior, equipo o actividad. Ej.: Cable SHD-GC 15 kV, código 3x120+3G, 180 m, conductor de cobre, armado de acero y cubierta de caucho, usado en chancadora primaria."></textarea>
-      <div class="form-hint">Este campo es opcional. Úsalo cuando quieras que el sistema estime la composición; también puedes registrar el coproducto sin descripción y completar la composición manualmente.</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-        <button type="button" class="btn btn-secondary btn-sm" id="btn-estimar-composicion" onclick="estimarComposicionCoproducto()">✦ Calcular composición con IA</button>
-        <span id="copro-ia-status" class="form-hint" style="align-self:center"></span>
-      </div>
+      <label class="form-label">Descripción técnica (opcional)</label>
+      <textarea class="form-control" id="copro-descripcion-ia" rows="5" placeholder="Registra código del material, marca, modelo, metraje, diámetro, peso, aplicación anterior, estado u otra información técnica disponible."></textarea>
+      <div class="form-hint">Este campo no es obligatorio. Puedes registrar el coproducto y completar la información posteriormente.</div>
     </div>
     <div class="form-group">
-      <label class="form-label">Composición estimada</label>
-      <textarea class="form-control" id="copro-composicion" rows="4" placeholder="Opcional. La estimación general aparecerá aquí. Puede corregirse manualmente antes de guardar."></textarea>
+      <label class="form-label">Composición del coproducto (opcional)</label>
+      <textarea class="form-control" id="copro-composicion" rows="4" placeholder="Ingresa la composición conocida o referencial. Ej.: Acero (cordones): 75%; Caucho (recubrimiento): 17%; Fibra (alma): 7%; Lubricante: 1%."></textarea>
+      <div class="form-hint">La composición se ingresa manualmente y puede editarse cuando se disponga de una ficha técnica, despiece o validación.</div>
       <input type="hidden" id="copro-ia-confianza" value="0">
     </div>
     <div class="form-row">
@@ -2751,7 +2748,7 @@ function renderCoproductos(){
       <div class="copro-head"><div><div class="copro-name">${escapeHtml(c.nombre)}</div><div class="copro-type">${escapeHtml(c.tipo)}${c.ubicacion?' · '+escapeHtml(c.ubicacion):''}</div></div>${needsEvac?'<span class="copro-evac-badge">⚠ Evacuar</span>':'<span class="badge badge-done">Stock controlado</span>'}</div>
       <div class="copro-stock-grid"><div class="copro-stock-item in"><span>Ingresos</span><strong>${st.ingresos.toFixed(3)} tn</strong></div><div class="copro-stock-item out"><span>Salidas</span><strong>${st.salidas.toFixed(3)} tn</strong></div><div class="copro-stock-item"><span>Stock actual</span><strong>${st.stock.toFixed(3)} tn</strong></div></div><div class="copro-stock-progress" title="Umbral de evacuación: 25 tn"><span style="width:${progress}%"></span></div><div style="font-size:10px;color:${needsEvac?'var(--warning)':'var(--text-m)'};margin-top:4px;font-weight:${needsEvac?'700':'500'}">${needsEvac?'Supera el umbral de 25 tn - programar evacuación':'Umbral de evacuación: 25 tn'}</div>
       <div class="copro-metrics"><div class="copro-metric"><span>Valor estimado actual</span><strong>S/ ${total.toLocaleString('es-PE',{maximumFractionDigits:0})}</strong></div><div class="copro-metric"><span>Valor por tn</span><strong>S/ ${c.valorTn.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div></div>
-      <div class="copro-detail"><b>Descripción técnica:</b> ${escapeHtml(c.descripcionIA||'No registrada')}</div><div class="copro-detail"><b>Composición estimada${c.confianzaIA?` (${c.confianzaIA}% confianza)`:''}:</b> ${escapeHtml(c.composicion)}</div><div class="copro-detail"><b>Característica:</b> ${escapeHtml(c.caracteristica)}</div>
+      <div class="copro-detail"><b>Descripción técnica:</b> ${escapeHtml(c.descripcionIA||'No registrada')}</div><div class="copro-detail"><b>Composición:</b> ${escapeHtml(c.composicion)}</div><div class="copro-detail"><b>Característica:</b> ${escapeHtml(c.caracteristica)}</div>
       ${editable?`<div class="copro-move-actions"><button class="btn btn-success btn-sm" onclick="openCoproMovimientoModal(${c.id},'ingreso')">+ Ingreso</button><button class="btn btn-warning btn-sm" onclick="openCoproMovimientoModal(${c.id},'salida')">− Salida</button><button class="btn btn-outline btn-sm" onclick="editCoproducto(${c.id})">Editar</button>${deletable?`<button class="btn btn-sm" style="background:#fdedec;color:var(--danger)" onclick="deleteCoproducto(${c.id})">Eliminar</button>`:''}</div>`:''}
     </div></article>`;
   }).join('');
@@ -2803,7 +2800,7 @@ function openCoproductoModal(){
   document.getElementById('copro-foto-file').value='';
   document.getElementById('copro-upload-status').textContent='';
   document.getElementById('copro-foto-status').textContent='';
-  document.getElementById('copro-modal-title').textContent='Registrar coproducto'; const iaStatus=document.getElementById('copro-ia-status'); if(iaStatus) iaStatus.textContent=''; const iaConf=document.getElementById('copro-ia-confianza'); if(iaConf) iaConf.value='0';
+  document.getElementById('copro-modal-title').textContent='Registrar coproducto'; const iaConf=document.getElementById('copro-ia-confianza'); if(iaConf) iaConf.value='0';
   configureCoproductoModelPermission();
   openModal('modal-coproducto');
 }
@@ -2812,7 +2809,7 @@ function editCoproducto(id){
   if(!canEditCoproductos()) return;
   const c=APP.data.coproductos.find(x=>x.id===id); if(!c) return;
   document.getElementById('copro-id').value=c.id; document.getElementById('copro-nombre').value=c.nombre;
-  document.getElementById('copro-tipo').value=c.tipo; document.getElementById('copro-descripcion-ia').value=c.descripcionIA||''; document.getElementById('copro-composicion').value=c.composicion; document.getElementById('copro-ia-confianza').value=c.confianzaIA||0; document.getElementById('copro-ia-status').textContent=c.confianzaIA?`Confianza estimada: ${c.confianzaIA}%`:'';
+  document.getElementById('copro-tipo').value=c.tipo; document.getElementById('copro-descripcion-ia').value=c.descripcionIA||''; document.getElementById('copro-composicion').value=c.composicion; document.getElementById('copro-ia-confianza').value='0';
   document.getElementById('copro-tonelaje').value=c.tonelaje; document.getElementById('copro-valor-tn').value=c.valorTn;
   document.getElementById('copro-caracteristica').value=c.caracteristica; document.getElementById('copro-ubicacion').value=c.ubicacion;
   document.getElementById('copro-modelo-url').value=c.modeloUrl; document.getElementById('copro-modelo-path').value=c.modeloPath;
@@ -2851,245 +2848,6 @@ async function uploadCoproductoPhoto(file){
 }
 
 
-function normalizarTextoIA(texto){
-  return String(texto||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-}
-
-function ajustarComposicion(comp){
-  const limpio={};
-  Object.entries(comp).forEach(([k,v])=>{ if(Number(v)>0.1) limpio[k]=Number(v); });
-  const total=Object.values(limpio).reduce((a,b)=>a+b,0)||1;
-  const normalizado={}; let acumulado=0; const claves=Object.keys(limpio);
-  claves.forEach((k,i)=>{ const n=i===claves.length-1?100-acumulado:Math.round(limpio[k]/total*1000)/10; normalizado[k]=Math.max(0,n); acumulado+=normalizado[k]; });
-  return normalizado;
-}
-
-function extraerPesoReferenciaKg(texto){
-  const t=normalizarTextoIA(texto);
-  let m=t.match(/(?:peso(?:\s+total)?|masa)\s*(?:aprox(?:imada)?\.?\s*)?(?:de|:|=)?\s*(\d+(?:[.,]\d+)?)\s*(kg|g|gr|gramos?|tn|t|toneladas?)/i);
-  if(!m) m=t.match(/(\d+(?:[.,]\d+)?)\s*(kg|g|gr|gramos?|tn|t|toneladas?)\s*(?:de\s+peso|totales?|aprox)/i);
-  if(!m) return null;
-  const valor=Number(m[1].replace(',','.'));
-  const unidad=m[2].toLowerCase();
-  if(/tn|tonelada|^t$/.test(unidad)) return valor*1000;
-  if(/^(g|gr|gramo)/.test(unidad)) return valor/1000;
-  return valor;
-}
-
-function nombreTecnicoComponente(nombre,t){
-  const n=normalizarTextoIA(nombre);
-  if(n==='acero' && /cable\s+acerado|cable\s+de\s+acero|wire\s*rope|6x19|6x36|alma\s+de\s+fibra|\bfc\b/.test(t)) return 'Acero (cordones)';
-  if(n==='caucho' && /cable\s+acerado|cable\s+de\s+acero|wire\s*rope/.test(t)) return 'Caucho (recubrimiento)';
-  if(n==='fibra') return 'Fibra (alma)';
-  if(n==='lubricante' || n==='aceite') return 'Lubricante';
-  return nombre;
-}
-
-function extraerComposicionDeclarada(texto,pesoReferenciaKg){
-  const t=normalizarTextoIA(texto);
-  const alias={
-    cobre:'Cobre',acero:'Acero',caucho:'Caucho',goma:'Caucho',pvc:'PVC',aluminio:'Aluminio',hierro:'Hierro',
-    plastico:'Plástico',bronce:'Bronce',plomo:'Plomo',fibra:'Fibra',lubricante:'Lubricante',aceite:'Aceite',
-    vidrio:'Vidrio',ceramica:'Cerámica',madera:'Madera',concreto:'Concreto',laton:'Latón',estaño:'Estaño',
-    niquel:'Níquel',zinc:'Zinc',inoxidable:'Acero inoxidable',aislante:'Aislante',electronica:'Electrónica',otros:'Otros'
-  };
-  const comp={};
-  Object.entries(alias).forEach(([token,nombre])=>{
-    let m=t.match(new RegExp(`${token}[^0-9]{0,28}(\\d+(?:[.,]\\d+)?)\\s*%`,'i'));
-    if(m) comp[nombre]=Number(m[1].replace(',','.'));
-  });
-  if(Object.keys(comp).length>=1){
-    const suma=Object.values(comp).reduce((a,b)=>a+b,0);
-    if(suma<100) comp.Otros=(comp.Otros||0)+(100-suma);
-    return {componentes:ajustarComposicion(comp),confianza:97,criterio:'composición porcentual indicada en la descripción',pesoReferenciaKg};
-  }
-
-  const masas={};
-  Object.entries(alias).forEach(([token,nombre])=>{
-    const m=t.match(new RegExp(`${token}[^0-9]{0,28}(\\d+(?:[.,]\\d+)?)\\s*(kg|tn|t|toneladas?)`,'i'));
-    if(m){
-      let kg=Number(m[1].replace(',','.'));
-      if(/tn|tonelada|^t$/i.test(m[2])) kg*=1000;
-      masas[nombre]=(masas[nombre]||0)+kg;
-    }
-  });
-  if(Object.keys(masas).length>=1){
-    const totalDeclarado=Object.values(masas).reduce((a,b)=>a+b,0);
-    const base=Math.max(Number(pesoReferenciaKg)||0,totalDeclarado)||totalDeclarado;
-    const porcentajes={};
-    Object.entries(masas).forEach(([k,v])=>porcentajes[k]=v/base*100);
-    if(totalDeclarado<base) porcentajes.Otros=(base-totalDeclarado)/base*100;
-    return {componentes:ajustarComposicion(porcentajes),confianza:96,criterio:'masas de materiales indicadas en la descripción',pesoReferenciaKg:base};
-  }
-  return null;
-}
-
-function estimacionLocalComposicion(descripcion,tipo){
-  const t=normalizarTextoIA(`${tipo} ${descripcion}`);
-  const pesoKg=extraerPesoReferenciaKg(descripcion);
-  const declarado=extraerComposicionDeclarada(descripcion,pesoKg);
-  if(declarado) return declarado;
-
-  let c={},confianza=52,criterio='estimación referencial por familia de equipo y características descritas';
-
-  // Cables de acero, eslingas y elementos de izaje.
-  if(/cable\s+acerado|cable\s+de\s+acero|wire\s*rope|6x19|6x36|alma\s+de\s+fibra|\bfc\b|iwrc|eslinga\s+de\s+cable/.test(t)){
-    c={Acero:75,Caucho:17,Fibra:7,Lubricante:1}; confianza=84; criterio='cable de acero con alma de fibra y recubrimiento';
-    if(/sin\s+recubrimiento|desnudo|no\s+recubierto/.test(t)){c={Acero:91,Fibra:7,Lubricante:2};confianza=89;criterio='cable de acero sin recubrimiento';}
-    if(/alma\s+de\s+acero|iwrc/.test(t)){c={Acero:97,Lubricante:2,Otros:1};confianza=91;criterio='cable de acero con alma metálica IWRC';}
-  }
-  // Cables eléctricos de potencia, control e instrumentación.
-  else if(/cable|conductor|shd|n2x|n2xh|vulcan|flexible|instrumentacion|control/.test(t)){
-    c={Cobre:38,Caucho:34,Acero:16,PVC:7,Otros:5}; confianza=66; criterio='cable eléctrico multiparte';
-    if(/aluminio/.test(t)){c={Aluminio:36,Caucho:36,Acero:16,PVC:7,Otros:5};confianza+=8;}
-    if(/sin armadura|no armado/.test(t)){c.Acero=3;c.Caucho+=7;c.PVC+=4;c.Otros+=2;confianza+=4;}
-    if(/armad|malla|pantalla|blindad/.test(t)){c.Acero+=8;c.Caucho-=5;c.Otros-=3;confianza+=5;}
-    if(/media tension|alta tension|\b15\s*kv|\b10\s*kv|6[.,]?6\s*kv/.test(t)){c.Cobre=(c.Cobre||0)+4;c.Caucho+=4;c.Otros-=4;c.PVC-=4;confianza+=5;}
-    if(/fibra optica|optical fiber/.test(t)){c={Vidrio:18,Plástico:42,Acero:22,Caucho:12,Otros:6};confianza=78;criterio='cable de fibra óptica reforzado';}
-  }
-  // Motores, generadores y alternadores.
-  else if(/\bmotor(?:\s+electrico)?\b|electromotor|generador|alternador|estator|rotor/.test(t)){
-    c={Acero:47,Hierro:24,Cobre:17,Aluminio:5,Plástico:2,Otros:5}; confianza=66; criterio='máquina eléctrica rotativa';
-    if(/carcasa de aluminio/.test(t)){c.Aluminio=22;c.Hierro=8;c.Acero=46;c.Cobre=17;c.Otros=7;confianza+=7;}
-    if(/hierro fundido|fundicion/.test(t)){c.Hierro=42;c.Acero=30;c.Cobre=17;c.Aluminio=3;c.Otros=8;confianza+=7;}
-    if(/sin bobina|bobinado retirado|sin cobre/.test(t)){c.Cobre=2;c.Acero+=8;c.Hierro+=5;c.Otros+=2;confianza+=8;}
-  }
-  // Transformadores y reactores.
-  else if(/transformador|trafo|reactor electrico/.test(t)){
-    c={Acero:36,Cobre:21,Aceite:27,Papel:5,Porcelana:4,Otros:7}; confianza=68; criterio='transformador inmerso en aceite';
-    if(/seco|resina/.test(t)){c={Acero:43,Cobre:24,Resina:18,Aluminio:5,Otros:10};confianza=78;criterio='transformador seco encapsulado';}
-    if(/devanado de aluminio|bobina de aluminio/.test(t)){c.Aluminio=21;c.Cobre=4;confianza+=8;}
-  }
-  // Tableros, celdas y componentes eléctricos/electrónicos.
-  else if(/tablero|gabinete|celda electrica|switchgear|variador|inversor|ups|rectificador|electronico/.test(t)){
-    c={Acero:49,Cobre:14,Aluminio:9,Plástico:10,Electrónica:12,Otros:6}; confianza=62; criterio='equipo eléctrico/electrónico en gabinete';
-  }
-  // Bombas, reductores, cajas y equipos mecánicos.
-  else if(/bomba|reductor|caja de engranajes|gearbox|compresor|ventilador|soplador/.test(t)){
-    c={Acero:58,Hierro:27,Cobre:3,Aluminio:3,Caucho:3,Aceite:3,Otros:3}; confianza=61; criterio='equipo mecánico rotativo';
-    if(/revestida en caucho|liner de caucho/.test(t)){c.Caucho=18;c.Acero-=8;c.Hierro-=7;c.Otros+=2;confianza+=7;}
-  }
-  // Válvulas, tuberías y fittings.
-  else if(/valvula|tuberia|tubo|fitting|codo|brida|spool/.test(t)){
-    c={Acero:84,Caucho:6,Plástico:3,Otros:7}; confianza=61; criterio='componente de conducción de fluidos';
-    if(/hdpe|polietileno/.test(t)){c={HDPE:94,Acero:3,Otros:3};confianza=82;criterio='tubería o fitting HDPE';}
-    if(/inoxidable/.test(t)){c={'Acero inoxidable':92,Caucho:3,Otros:5};confianza=80;}
-    if(/revestid|engomad/.test(t)){c={Acero:68,Caucho:27,Otros:5};confianza=75;}
-  }
-  // Neumáticos, fajas y cauchos técnicos.
-  else if(/neumatico|llanta|faja transportadora|correa transportadora|manguera|caucho/.test(t)){
-    c={Caucho:66,Acero:18,Fibra:10,'Negro de humo':4,Otros:2}; confianza=70; criterio='producto elastomérico reforzado';
-    if(/manguera hidraulica/.test(t)){c={Caucho:48,Acero:34,Fibra:10,Aceite:3,Otros:5};confianza=77;}
-  }
-  // Baterías y acumuladores.
-  else if(/bateria|acumulador|celda de bateria/.test(t)){
-    c={Plomo:58,Electrolito:19,Plástico:16,Cobre:2,Otros:5}; confianza=72; criterio='batería plomo-ácido';
-    if(/litio|lithium|li-ion/.test(t)){c={Aluminio:23,Cobre:14,Acero:12,Plástico:13,'Material activo':31,Otros:7};confianza=70;criterio='batería de ion-litio';}
-  }
-  // Radiadores e intercambiadores.
-  else if(/radiador|intercambiador|enfriador|cooler/.test(t)){
-    c={Cobre:38,Aluminio:28,Acero:23,Plástico:5,Otros:6}; confianza=63; criterio='intercambiador metálico';
-  }
-  // Estructuras y piezas de maquinaria pesada.
-  else if(/estructura|chasis|tolva|cucharon|balde|brazo|bastidor|eje|engranaje|rodillo/.test(t)){
-    c={Acero:91,Caucho:3,Grasa:2,Otros:4}; confianza=65; criterio='componente estructural o mecánico pesado';
-  }
-  // Radios portátiles, walkie-talkies y comunicaciones de mano.
-  else if(/walkie[ -]?talkie|radio portatil|radio de comunicacion|handheld radio|motorola|kenwood|hytera/.test(t)){
-    c={Plástico:41,Batería:24,Electrónica:17,Cobre:6,Aluminio:4,Acero:3,Vidrio:2,Caucho:2,Otros:1}; confianza=74; criterio='equipo portátil de radiocomunicación';
-    if(/sin bateria/.test(t)){c.Batería=1;c.Plástico+=10;c.Electrónica+=7;c.Otros+=6;confianza+=5;}
-    if(/bateria de litio|li-ion|litio/.test(t)){c.Batería=27;c.Plástico=39;c.Electrónica=17;c.Cobre=6;c.Aluminio=4;c.Acero=2;c.Vidrio=2;c.Caucho=2;c.Otros=1;confianza+=4;}
-  }
-  // Equipos informáticos y telecomunicaciones.
-  else if(/computadora|laptop|servidor|monitor|televisor|radio|telecomunicacion|router|switch de red/.test(t)){
-    c={Plástico:31,Acero:24,Aluminio:16,Cobre:9,Vidrio:8,Electrónica:9,Otros:3}; confianza=60; criterio='residuo de equipo eléctrico y electrónico';
-  }
-  // Fallback general, basado en materiales nombrados.
-  else{
-    const detectados=[];
-    const mapa=[['acero','Acero'],['cobre','Cobre'],['aluminio','Aluminio'],['caucho','Caucho'],['plastico','Plástico'],['hierro','Hierro'],['bronce','Bronce'],['vidrio','Vidrio'],['madera','Madera'],['ceramica','Cerámica'],['concreto','Concreto']];
-    mapa.forEach(([token,nombre])=>{if(t.includes(token))detectados.push(nombre);});
-    if(detectados.length){
-      const base=85/detectados.length; detectados.forEach(x=>c[x]=base); c.Otros=15;
-      confianza=45+Math.min(18,detectados.length*4);criterio='materiales identificados, sin tipología suficiente';
-    }else{
-      c={Acero:45,Cobre:12,Aluminio:8,Caucho:10,Plástico:10,Otros:15};
-      confianza=32;criterio='descripción insuficiente; estimación genérica de baja confianza';
-    }
-  }
-
-  const detalles=(t.match(/\b\d+(?:[.,]\d+)?\s*(?:m|metros|mm|cm|kg|tn|t|kv|v|hp|kw|pulgada|pulgadas|mm2)\b/g)||[]).length;
-  const datosTecnicos=(t.match(/codigo|modelo|serie|fabricante|diametro|longitud|metraje|potencia|voltaje|calibre|seccion|material|revestimiento|alma|armadura/g)||[]).length;
-  confianza=Math.min(94,confianza+Math.min(10,detalles*2)+Math.min(8,datosTecnicos));
-  return {componentes:ajustarComposicion(c),confianza,criterio,pesoReferenciaKg:pesoKg};
-}
-function formatearComposicionConPeso(componentes,pesoReferenciaKg,tipo,descripcion){
-  const t=normalizarTextoIA(`${tipo} ${descripcion}`);
-  const peso=Number(pesoReferenciaKg);
-  const tienePeso=Number.isFinite(peso)&&peso>0;
-  return Object.entries(componentes).map(([k,v])=>{
-    const porcentaje=Number(v);
-    const nombre=nombreTecnicoComponente(k,t);
-    const pTxt=porcentaje.toFixed(1).replace('.0','');
-    if(!tienePeso) return `${nombre}: ${pTxt}%`;
-    const kg=porcentaje/100*peso;
-    const kgTxt=kg<1?kg.toFixed(3).replace(/0+$/,'').replace(/\.$/,''):kg.toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
-    return `${nombre}: ${pTxt}% (${kgTxt} kg)`;
-  }).join('\n');
-}
-
-async function estimarComposicionCoproducto(){
-  const descripcion=document.getElementById('copro-descripcion-ia').value.trim();
-  const tipo=document.getElementById('copro-tipo').value;
-  const nombre=document.getElementById('copro-nombre').value.trim();
-  const caracteristica=document.getElementById('copro-caracteristica')?.value?.trim()||'';
-  const status=document.getElementById('copro-ia-status');
-  const btn=document.getElementById('btn-estimar-composicion');
-  if(!descripcion){
-    showToast('La descripción es opcional para guardar, pero necesaria para analizar la composición con IA.','warning');
-    return;
-  }
-  status.textContent='Analizando el coproducto con IA general...';
-  if(btn){btn.disabled=true;btn.textContent='Analizando...';}
-  try{
-    const {data,error}=await db.functions.invoke('estimar-composicion-coproducto',{
-      body:{nombre,tipo,descripcion,caracteristica}
-    });
-    if(error) throw error;
-    if(!data||!Array.isArray(data.componentes)||!data.componentes.length){
-      throw new Error('La IA no devolvió una composición utilizable.');
-    }
-    const lineas=data.componentes.map(item=>{
-      const material=String(item.material||'Material').trim();
-      const funcion=item.funcion?` (${String(item.funcion).trim()})`:'';
-      const pct=Number(item.porcentaje);
-      if(!Number.isFinite(pct)) return null;
-      const pctTxt=pct.toLocaleString('es-PE',{minimumFractionDigits:0,maximumFractionDigits:2});
-      const kg=Number(item.kg);
-      const kgTxt=Number.isFinite(kg)&&kg>=0
-        ?` (${kg.toLocaleString('es-PE',{minimumFractionDigits:0,maximumFractionDigits:3})} kg)`
-        :'';
-      return `${material}${funcion}: ${pctTxt}%${kgTxt}`;
-    }).filter(Boolean);
-    document.getElementById('copro-composicion').value=lineas.join('\n');
-    const confianza=Math.max(0,Math.min(100,Math.round(Number(data.confianza||0))));
-    document.getElementById('copro-ia-confianza').value=confianza;
-    const base=data.peso_total_kg!=null&&Number.isFinite(Number(data.peso_total_kg))
-      ?` · peso total analizado: ${Number(data.peso_total_kg).toLocaleString('es-PE',{maximumFractionDigits:3})} kg`
-      :' · sin peso total: no se inventaron kilogramos';
-    const advertencias=Array.isArray(data.advertencias)&&data.advertencias.length
-      ?` · ${data.advertencias.join(' ')}`:'';
-    status.textContent=`Confianza estimada: ${confianza}% · ${data.base_estimacion||'análisis técnico general'}${base}${advertencias}`;
-    showToast('Composición generada con IA. Revisa y valida antes de guardar.','success');
-  }catch(err){
-    console.error('Error IA:',err);
-    status.textContent='No se pudo realizar el análisis con IA. No se generó una composición por reglas ni palabras clave.';
-    showToast('La función de IA no está configurada o falló. Revisa la Edge Function y la clave OPENAI_API_KEY.','error');
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent='✦ Calcular composición con IA';}
-  }
-}
-
 async function syncMovimientosToDrive(options={}){
   const silent=Boolean(options.silent);
   if(!GOOGLE_SHEETS_SYNC_URL){
@@ -3112,7 +2870,7 @@ async function syncMovimientosToDrive(options={}){
 async function saveCoproducto(){
   if(!canEditCoproductos()){showToast('No tienes permiso','error');return;}
   const id=Number(document.getElementById('copro-id').value)||null;
-  const c={nombre:document.getElementById('copro-nombre').value.trim(),tipo:document.getElementById('copro-tipo').value,descripcionIA:document.getElementById('copro-descripcion-ia').value.trim(),composicion:document.getElementById('copro-composicion').value.trim(),confianzaIA:Number(document.getElementById('copro-ia-confianza').value||0),tonelaje:Number(document.getElementById('copro-tonelaje').value||0),valorTn:Number(document.getElementById('copro-valor-tn').value),caracteristica:document.getElementById('copro-caracteristica').value.trim(),ubicacion:document.getElementById('copro-ubicacion').value.trim(),modeloUrl:document.getElementById('copro-modelo-url').value,modeloPath:document.getElementById('copro-modelo-path').value,fotoUrl:document.getElementById('copro-foto-url').value,fotoPath:document.getElementById('copro-foto-path').value,registradoPor:APP.user.login};
+  const c={nombre:document.getElementById('copro-nombre').value.trim(),tipo:document.getElementById('copro-tipo').value,descripcionIA:document.getElementById('copro-descripcion-ia').value.trim(),composicion:document.getElementById('copro-composicion').value.trim(),confianzaIA:0,tonelaje:Number(document.getElementById('copro-tonelaje').value||0),valorTn:Number(document.getElementById('copro-valor-tn').value),caracteristica:document.getElementById('copro-caracteristica').value.trim(),ubicacion:document.getElementById('copro-ubicacion').value.trim(),modeloUrl:document.getElementById('copro-modelo-url').value,modeloPath:document.getElementById('copro-modelo-path').value,fotoUrl:document.getElementById('copro-foto-url').value,fotoPath:document.getElementById('copro-foto-path').value,registradoPor:APP.user.login};
   if(!c.nombre||!c.tipo||!c.caracteristica||!Number.isFinite(c.tonelaje)||c.tonelaje<0||!Number.isFinite(c.valorTn)||c.valorTn<0){showToast('Completa los campos obligatorios','warning');return;}
   const status=document.getElementById('copro-upload-status');
   const photoStatus=document.getElementById('copro-foto-status');
@@ -3175,7 +2933,6 @@ async function downloadCoproductosPDF(){
     pdf.setTextColor(...gray);pdf.setFont('helvetica','normal');pdf.setFontSize(8);pdf.text('STOCK ACTUAL',96,64);pdf.setTextColor(...green);pdf.setFont('helvetica','bold');pdf.setFontSize(20);pdf.text(st.stock.toFixed(3)+' tn',96,76);pdf.setFontSize(8);pdf.setTextColor(...gray);pdf.setFont('helvetica','normal');pdf.text(`Ingresos: ${st.ingresos.toFixed(3)} tn`,96,85);pdf.text(`Salidas: ${st.salidas.toFixed(3)} tn`,145,85);pdf.text(`Valor: ${money(st.stock*c.valorTn)}`,96,93);
     let yy=108;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Identificación',M,yy);yy+=7;yy=txt(`Tipo: ${c.tipo||'-'}   |   Ubicación: ${c.ubicacion||'-'}   |   Modelo 3D: ${c.modeloUrl?'Disponible':'No adjunto'}`,M,yy,182,8.5,'normal',gray);
     yy+=3;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Composición estimada',M,yy);yy+=7;yy=txt(c.composicion||'No registrada',M,yy,182,8.5,'normal',gray);
-    if(c.confianzaIA){pdf.setTextColor(...gray);pdf.setFontSize(7.5);pdf.text(`Nivel de confianza referencial: ${c.confianzaIA}%`,M,yy+1);yy+=6;}
     yy+=2;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Descripción y características',M,yy);yy+=7;yy=txt(c.descripcionIA||'Descripción técnica no registrada.',M,yy,182,8.5,'normal',gray);yy=txt('Característica principal: '+(c.caracteristica||'No registrada'),M,yy+2,182,8.5,'normal',gray);
     yy+=5;pdf.setTextColor(...dark);pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.text('Nivel frente al umbral de 25 tn',M,yy);yy+=7;pdf.setFillColor(224,235,227);pdf.roundedRect(M,yy,182,7,3.5,3.5,'F');pdf.setFillColor(...(needs?orange:green));pdf.roundedRect(M,yy,Math.max(2,Math.min(182,182*(st.stock/25))),7,3.5,3.5,'F');yy+=13;yy=txt(needs?`Exceso sobre el umbral: ${(st.stock-25).toFixed(2)} tn. Coordinar disponibilidad de transporte, destino y ventana de evacuación.`:`Capacidad referencial restante antes de alerta: ${(25-st.stock).toFixed(2)} tn.`,M,yy,182,8.5,'normal',needs?orange:gray);
     footer(`Catálogo de coproductos · ${idx+1}/${rows.length}`);
