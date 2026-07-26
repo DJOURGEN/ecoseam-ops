@@ -420,21 +420,35 @@ tbody tr:hover{background:var(--surface-1)}
 .copro-stock-progress{height:8px;background:#e5eee7;border-radius:999px;overflow:hidden;margin-top:8px}.copro-stock-progress span{display:block;height:100%;background:var(--success);border-radius:999px}.copro-card.evacuation-alert .copro-stock-progress span{background:var(--warning)}
 
 /* ===== MOBILE ===== */
+html,body{max-width:100%;overflow-x:hidden}
+.main,.content,[id^="view-"]{min-width:0;max-width:100%}
+img,canvas,svg,video{max-width:100%}
+.table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
 .mobile-nav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;
-  background:var(--surface);border-top:1px solid var(--border);
-  padding:8px 4px calc(8px + var(--safe-bottom));
+  width:100%;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  box-shadow:0 -5px 18px rgba(0,0,0,.08);
+  padding:7px 6px calc(7px + var(--safe-bottom));
   z-index:200;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(var(--mobile-cols,4),minmax(0,1fr));
+  gap:3px;
 }
 .mobile-nav-item{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px;border-radius:8px;font-size:10px;color:var(--text-s);cursor:pointer;
-  transition:color var(--transition);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  min-width:0;min-height:52px;
+  padding:5px 2px;border-radius:9px;font-size:9.5px;line-height:1.1;
+  color:var(--text-s);cursor:pointer;transition:all var(--transition);
+  text-align:center;overflow:hidden;
 }
-.mobile-nav-item.active{color:var(--accent)}
-.mobile-nav-item svg{width:22px;height:22px}
+.mobile-nav-item span{
+  display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mobile-nav-item.active{color:var(--accent);background:var(--surface-2);font-weight:700}
+.mobile-nav-item svg{width:21px;height:21px;flex:0 0 auto}
 
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
 
@@ -449,7 +463,7 @@ tbody tr:hover{background:var(--surface-1)}
   .sidebar-overlay{display:block}
   .hamburger{display:block}
   .mobile-nav{display:grid}
-  .content{padding:16px;padding-bottom:90px}
+  .content{padding:14px;padding-bottom:var(--mobile-content-bottom,90px)}
   .topbar{padding:0 16px}
   .stat-grid{grid-template-columns:repeat(2,1fr)}
   .modal-overlay{align-items:flex-end;padding:0}
@@ -537,7 +551,7 @@ tbody tr:hover{background:var(--surface-1)}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v11 · Sin IA · Catálogo profesional</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v12 · Móvil adaptable · Sin IA</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1025,29 +1039,8 @@ tbody tr:hover{background:var(--surface-1)}
     </div><!-- /content -->
   </div><!-- /main -->
 
-  <!-- Mobile nav -->
-  <nav class="mobile-nav" id="mobile-nav">
-    <div class="mobile-nav-item" id="mn-dashboard" onclick="navigateTo('dashboard')">
-      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>
-      <span>Inicio</span>
-    </div>
-    <div class="mobile-nav-item" id="mn-actividades" onclick="navigateTo('actividades')">
-      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>Actividades</span>
-    </div>
-    <div class="mobile-nav-item" id="mn-restricciones" onclick="navigateTo('restricciones')">
-      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>Restricciones</span>
-    </div>
-    <div class="mobile-nav-item" id="mn-reportes" onclick="navigateTo('reportes')">
-      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M4 20h16M6 20V12M10 20V8M14 20V4M18 20V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>Reportes</span>
-    </div>
-    <div class="mobile-nav-item" id="mn-admin" onclick="navigateTo('admin')">
-      <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>Admin</span>
-    </div>
-  </nav>
+  <!-- Navegación inferior móvil: se genera según el rol del usuario -->
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Accesos rápidos"></nav>
 </div><!-- /page-app -->
 
 <!-- ==================== MODALS ==================== -->
@@ -1738,11 +1731,26 @@ function setupUI() {
     nav.appendChild(el);
   });
 
-  // Mobile nav visibility
-  document.querySelectorAll('.mobile-nav-item').forEach(el => {
-    const id = el.id.replace('mn-','');
-    el.style.display = allowed.includes(id) ? 'flex' : 'none';
+  // Navegación inferior móvil: mostrar TODOS los módulos permitidos para el rol
+  const mobileNav = document.getElementById('mobile-nav');
+  mobileNav.innerHTML = '';
+  const mobileItems = NAV_CONFIG.all.filter(item => allowed.includes(item.id));
+  mobileItems.forEach(item => {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'mobile-nav-item';
+    el.id = 'mn-' + item.id;
+    el.setAttribute('aria-label', item.label);
+    el.innerHTML = ICONS[item.icon] + '<span>' + item.label + '</span>';
+    el.onclick = () => navigateTo(item.id);
+    mobileNav.appendChild(el);
   });
+
+  // 1 fila hasta 4 accesos; 2 filas para perfiles con más opciones
+  const mobileCols = mobileItems.length <= 4 ? Math.max(1, mobileItems.length) : 4;
+  const mobileRows = Math.ceil(mobileItems.length / mobileCols);
+  mobileNav.style.setProperty('--mobile-cols', mobileCols);
+  document.documentElement.style.setProperty('--mobile-content-bottom', (mobileRows === 1 ? 86 : 145) + 'px');
 
   // Nueva actividad solo dentro de la página Actividades
   const puedeRegistrarActividad = ['operador','controlador','admin'].includes(u.role);
