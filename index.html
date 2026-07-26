@@ -537,7 +537,7 @@ tbody tr:hover{background:var(--surface-1)}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v6 · IA + Drive</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v8 · IA general</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1271,17 +1271,17 @@ tbody tr:hover{background:var(--surface-1)}
       <div class="form-group"><label class="form-label">Tipo *</label><select class="form-control" id="copro-tipo"><option value="">Seleccionar</option><option>Cables</option><option>Motores</option><option>Transformadores</option><option>Componentes eléctricos</option><option>Componentes mecánicos</option><option>Otros</option></select></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Descripción técnica para análisis inteligente *</label>
+      <label class="form-label">Descripción técnica para análisis inteligente (opcional)</label>
       <textarea class="form-control" id="copro-descripcion-ia" rows="5" placeholder="Describe código del material, metraje, diámetro, peso, cantidad de caucho, acero, cobre, uso anterior, equipo o actividad. Ej.: Cable SHD-GC 15 kV, código 3x120+3G, 180 m, conductor de cobre, armado de acero y cubierta de caucho, usado en chancadora primaria."></textarea>
-      <div class="form-hint">Mientras más datos técnicos ingreses, mejor será la estimación. La composición obtenida debe validarse antes de guardar.</div>
+      <div class="form-hint">Este campo es opcional. Úsalo cuando quieras que el sistema estime la composición; también puedes registrar el coproducto sin descripción y completar la composición manualmente.</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
         <button type="button" class="btn btn-secondary btn-sm" id="btn-estimar-composicion" onclick="estimarComposicionCoproducto()">✦ Calcular composición con IA</button>
         <span id="copro-ia-status" class="form-hint" style="align-self:center"></span>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Composición estimada *</label>
-      <textarea class="form-control" id="copro-composicion" rows="4" placeholder="La estimación aparecerá aquí automáticamente. Puede corregirse luego de la validación técnica."></textarea>
+      <label class="form-label">Composición estimada</label>
+      <textarea class="form-control" id="copro-composicion" rows="4" placeholder="Opcional. La estimación general aparecerá aquí. Puede corregirse manualmente antes de guardar."></textarea>
       <input type="hidden" id="copro-ia-confianza" value="0">
     </div>
     <div class="form-row">
@@ -2831,44 +2831,167 @@ function ajustarComposicion(comp){
   return normalizado;
 }
 
+function extraerPesoReferenciaKg(texto){
+  const t=normalizarTextoIA(texto);
+  let m=t.match(/(?:peso(?:\s+total)?|masa)\s*(?:aprox(?:imada)?\.?\s*)?(?:de|:|=)?\s*(\d+(?:[.,]\d+)?)\s*(kg|tn|t|toneladas?)/i);
+  if(!m) m=t.match(/(\d+(?:[.,]\d+)?)\s*(kg|tn|t|toneladas?)\s*(?:de\s+peso|totales?|aprox)/i);
+  if(!m) return 100; // Base técnica para mostrar equivalencia: composición por cada 100 kg.
+  const valor=Number(m[1].replace(',','.'));
+  return /tn|tonelada|\bt\b/i.test(m[2]) ? valor*1000 : valor;
+}
+
+function nombreTecnicoComponente(nombre,t){
+  const n=normalizarTextoIA(nombre);
+  if(n==='acero' && /cable\s+acerado|cable\s+de\s+acero|wire\s*rope|6x19|6x36|alma\s+de\s+fibra|\bfc\b/.test(t)) return 'Acero (cordones)';
+  if(n==='caucho' && /cable\s+acerado|cable\s+de\s+acero|wire\s*rope/.test(t)) return 'Caucho (recubrimiento)';
+  if(n==='fibra') return 'Fibra (alma)';
+  if(n==='lubricante' || n==='aceite') return 'Lubricante';
+  return nombre;
+}
+
+function extraerComposicionDeclarada(texto,pesoReferenciaKg){
+  const t=normalizarTextoIA(texto);
+  const alias={
+    cobre:'Cobre',acero:'Acero',caucho:'Caucho',goma:'Caucho',pvc:'PVC',aluminio:'Aluminio',hierro:'Hierro',
+    plastico:'Plástico',bronce:'Bronce',plomo:'Plomo',fibra:'Fibra',lubricante:'Lubricante',aceite:'Aceite',
+    vidrio:'Vidrio',ceramica:'Cerámica',madera:'Madera',concreto:'Concreto',laton:'Latón',estaño:'Estaño',
+    niquel:'Níquel',zinc:'Zinc',inoxidable:'Acero inoxidable',aislante:'Aislante',electronica:'Electrónica',otros:'Otros'
+  };
+  const comp={};
+  Object.entries(alias).forEach(([token,nombre])=>{
+    let m=t.match(new RegExp(`${token}[^0-9]{0,28}(\\d+(?:[.,]\\d+)?)\\s*%`,'i'));
+    if(m) comp[nombre]=Number(m[1].replace(',','.'));
+  });
+  if(Object.keys(comp).length>=1){
+    const suma=Object.values(comp).reduce((a,b)=>a+b,0);
+    if(suma<100) comp.Otros=(comp.Otros||0)+(100-suma);
+    return {componentes:ajustarComposicion(comp),confianza:97,criterio:'composición porcentual indicada en la descripción',pesoReferenciaKg};
+  }
+
+  const masas={};
+  Object.entries(alias).forEach(([token,nombre])=>{
+    const m=t.match(new RegExp(`${token}[^0-9]{0,28}(\\d+(?:[.,]\\d+)?)\\s*(kg|tn|t|toneladas?)`,'i'));
+    if(m){
+      let kg=Number(m[1].replace(',','.'));
+      if(/tn|tonelada|^t$/i.test(m[2])) kg*=1000;
+      masas[nombre]=(masas[nombre]||0)+kg;
+    }
+  });
+  if(Object.keys(masas).length>=1){
+    const totalDeclarado=Object.values(masas).reduce((a,b)=>a+b,0);
+    const base=Math.max(Number(pesoReferenciaKg)||0,totalDeclarado)||totalDeclarado;
+    const porcentajes={};
+    Object.entries(masas).forEach(([k,v])=>porcentajes[k]=v/base*100);
+    if(totalDeclarado<base) porcentajes.Otros=(base-totalDeclarado)/base*100;
+    return {componentes:ajustarComposicion(porcentajes),confianza:96,criterio:'masas de materiales indicadas en la descripción',pesoReferenciaKg:base};
+  }
+  return null;
+}
+
 function estimacionLocalComposicion(descripcion,tipo){
   const t=normalizarTextoIA(`${tipo} ${descripcion}`);
-  // Primero respeta porcentajes expresamente indicados por el usuario.
-  const explicitos={};
-  const materiales=['cobre','acero','caucho','pvc','aluminio','hierro','plastico','bronce','plomo','aceite','otros'];
-  materiales.forEach(mat=>{
-    const re=new RegExp(`${mat}[^0-9]{0,18}(\\d+(?:[.,]\\d+)?)\\s*%`,'i'); const m=t.match(re);
-    if(m) explicitos[mat.charAt(0).toUpperCase()+mat.slice(1)]=Number(m[1].replace(',','.'));
-  });
-  if(Object.keys(explicitos).length>=2){
-    const suma=Object.values(explicitos).reduce((a,b)=>a+b,0); if(suma<100) explicitos.Otros=100-suma;
-    return {componentes:ajustarComposicion(explicitos),confianza:95,criterio:'porcentajes técnicos declarados'};
+  const pesoKg=extraerPesoReferenciaKg(descripcion);
+  const declarado=extraerComposicionDeclarada(descripcion,pesoKg);
+  if(declarado) return declarado;
+
+  let c={},confianza=52,criterio='estimación referencial por familia de equipo y características descritas';
+
+  // Cables de acero, eslingas y elementos de izaje.
+  if(/cable\s+acerado|cable\s+de\s+acero|wire\s*rope|6x19|6x36|alma\s+de\s+fibra|\bfc\b|iwrc|eslinga\s+de\s+cable/.test(t)){
+    c={Acero:75,Caucho:17,Fibra:7,Lubricante:1}; confianza=84; criterio='cable de acero con alma de fibra y recubrimiento';
+    if(/sin\s+recubrimiento|desnudo|no\s+recubierto/.test(t)){c={Acero:91,Fibra:7,Lubricante:2};confianza=89;criterio='cable de acero sin recubrimiento';}
+    if(/alma\s+de\s+acero|iwrc/.test(t)){c={Acero:97,Lubricante:2,Otros:1};confianza=91;criterio='cable de acero con alma metálica IWRC';}
   }
-  let c={},confianza=58,criterio='estimación referencial por tipología y palabras clave';
-  if(/cable|conductor|shd|n2x|n2xh|vulcan/.test(t)){
-    c={Cobre:42,Caucho:36,Acero:15,Otros:7}; confianza=70;
-    if(/aluminio|aluminium/.test(t)){c={Aluminio:38,Caucho:40,Acero:15,Otros:7};confianza+=7;}
-    if(/pvc/.test(t)){c.Caucho=(c.Caucho||0)-15;c.PVC=15;confianza+=4;}
-    if(/armad|malla|pantalla|blindad|acero/.test(t)){c.Acero=(c.Acero||0)+8;c.Caucho=(c.Caucho||0)-5;c.Otros=(c.Otros||0)-3;confianza+=5;}
-    if(/alta tension|media tension|15 kv|10 kv|6[.,]?6 kv/.test(t)){c.Cobre=(c.Cobre||0)+4;c.Caucho=(c.Caucho||0)+3;c.Otros=(c.Otros||0)-7;confianza+=4;}
-  }else if(/motor|electromotor|bobina|estator|rotor/.test(t)){
-    c={Acero:58,Cobre:18,Aluminio:9,Plástico:5,Otros:10};confianza=68;
-    if(/carcasa de hierro|hierro fundido|fundicion/.test(t)){c={Hierro:48,Acero:20,Cobre:18,Aluminio:5,Otros:9};confianza+=6;}
-    if(/sin bobina|bobinado retirado/.test(t)){c.Cobre=3;c.Acero+=10;c.Otros+=5;confianza+=5;}
-  }else if(/transformador|trafo/.test(t)){
-    c={Acero:40,Cobre:22,Aceite:25,Aluminio:5,Otros:8};confianza=67;
-    if(/seco/.test(t)){delete c.Aceite;c.Acero=50;c.Cobre=27;c.Aluminio=8;c.Otros=15;confianza+=8;}
-    if(/aluminio/.test(t)){c.Aluminio=22;c.Cobre=5;confianza+=5;}
-  }else if(/tablero|gabinete|celda electrica|switchgear/.test(t)){
-    c={Acero:62,Cobre:12,Aluminio:6,Plástico:10,Otros:10};confianza=62;
-  }else if(/bomba|reductor|caja de engranajes|gearbox/.test(t)){
-    c={Acero:72,Hierro:16,Cobre:2,Caucho:3,Otros:7};confianza=60;
-  }else{
-    c={Acero:50,Cobre:15,Aluminio:8,Caucho:10,Plástico:7,Otros:10};
+  // Cables eléctricos de potencia, control e instrumentación.
+  else if(/cable|conductor|shd|n2x|n2xh|vulcan|flexible|instrumentacion|control/.test(t)){
+    c={Cobre:38,Caucho:34,Acero:16,PVC:7,Otros:5}; confianza=66; criterio='cable eléctrico multiparte';
+    if(/aluminio/.test(t)){c={Aluminio:36,Caucho:36,Acero:16,PVC:7,Otros:5};confianza+=8;}
+    if(/sin armadura|no armado/.test(t)){c.Acero=3;c.Caucho+=7;c.PVC+=4;c.Otros+=2;confianza+=4;}
+    if(/armad|malla|pantalla|blindad/.test(t)){c.Acero+=8;c.Caucho-=5;c.Otros-=3;confianza+=5;}
+    if(/media tension|alta tension|\b15\s*kv|\b10\s*kv|6[.,]?6\s*kv/.test(t)){c.Cobre=(c.Cobre||0)+4;c.Caucho+=4;c.Otros-=4;c.PVC-=4;confianza+=5;}
+    if(/fibra optica|optical fiber/.test(t)){c={Vidrio:18,Plástico:42,Acero:22,Caucho:12,Otros:6};confianza=78;criterio='cable de fibra óptica reforzado';}
   }
-  const detalles=(t.match(/\b\d+(?:[.,]\d+)?\s*(?:m|metros|mm|kg|tn|kv|hp|kw)\b/g)||[]).length;
-  confianza=Math.min(90,confianza+Math.min(12,detalles*2));
-  return {componentes:ajustarComposicion(c),confianza,criterio};
+  // Motores, generadores y alternadores.
+  else if(/motor|electromotor|generador|alternador|estator|rotor/.test(t)){
+    c={Acero:47,Hierro:24,Cobre:17,Aluminio:5,Plástico:2,Otros:5}; confianza=66; criterio='máquina eléctrica rotativa';
+    if(/carcasa de aluminio/.test(t)){c.Aluminio=22;c.Hierro=8;c.Acero=46;c.Cobre=17;c.Otros=7;confianza+=7;}
+    if(/hierro fundido|fundicion/.test(t)){c.Hierro=42;c.Acero=30;c.Cobre=17;c.Aluminio=3;c.Otros=8;confianza+=7;}
+    if(/sin bobina|bobinado retirado|sin cobre/.test(t)){c.Cobre=2;c.Acero+=8;c.Hierro+=5;c.Otros+=2;confianza+=8;}
+  }
+  // Transformadores y reactores.
+  else if(/transformador|trafo|reactor electrico/.test(t)){
+    c={Acero:36,Cobre:21,Aceite:27,Papel:5,Porcelana:4,Otros:7}; confianza=68; criterio='transformador inmerso en aceite';
+    if(/seco|resina/.test(t)){c={Acero:43,Cobre:24,Resina:18,Aluminio:5,Otros:10};confianza=78;criterio='transformador seco encapsulado';}
+    if(/devanado de aluminio|bobina de aluminio/.test(t)){c.Aluminio=21;c.Cobre=4;confianza+=8;}
+  }
+  // Tableros, celdas y componentes eléctricos/electrónicos.
+  else if(/tablero|gabinete|celda electrica|switchgear|variador|inversor|ups|rectificador|electronico/.test(t)){
+    c={Acero:49,Cobre:14,Aluminio:9,Plástico:10,Electrónica:12,Otros:6}; confianza=62; criterio='equipo eléctrico/electrónico en gabinete';
+  }
+  // Bombas, reductores, cajas y equipos mecánicos.
+  else if(/bomba|reductor|caja de engranajes|gearbox|compresor|ventilador|soplador/.test(t)){
+    c={Acero:58,Hierro:27,Cobre:3,Aluminio:3,Caucho:3,Aceite:3,Otros:3}; confianza=61; criterio='equipo mecánico rotativo';
+    if(/revestida en caucho|liner de caucho/.test(t)){c.Caucho=18;c.Acero-=8;c.Hierro-=7;c.Otros+=2;confianza+=7;}
+  }
+  // Válvulas, tuberías y fittings.
+  else if(/valvula|tuberia|tubo|fitting|codo|brida|spool/.test(t)){
+    c={Acero:84,Caucho:6,Plástico:3,Otros:7}; confianza=61; criterio='componente de conducción de fluidos';
+    if(/hdpe|polietileno/.test(t)){c={HDPE:94,Acero:3,Otros:3};confianza=82;criterio='tubería o fitting HDPE';}
+    if(/inoxidable/.test(t)){c={'Acero inoxidable':92,Caucho:3,Otros:5};confianza=80;}
+    if(/revestid|engomad/.test(t)){c={Acero:68,Caucho:27,Otros:5};confianza=75;}
+  }
+  // Neumáticos, fajas y cauchos técnicos.
+  else if(/neumatico|llanta|faja transportadora|correa transportadora|manguera|caucho/.test(t)){
+    c={Caucho:66,Acero:18,Fibra:10,'Negro de humo':4,Otros:2}; confianza=70; criterio='producto elastomérico reforzado';
+    if(/manguera hidraulica/.test(t)){c={Caucho:48,Acero:34,Fibra:10,Aceite:3,Otros:5};confianza=77;}
+  }
+  // Baterías y acumuladores.
+  else if(/bateria|acumulador|celda de bateria/.test(t)){
+    c={Plomo:58,Electrolito:19,Plástico:16,Cobre:2,Otros:5}; confianza=72; criterio='batería plomo-ácido';
+    if(/litio|lithium|li-ion/.test(t)){c={Aluminio:23,Cobre:14,Acero:12,Plástico:13,'Material activo':31,Otros:7};confianza=70;criterio='batería de ion-litio';}
+  }
+  // Radiadores e intercambiadores.
+  else if(/radiador|intercambiador|enfriador|cooler/.test(t)){
+    c={Cobre:38,Aluminio:28,Acero:23,Plástico:5,Otros:6}; confianza=63; criterio='intercambiador metálico';
+  }
+  // Estructuras y piezas de maquinaria pesada.
+  else if(/estructura|chasis|tolva|cucharon|balde|brazo|bastidor|eje|engranaje|rodillo/.test(t)){
+    c={Acero:91,Caucho:3,Grasa:2,Otros:4}; confianza=65; criterio='componente estructural o mecánico pesado';
+  }
+  // Equipos informáticos y telecomunicaciones.
+  else if(/computadora|laptop|servidor|monitor|televisor|radio|telecomunicacion|router|switch de red/.test(t)){
+    c={Plástico:31,Acero:24,Aluminio:16,Cobre:9,Vidrio:8,Electrónica:9,Otros:3}; confianza=60; criterio='residuo de equipo eléctrico y electrónico';
+  }
+  // Fallback general, basado en materiales nombrados.
+  else{
+    const detectados=[];
+    const mapa=[['acero','Acero'],['cobre','Cobre'],['aluminio','Aluminio'],['caucho','Caucho'],['plastico','Plástico'],['hierro','Hierro'],['bronce','Bronce'],['vidrio','Vidrio'],['madera','Madera'],['ceramica','Cerámica'],['concreto','Concreto']];
+    mapa.forEach(([token,nombre])=>{if(t.includes(token))detectados.push(nombre);});
+    if(detectados.length){
+      const base=85/detectados.length; detectados.forEach(x=>c[x]=base); c.Otros=15;
+      confianza=45+Math.min(18,detectados.length*4);criterio='materiales identificados, sin tipología suficiente';
+    }else{
+      c={Acero:45,Cobre:12,Aluminio:8,Caucho:10,Plástico:10,Otros:15};
+      confianza=32;criterio='descripción insuficiente; estimación genérica de baja confianza';
+    }
+  }
+
+  const detalles=(t.match(/\b\d+(?:[.,]\d+)?\s*(?:m|metros|mm|cm|kg|tn|t|kv|v|hp|kw|pulgada|pulgadas|mm2)\b/g)||[]).length;
+  const datosTecnicos=(t.match(/codigo|modelo|serie|fabricante|diametro|longitud|metraje|potencia|voltaje|calibre|seccion|material|revestimiento|alma|armadura/g)||[]).length;
+  confianza=Math.min(94,confianza+Math.min(10,detalles*2)+Math.min(8,datosTecnicos));
+  return {componentes:ajustarComposicion(c),confianza,criterio,pesoReferenciaKg:pesoKg};
+}
+function formatearComposicionConPeso(componentes,pesoReferenciaKg,tipo,descripcion){
+  const t=normalizarTextoIA(`${tipo} ${descripcion}`);
+  const peso=Number(pesoReferenciaKg)||100;
+  return Object.entries(componentes).map(([k,v])=>{
+    const porcentaje=Number(v);
+    const kg=porcentaje/100*peso;
+    const nombre=nombreTecnicoComponente(k,t);
+    const pTxt=porcentaje.toFixed(1).replace('.0','');
+    const kgTxt=kg.toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+    return `${nombre}: ${pTxt}% (${kgTxt} kg)`;
+  }).join('\n');
 }
 
 async function estimarComposicionCoproducto(){
@@ -2888,7 +3011,7 @@ async function estimarComposicionCoproducto(){
   }catch(e){ /* usa el estimador local de respaldo */ }
   if(!resultado) resultado=estimacionLocalComposicion(descripcion,tipo);
   const componentes=resultado.componentes||{};
-  document.getElementById('copro-composicion').value=Object.entries(componentes).map(([k,v])=>`${k}: ${Number(v).toFixed(1).replace('.0','')} %`).join('\n');
+  document.getElementById('copro-composicion').value=formatearComposicionConPeso(componentes,resultado.pesoReferenciaKg,tipo,descripcion);
   const confianza=Math.round(Number(resultado.confianza||60));
   document.getElementById('copro-ia-confianza').value=confianza;
   status.textContent=`Confianza estimada: ${confianza}% · ${resultado.criterio||'estimación inteligente'}`;
@@ -2918,7 +3041,7 @@ async function saveCoproducto(){
   if(!canEditCoproductos()){showToast('No tienes permiso','error');return;}
   const id=Number(document.getElementById('copro-id').value)||null;
   const c={nombre:document.getElementById('copro-nombre').value.trim(),tipo:document.getElementById('copro-tipo').value,descripcionIA:document.getElementById('copro-descripcion-ia').value.trim(),composicion:document.getElementById('copro-composicion').value.trim(),confianzaIA:Number(document.getElementById('copro-ia-confianza').value||0),tonelaje:Number(document.getElementById('copro-tonelaje').value||0),valorTn:Number(document.getElementById('copro-valor-tn').value),caracteristica:document.getElementById('copro-caracteristica').value.trim(),ubicacion:document.getElementById('copro-ubicacion').value.trim(),modeloUrl:document.getElementById('copro-modelo-url').value,modeloPath:document.getElementById('copro-modelo-path').value,registradoPor:APP.user.login};
-  if(!c.nombre||!c.tipo||!c.descripcionIA||!c.composicion||!c.caracteristica||!Number.isFinite(c.tonelaje)||c.tonelaje<0||!Number.isFinite(c.valorTn)||c.valorTn<0){showToast('Completa los campos obligatorios','warning');return;}
+  if(!c.nombre||!c.tipo||!c.caracteristica||!Number.isFinite(c.tonelaje)||c.tonelaje<0||!Number.isFinite(c.valorTn)||c.valorTn<0){showToast('Completa los campos obligatorios','warning');return;}
   const status=document.getElementById('copro-upload-status');
   try{
     const file=canUploadCoproductoModel()?document.getElementById('copro-modelo-file').files[0]:null;
