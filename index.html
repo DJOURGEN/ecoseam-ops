@@ -881,6 +881,7 @@ img,canvas,svg,video{max-width:100%}
             <div class="form-group" style="margin:0"><label class="form-label">Estado del vehículo</label><select class="filter-select" id="patio-tipo-mov" onchange="renderPatios()"><option value="">Todos</option><option value="en_patio">En patio</option><option value="salio">Con salida registrada</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Subclase</label><select class="filter-select" id="patio-subclase" onchange="renderPatios()"><option value="">Todas</option><option value="Metálico">Metálico</option><option value="No metálico">No metálico</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Gerencia</label><select class="filter-select" id="patio-gerencia" onchange="renderPatios()"><option value="">Todas</option><option>Mantenimiento</option><option>Concentradora</option><option>Ingeniería & Proyectos</option><option>Campamento</option><option>Patio de recepción 4388</option><option>DEG</option></select></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Patio recepción</label><select class="filter-select" id="patio-recepcion-filtro" onchange="renderPatios()"><option value="">Todos</option><option>4388</option><option>DEG</option><option>Otros</option></select></div>
             <div class="filters-spacer"></div>
             <button class="btn btn-outline btn-sm" onclick="clearPatioFilters()">Limpiar</button>
             <button class="btn btn-outline btn-sm" onclick="exportMovimientosCSV()">Exportar Excel</button>
@@ -904,7 +905,7 @@ img,canvas,svg,video{max-width:100%}
         <div class="card" style="padding:0">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Fecha</th><th>Estado</th><th>Subclase</th><th>Clase</th><th>Residuo</th><th>Material</th><th>Vehículo</th><th>Empresa</th><th>Peso (tn)</th><th>Procedencia</th><th>Gerencia</th><th>Hora ingreso</th><th>Hora salida</th><th>Registrado por</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Estado</th><th>Patio recepción</th><th>Placa</th><th>Subclase</th><th>Clase</th><th>Residuo</th><th>Material</th><th>Vehículo</th><th>Empresa</th><th>Peso (tn)</th><th>Procedencia</th><th>Gerencia</th><th>Hora ingreso</th><th>Hora salida</th><th>Registrado por</th><th>Acciones</th></tr></thead>
               <tbody id="tbody-movimientos"></tbody>
             </table>
           </div>
@@ -1390,6 +1391,11 @@ img,canvas,svg,video{max-width:100%}
       <div class="form-group"><label class="form-label">Tipo de residuo *</label><select class="form-control" id="mov-residuo"><option value="">Seleccionar</option><option>Pesado</option><option>Liviano</option></select></div>
       <div class="form-group"><label class="form-label">Tipo de vehículo *</label><select class="form-control" id="mov-vehiculo"><option value="">Seleccionar</option><option>Plataforma</option><option>Grúa</option><option>Amarillo</option></select></div>
     </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Placa del vehículo *</label><input class="form-control" id="mov-placa" type="text" maxlength="12" placeholder="Ej.: ABC-123" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9-]/g,'')"></div>
+      <div class="form-group"><label class="form-label">Patio de recepción *</label><select class="form-control" id="mov-patio" onchange="toggleOtroPatio()"><option value="">Seleccionar</option><option>4388</option><option>DEG</option><option value="Otros">Otros</option></select></div>
+    </div>
+    <div class="form-group" id="mov-patio-otro-group" style="display:none"><label class="form-label">Especificar otro patio *</label><input class="form-control" id="mov-patio-otro" type="text" placeholder="Nombre o código del patio"></div>
     <div class="form-group"><label class="form-label">Descripción del material *</label><input class="form-control" id="mov-descripcion" type="text" placeholder="Ej.: chatarra metálica, HDPE, bolas de acero..."></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Empresa que lo trajo *</label><input class="form-control" id="mov-empresa" type="text" placeholder="Nombre de la empresa"></div>
@@ -1734,7 +1740,7 @@ function dbMovimientoToApp(row) {
   return {
     id: row.id, fecha: row.fecha, movimiento: row.movimiento || 'ingreso',
     subclase: row.subclase || '', clase: row.clase || '', tipoResiduo: row.tipo_residuo || '',
-    descripcion: row.descripcion || '', vehiculo: row.tipo_vehiculo || '', empresa: row.empresa || '',
+    descripcion: row.descripcion || '', vehiculo: row.tipo_vehiculo || '', placa: row.placa || '', patioRecepcion: row.patio_recepcion || '', empresa: row.empresa || '',
     peso: Number(row.peso_tn || 0), procedencia: row.procedencia || '', gerencia: row.gerencia || '',
     inicio: row.hora_inicio ? String(row.hora_inicio).slice(0,5) : '',
     fin: row.hora_fin ? String(row.hora_fin).slice(0,5) : '',
@@ -1744,7 +1750,7 @@ function dbMovimientoToApp(row) {
 function appMovimientoToDb(m) {
   return {
     fecha:m.fecha, movimiento:m.movimiento, subclase:m.subclase, clase:m.clase,
-    tipo_residuo:m.tipoResiduo, descripcion:m.descripcion, tipo_vehiculo:m.vehiculo,
+    tipo_residuo:m.tipoResiduo, descripcion:m.descripcion, tipo_vehiculo:m.vehiculo, placa:m.placa, patio_recepcion:m.patioRecepcion,
     empresa:m.empresa, peso_tn:m.peso, procedencia:m.procedencia, gerencia:m.gerencia,
     hora_inicio:m.inicio || null, hora_fin:m.fin || null, registrado_por:m.registradoPor
   };
@@ -2833,13 +2839,18 @@ function openMovimientoModal(id=null){
   const now = new Date();
   const today = now.toISOString().split('T')[0];
   const currentTime = now.toTimeString().slice(0,5);
-  const values = m || {fecha:today,movimiento:'ingreso',subclase:'',clase:'',tipoResiduo:'',descripcion:'',vehiculo:'',empresa:'',peso:'',procedencia:'',gerencia:'',inicio:currentTime,fin:''};
+  const values = m || {fecha:today,movimiento:'ingreso',subclase:'',clase:'',tipoResiduo:'',descripcion:'',vehiculo:'',placa:'',patioRecepcion:'',empresa:'',peso:'',procedencia:'',gerencia:'',inicio:currentTime,fin:''};
   document.getElementById('mov-fecha').value=values.fecha;
   document.getElementById('mov-subclase').value=values.subclase;
   document.getElementById('mov-clase').value=values.clase;
   document.getElementById('mov-residuo').value=values.tipoResiduo;
   document.getElementById('mov-descripcion').value=values.descripcion;
   document.getElementById('mov-vehiculo').value=values.vehiculo;
+  document.getElementById('mov-placa').value=values.placa||'';
+  const patiosBase=['4388','DEG'];
+  document.getElementById('mov-patio').value=patiosBase.includes(values.patioRecepcion)?values.patioRecepcion:(values.patioRecepcion?'Otros':'');
+  document.getElementById('mov-patio-otro').value=patiosBase.includes(values.patioRecepcion)?'':(values.patioRecepcion||'');
+  toggleOtroPatio();
   document.getElementById('mov-empresa').value=values.empresa;
   document.getElementById('mov-peso').value=values.peso;
   document.getElementById('mov-procedencia').value=values.procedencia;
@@ -2847,6 +2858,12 @@ function openMovimientoModal(id=null){
   document.getElementById('mov-inicio').value=values.inicio;
   document.getElementById('mov-fin').value=values.fin;
   openModal('modal-movimiento');
+}
+
+function toggleOtroPatio(){
+  const select=document.getElementById('mov-patio');
+  const group=document.getElementById('mov-patio-otro-group');
+  if(group) group.style.display=select?.value==='Otros'?'block':'none';
 }
 
 async function saveMovimiento(){
@@ -2859,6 +2876,8 @@ async function saveMovimiento(){
     tipoResiduo:document.getElementById('mov-residuo').value,
     descripcion:document.getElementById('mov-descripcion').value.trim(),
     vehiculo:document.getElementById('mov-vehiculo').value,
+    placa:document.getElementById('mov-placa').value.trim().toUpperCase(),
+    patioRecepcion:(document.getElementById('mov-patio').value==='Otros'?document.getElementById('mov-patio-otro').value.trim():document.getElementById('mov-patio').value),
     empresa:document.getElementById('mov-empresa').value.trim(),
     peso:Number(document.getElementById('mov-peso').value),
     procedencia:document.getElementById('mov-procedencia').value.trim(),
@@ -2867,12 +2886,12 @@ async function saveMovimiento(){
     fin:document.getElementById('mov-fin').value,
     registradoPor:APP.user.login
   };
-  if(!m.fecha||!m.subclase||!m.clase||!m.tipoResiduo||!m.descripcion||!m.vehiculo||!m.empresa||!m.peso||!m.procedencia||!m.gerencia||!m.inicio){showToast('Completa todos los campos obligatorios del ingreso','error');return;}
+  if(!m.fecha||!m.subclase||!m.clase||!m.tipoResiduo||!m.descripcion||!m.vehiculo||!m.placa||!m.patioRecepcion||!m.empresa||!m.peso||!m.procedencia||!m.gerencia||!m.inicio){showToast('Completa todos los campos obligatorios del ingreso','error');return;}
   if(m.peso<=0){showToast('El peso debe ser mayor que cero','error');return;}
   const id=document.getElementById('mov-id').value;
   const query=id?db.from('movimientos_material').update(appMovimientoToDb(m)).eq('id',id):db.from('movimientos_material').insert([appMovimientoToDb(m)]);
   const {error}=await query;
-  if(error){console.error(error);showToast('Error al guardar. Verifica que la tabla movimientos_material exista','error');return;}
+  if(error){console.error(error);showToast('Error al guardar: '+(error.message||'revisa columnas y políticas de Supabase'),'error');return;}
   closeModal('modal-movimiento'); await loadAllData(); showToast(id?'Ingreso actualizado':'Ingreso registrado. Cuando el vehículo se retire, pulsa “Marcar salida”.','success'); syncMovimientosToDrive({silent:true});
 }
 
@@ -2882,7 +2901,7 @@ async function marcarSalidaVehiculo(id){
   if(!m){showToast('No se encontró el ingreso seleccionado','error');return;}
   if(m.fin){showToast('Este vehículo ya tiene una hora de salida registrada','warning');return;}
   const hora=new Date().toTimeString().slice(0,5);
-  if(!confirm(`¿Registrar la salida del vehículo ${m.vehiculo} a las ${hora}?`)) return;
+  if(!confirm(`¿Registrar la salida del vehículo ${m.vehiculo}, placa ${m.placa||'sin placa'}, a las ${hora}?`)) return;
   const {error}=await db.from('movimientos_material').update({hora_fin:hora}).eq('id',id);
   if(error){console.error(error);showToast('No se pudo registrar la salida','error');return;}
   await loadAllData();
@@ -2897,12 +2916,12 @@ async function deleteMovimiento(id){
   if(error){console.error(error);showToast('Error al eliminar','error');return;} await loadAllData(); showToast('Ingreso eliminado','warning'); syncMovimientosToDrive({silent:true});
 }
 function getPatioFilteredData(){
-  const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', t=document.getElementById('patio-tipo-mov')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'';
-  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||(t==='en_patio'?!m.fin:!!m.fin))&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
+  const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', t=document.getElementById('patio-tipo-mov')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'', p=document.getElementById('patio-recepcion-filtro')?.value||'';
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||(t==='en_patio'?!m.fin:!!m.fin))&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
 }
 function getPatioChartData(){
-  const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'';
-  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
+  const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'', p=document.getElementById('patio-recepcion-filtro')?.value||'';
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
 }
 function renderPatios(){
   const data=getPatioFilteredData(); const editable=canEditPatios();
@@ -2918,8 +2937,8 @@ function renderPatios(){
   tbody.innerHTML=data.length?data.map(m=>{
     const estado=m.fin?'<span class="badge badge-done">Salió</span>':'<span class="badge badge-pending">En patio</span>';
     const salidaBtn=editable&&!m.fin?`<button class="btn btn-success btn-sm" onclick="marcarSalidaVehiculo(${m.id})">✓ Marcar salida</button>`:'';
-    return `<tr><td>${formatDate(m.fecha)}</td><td>${estado}</td><td>${m.subclase}</td><td>${m.clase}</td><td>${m.tipoResiduo}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${m.vehiculo}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${m.gerencia}</td><td>${m.inicio||'—'}</td><td>${m.fin||'<span style="color:var(--warning);font-weight:700">Pendiente</span>'}</td><td>${m.registradoPor||'—'}</td><td style="white-space:nowrap;display:flex;gap:6px;flex-wrap:wrap">${salidaBtn}${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?`<button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`;
-  }).join(''):`<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--text-m)">No hay vehículos para los filtros seleccionados</td></tr>`;
+    return `<tr><td>${formatDate(m.fecha)}</td><td>${estado}</td><td><strong>${escapeHtml(m.patioRecepcion||'—')}</strong></td><td><strong>${escapeHtml(m.placa||'—')}</strong></td><td>${m.subclase}</td><td>${m.clase}</td><td>${m.tipoResiduo}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${m.vehiculo}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${m.gerencia}</td><td>${m.inicio||'—'}</td><td>${m.fin||'<span style="color:var(--warning);font-weight:700">Pendiente</span>'}</td><td>${m.registradoPor||'—'}</td><td style="white-space:nowrap;display:flex;gap:6px;flex-wrap:wrap">${salidaBtn}${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?`<button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`;
+  }).join(''):`<tr><td colspan="17" style="text-align:center;padding:32px;color:var(--text-m)">No hay vehículos para los filtros seleccionados</td></tr>`;
   renderPatioCharts(getPatioChartData());
 }
 function renderPatioCharts(data){
@@ -2933,11 +2952,11 @@ function renderPatioCharts(data){
   const byGer={}; ingresos.forEach(m=>byGer[m.gerencia]=(byGer[m.gerencia]||0)+m.peso); const arr=Object.entries(byGer).sort((a,b)=>b[1]-a[1]); const max=arr[0]?.[1]||1;
   document.getElementById('chart-patio-gerencia').innerHTML=arr.length?arr.map(([g,v])=>`<div class="pyramid-row" style="width:${Math.max(30,(v/max)*96)}%" title="${v.toFixed(3)} tn">${g}: ${v.toFixed(2)} tn</div>`).join(''):'<div class="wa-empty">Sin datos para mostrar</div>';
 }
-function clearPatioFilters(){['patio-desde','patio-hasta','patio-tipo-mov','patio-subclase','patio-gerencia'].forEach(id=>document.getElementById(id).value='');renderPatios();}
+function clearPatioFilters(){['patio-desde','patio-hasta','patio-tipo-mov','patio-subclase','patio-gerencia','patio-recepcion-filtro'].forEach(id=>document.getElementById(id).value='');renderPatios();}
 function exportMovimientosCSV(){
   const data=getPatioFilteredData(); if(!data.length){showToast('No hay datos para exportar','warning');return;}
-  const headers=['Fecha','Movimiento','Subclase','Clase','Tipo residuo','Descripción','Vehículo','Empresa','Peso tn','Procedencia','Gerencia','Hora inicio','Hora fin','Registrado por'];
-  const rows=data.map(m=>[m.fecha,m.fin?'Salió':'En patio',m.subclase,m.clase,m.tipoResiduo,m.descripcion,m.vehiculo,m.empresa,m.peso,m.procedencia,m.gerencia,m.inicio,m.fin||'',m.registradoPor]);
+  const headers=['Fecha','Estado','Patio recepción','Placa','Subclase','Clase','Tipo residuo','Descripción','Vehículo','Empresa','Peso tn','Procedencia','Gerencia','Hora inicio','Hora fin','Registrado por'];
+  const rows=data.map(m=>[m.fecha,m.fin?'Salió':'En patio',m.patioRecepcion,m.placa,m.subclase,m.clase,m.tipoResiduo,m.descripcion,m.vehiculo,m.empresa,m.peso,m.procedencia,m.gerencia,m.inicio,m.fin||'',m.registradoPor]);
   const csv='\ufeff'+[headers,...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n'); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='movimientos_patios.csv';a.click();URL.revokeObjectURL(a.href);
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -3553,7 +3572,7 @@ async function syncMovimientosToDrive(options={}){
   const rows=[...APP.data.movimientos].sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))||Number(a.id)-Number(b.id));
   const payload={token:GOOGLE_SHEETS_SYNC_TOKEN,accion:'sincronizar',hoja:'Movimientos_material',actualizado_en:new Date().toISOString(),filas:rows.map(m=>({
     id:m.id,fecha:m.fecha,movimiento:m.movimiento,subclase:m.subclase,clase:m.clase,tipo_residuo:m.tipoResiduo,
-    descripcion:m.descripcion,tipo_vehiculo:m.vehiculo,empresa:m.empresa,peso_tn:m.peso,procedencia:m.procedencia,
+    descripcion:m.descripcion,tipo_vehiculo:m.vehiculo,placa:m.placa,patio_recepcion:m.patioRecepcion,empresa:m.empresa,peso_tn:m.peso,procedencia:m.procedencia,
     gerencia:m.gerencia,hora_inicio:m.inicio,hora_fin:m.fin,registrado_por:m.registradoPor
   }))};
   try{
