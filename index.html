@@ -1036,7 +1036,7 @@ img,canvas,svg,video{max-width:100%}
 
           <div class="game-layout">
             <div class="card game-question">
-              <div class="card-header"><div><div class="card-title">Reto Seguro</div><div class="card-subtitle">Responde, aprende y acumula puntos para el sorteo de fin de mes</div></div><span class="badge badge-done" id="game-question-value">Hasta 100 pts</span></div>
+              <div class="card-header"><div><div class="card-title">Reto Seguro</div><div class="card-subtitle">Una pregunta diaria con tiempo. Responde rápido y correctamente para sumar más puntos</div></div><span class="badge badge-done" id="game-question-value">Máximo 20 pts</span></div>
               <div id="game-question-box" class="game-empty">Presiona “Comenzar reto” para recibir una pregunta.</div>
               <div id="game-start-actions" style="display:flex;justify-content:center;margin-top:15px"><button class="btn btn-primary btn-lg" onclick="startSafetyChallenge()">Comenzar reto</button></div>
             </div>
@@ -1053,11 +1053,13 @@ img,canvas,svg,video{max-width:100%}
               <div class="card">
                 <div class="card-title">Cómo se asignan los puntos</div>
                 <div class="game-rules" style="margin-top:10px">
-                  <b>100 puntos:</b> respuesta correcta sin errores previos.<br>
-                  <b>70 puntos:</b> correcta después de 1 error previo.<br>
-                  <b>40 puntos:</b> correcta después de 2 errores previos.<br>
-                  <b>20 puntos:</b> correcta después de 3 o más errores previos.<br><br>
-                  Si una pregunta vuelve a aparecer porque antes fue respondida incorrectamente, su premio disminuye. Así se recompensa aprender desde el primer intento sin dejar de reforzar lo que causó dudas.
+                  <b>20 puntos:</b> respuesta correcta en menos de 10 segundos.<br>
+                  <b>15 puntos:</b> respuesta correcta entre 10 y 20 segundos.<br>
+                  <b>10 puntos:</b> respuesta correcta entre 20 y 30 segundos.<br>
+                  <b>5 puntos:</b> respuesta correcta después de 30 segundos.<br>
+                  <b>0 puntos:</b> respuesta incorrecta o tiempo agotado.<br><br>
+                  Las preguntas falladas volverán a aparecer y su puntaje disminuirá progresivamente.<br><br>
+                  Cada operario recibe solo una pregunta por día. El puntaje depende de la rapidez y la precisión. Las preguntas falladas vuelven a aparecer con menor puntaje para reforzar el aprendizaje.
                 </div>
               </div>
               <div class="card level-card">
@@ -1792,7 +1794,7 @@ function dbSeguridadPreguntaToApp(row){
   return {id:row.id,tema:row.tema||'Seguridad',pregunta:row.pregunta||'',opciones:Array.isArray(row.opciones)?row.opciones:[],correcta:Number(row.correcta||0),explicacion:row.explicacion||'',documentoId:row.documento_id?Number(row.documento_id):null,activo:row.activo!==false,creadoPor:row.creado_por||'',dificultad:Number(row.dificultad||1),generadaAutomaticamente:Boolean(row.generada_automaticamente),fuenteExtracto:row.fuente_extracto||'',createdAt:row.created_at||''};
 }
 function dbSeguridadIntentoToApp(row){
-  return {id:row.id,preguntaId:Number(row.pregunta_id),usuarioLogin:row.usuario_login||'',correcto:Boolean(row.correcto),puntos:Number(row.puntos||0),erroresPrevios:Number(row.errores_previos||0),respuesta:Number(row.respuesta),createdAt:row.created_at||''};
+  return {id:row.id,preguntaId:Number(row.pregunta_id),usuarioLogin:row.usuario_login||'',correcto:Boolean(row.correcto),puntos:Number(row.puntos||0),erroresPrevios:Number(row.errores_previos||0),respuesta:Number(row.respuesta),tiempoRespuesta:Number(row.tiempo_respuesta||0),fechaReto:row.fecha_reto||'',createdAt:row.created_at||''};
 }
 
 async function loadAllData() {
@@ -1875,8 +1877,13 @@ function initSampleData() {
 
 
 /* ===== ASISTENTE DOCUMENTAL DE SEGURIDAD ===== */
-function puedeGestionarSeguridad(){return Boolean(APP.user&&['supervisor','admin'].includes(APP.user.role));}
-function esParticipanteReto(){return Boolean(APP.user&&APP.user.role==='operador');}
+function normalizarRolSeguridad(rol){
+  const r=String(rol||'').trim().toLowerCase();
+  const map={administrador:'admin',administracion:'admin',administrativo:'administrativo',supervision:'supervisor',supervisor:'supervisor',gerente:'gerencia',gerencia:'gerencia',operadores:'operador',operator:'operador'};
+  return map[r]||r;
+}
+function puedeGestionarSeguridad(){return Boolean(APP.user&&['supervisor','admin'].includes(normalizarRolSeguridad(APP.user.role)));}
+function esParticipanteReto(){return Boolean(APP.user&&normalizarRolSeguridad(APP.user.role)==='operador');}
 function puedeVerSeguimientoReto(){return Boolean(APP.user&&['supervisor','gerencia','admin','administrativo'].includes(APP.user.role));}
 function normalizarBusqueda(v){
   return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9ñ\s]/g,' ').replace(/\s+/g,' ').trim();
@@ -1925,11 +1932,11 @@ function openSeguridadUpload(){
 }
 
 function obtenerNivelSeguridad(points){
-  if(points>=4000)return {nombre:'Maestro de seguridad',icono:'🏆',siguiente:null};
-  if(points>=2400)return {nombre:'Líder preventivo',icono:'⭐',siguiente:4000};
-  if(points>=1600)return {nombre:'Guardián de seguridad',icono:'🛡️',siguiente:2400};
-  if(points>=800)return {nombre:'Observador preventivo',icono:'👀',siguiente:1600};
-  return {nombre:'Aprendiz',icono:'🌱',siguiente:800};
+  if(points>=800)return {nombre:'Maestro de seguridad',icono:'🏆',siguiente:null};
+  if(points>=600)return {nombre:'Líder preventivo',icono:'⭐',siguiente:800};
+  if(points>=400)return {nombre:'Guardián de seguridad',icono:'🛡️',siguiente:600};
+  if(points>=200)return {nombre:'Observador preventivo',icono:'👀',siguiente:400};
+  return {nombre:'Aprendiz',icono:'🌱',siguiente:200};
 }
 function userSafetyStats(login=APP.user?.login){
   const tries=(APP.data.seguridadIntentos||[]).filter(x=>x.usuarioLogin===login&&String(x.createdAt||'').slice(0,7)===monthKeyLocal());
@@ -2088,7 +2095,7 @@ async function eliminarDocumentoSeguridad(id){
 
 
 /* ===== RETO SEGURO ===== */
-const SAFETY_GAME={current:null,answered:false};
+const SAFETY_GAME={current:null,answered:false,startedAt:null,timerId:null,timeLimit:30,displayOptions:[]};
 function showSeguridadTab(tab){
   const consulta=tab==='consulta';
   document.getElementById('seg-panel-consulta').style.display=consulta?'block':'none';
@@ -2098,19 +2105,28 @@ function showSeguridadTab(tab){
   if(!consulta)renderSafetyGame();
 }
 function monthKeyLocal(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function dayKeyLocal(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function currentUserGameAttempts(){
   const key=monthKeyLocal();
   return (APP.data.seguridadIntentos||[]).filter(x=>x.usuarioLogin===APP.user?.login && String(x.createdAt||'').slice(0,7)===key);
 }
+function todayUserAttempt(){
+  const today=dayKeyLocal();
+  return currentUserGameAttempts().find(x=>(x.fechaReto||String(x.createdAt||'').slice(0,10))===today);
+}
 function questionWrongCount(questionId){return currentUserGameAttempts().filter(x=>x.preguntaId===Number(questionId)&&!x.correcto).length;}
-function pointsForWrongCount(n){return n<=0?100:n===1?70:n===2?40:20;}
+function sanitizeOptionText(text){return String(text||'').replace(/^\s*(?:✅|✔️?|✓|☑️?)\s*/u,'').trim();}
+function pointsForResponse(seconds,wrongCount){
+  let base=seconds<=10?20:seconds<=20?15:seconds<=30?10:5;
+  return Math.max(2,base-(Math.min(wrongCount,3)*5));
+}
 function renderSafetyGame(){
   const operatorBox=document.getElementById('game-operator-content'),monitorBox=document.getElementById('game-monitor-content'),tab=document.getElementById('seg-tab-juego');
   const participant=esParticipanteReto();
   if(operatorBox)operatorBox.style.display=participant?'block':'none';
   if(monitorBox)monitorBox.style.display=participant?'none':'block';
   if(tab)tab.innerHTML=participant?'🎮 Reto Seguro':'📊 Seguimiento de aprendizaje';
-  if(!participant){renderLearningMonitor();return;}
+  if(!participant){clearSafetyTimer();renderLearningMonitor();return;}
   const tries=currentUserGameAttempts(),points=tries.reduce((a,x)=>a+(x.puntos||0),0),tickets=Math.floor(points/800),remainder=points%800,next=remainder===0&&points>0?800:800-remainder;
   const month=new Intl.DateTimeFormat('es-PE',{month:'long',year:'numeric'}).format(new Date());
   document.getElementById('game-points').textContent=points;
@@ -2124,15 +2140,22 @@ function renderSafetyGame(){
   document.getElementById('game-progress-text').textContent=`${remainder} de 800 puntos para el próximo ticket`;
   const hist=document.getElementById('game-history');
   hist.innerHTML=tries.length?tries.slice(0,5).map(t=>{const q=APP.data.seguridadPreguntas.find(x=>x.id===t.preguntaId);return `<div class="game-history-item"><strong>${t.correcto?'✅':'❌'} ${escapeHtml(q?.tema||'Pregunta de seguridad')}</strong><div>${t.correcto?'Correcta':'Incorrecta'} · +${t.puntos} puntos · ${new Date(t.createdAt).toLocaleDateString('es-PE')}</div></div>`}).join(''):'<div class="game-help">Aún no hay respuestas registradas este mes.</div>';
+  const done=todayUserAttempt();
+  const box=document.getElementById('game-question-box'),actions=document.getElementById('game-start-actions');
+  if(done&&!SAFETY_GAME.current){
+    if(actions)actions.style.display='none';
+    if(box)box.innerHTML=`<div class="alert alert-success"><div><strong>Reto diario completado.</strong><br>Hoy ya respondiste la pregunta. Obtuviste ${done.puntos} puntos. Regresa mañana para un nuevo reto.</div></div>`;
+  }else if(actions&&!SAFETY_GAME.current){actions.style.display='flex';}
 }
-function operariosReto(){return (APP.data.usuarios||[]).filter(u=>(u.role||u.rol)==='operador'&&u.activo!==false);}
+function operariosReto(){return (APP.data.usuarios||[]).filter(u=>normalizarRolSeguridad(u.role||u.rol)==='operador'&&u.activo!==false);}
 function estadisticaOperarioReto(login){
   const key=monthKeyLocal(),tries=(APP.data.seguridadIntentos||[]).filter(x=>x.usuarioLogin===login&&String(x.createdAt||'').slice(0,7)===key),points=tries.reduce((a,x)=>a+(x.puntos||0),0),correct=tries.filter(x=>x.correcto).length;
   const precision=tries.length?Math.round(correct/tries.length*100):0,level=obtenerNivelSeguridad(points);
   let estado='Al día',clase='good',motivo='Buen avance';
+  const expected=Math.max(1,new Date().getDate());
   if(!tries.length){estado='Sin participación';clase='none';motivo='Aún no registra respuestas este mes';}
   else if(precision<70){estado='Reforzar';clase='bad';motivo=`Precisión baja (${precision}%)`;}
-  else if(tries.length<5){estado='Baja participación';clase='warn';motivo=`Solo ${tries.length} respuestas`;}
+  else if(tries.length<Math.min(5,expected)){estado='Baja participación';clase='warn';motivo=`Solo ${tries.length} retos diarios completados`;}
   return {login,tries,points,correct,precision,level,tickets:Math.floor(points/800),estado,clase,motivo};
 }
 function renderLearningMonitor(){
@@ -2146,43 +2169,64 @@ function renderLearningMonitor(){
   const tbox=document.getElementById('monitor-weak-topics');if(tbox)tbox.innerHTML=topicRows.length?topicRows.map(r=>`<div class="learning-topic-item"><strong>${escapeHtml(r.tema)}</strong><div class="learning-bar"><span style="width:${r.rate}%"></span></div><span>${r.errors}/${r.total} errores</span></div>`).join(''):'<div class="game-help">Aún no existen respuestas suficientes para identificar temas débiles.</div>';
   const fbox=document.getElementById('monitor-followup-list');if(fbox)fbox.innerHTML=follow.length?follow.map(r=>`<div class="alert ${r.clase==='bad'?'alert-danger':r.clase==='warn'?'alert-warning':'alert-info'}"><div><strong>${escapeHtml(r.nombre)}</strong> · ${escapeHtml(r.motivo)}<br><small>Nivel: ${r.level.icono} ${escapeHtml(r.level.nombre)} · ${r.points} puntos · ${r.tickets} tickets</small></div></div>`).join(''):'<div class="alert alert-success"><div>No se detectan operarios que requieran seguimiento con los criterios actuales.</div></div>';
 }
+function clearSafetyTimer(){if(SAFETY_GAME.timerId){clearInterval(SAFETY_GAME.timerId);SAFETY_GAME.timerId=null;}}
 function startSafetyChallenge(){
-  if(!esParticipanteReto()){showToast('Este perfil solo puede visualizar el seguimiento del aprendizaje','warning');return;}
+  if(!esParticipanteReto()){showToast('Este perfil solo puede visualizar el seguimiento del aprendizaje','warning');renderSafetyGame();return;}
+  if(todayUserAttempt()){showToast('Ya completaste el reto de hoy. Vuelve mañana.','warning');SAFETY_GAME.current=null;renderSafetyGame();return;}
   const qs=(APP.data.seguridadPreguntas||[]).filter(q=>q.activo&&q.opciones.length>=3);
   if(!qs.length){document.getElementById('game-question-box').innerHTML='<div class="alert alert-warning"><div>No existen preguntas publicadas todavía. Un supervisor o administrador debe cargarlas desde “Gestionar preguntas”.</div></div>';return;}
   const recent=currentUserGameAttempts().slice(0,6).map(x=>x.preguntaId),target=dificultadObjetivoUsuario();
   let pool=qs.filter(q=>!recent.includes(q.id)&&Number(q.dificultad||1)===target);
   if(!pool.length)pool=qs.filter(q=>Number(q.dificultad||1)<=target);
   if(!pool.length)pool=qs;
-  // Repetición espaciada: prioriza preguntas falladas, sin abandonar la dificultad adecuada.
   const failed=pool.filter(q=>questionWrongCount(q.id)>0);
   if(failed.length&&Math.random()<0.6)pool=failed;
-  SAFETY_GAME.current=pool[Math.floor(Math.random()*pool.length)];SAFETY_GAME.answered=false;renderCurrentQuestion();
+  SAFETY_GAME.current=pool[Math.floor(Math.random()*pool.length)];SAFETY_GAME.answered=false;SAFETY_GAME.startedAt=Date.now();
+  renderCurrentQuestion();
 }
 function renderCurrentQuestion(){
   const q=SAFETY_GAME.current;if(!q)return;
-  const wrongs=questionWrongCount(q.id),value=pointsForWrongCount(wrongs);
-  document.getElementById('game-question-value').textContent=`Hasta ${value} pts`;
+  document.getElementById('game-question-value').textContent='Máximo 20 pts';
   document.getElementById('game-start-actions').style.display='none';
   const dif=['','Básica','Intermedia','Avanzada'][Number(q.dificultad||1)]||'Básica';
-  document.getElementById('game-question-box').innerHTML=`<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><div class="game-topic">${escapeHtml(q.tema)}</div><span class="difficulty-badge">${dif}</span>${q.generadaAutomaticamente?'<span class="difficulty-badge">Generada desde documento</span>':''}</div><div class="game-qtext">${escapeHtml(q.pregunta)}</div><div class="game-options">${q.opciones.map((o,i)=>`<button class="game-option" data-option="${i}"><b>${String.fromCharCode(65+i)}.</b> ${escapeHtml(o)}</button>`).join('')}</div><div id="game-feedback"></div><div class="game-actions" id="game-next-action" style="display:none"><button class="btn btn-primary" onclick="startSafetyChallenge()">Siguiente pregunta</button></div>`;
+  const display=q.opciones.map((o,i)=>({text:sanitizeOptionText(o),originalIndex:i}));
+  SAFETY_GAME.displayOptions=barajar(display);
+  document.getElementById('game-question-box').innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><div class="game-topic">${escapeHtml(q.tema)}</div><span class="difficulty-badge">${dif}</span>${q.generadaAutomaticamente?'<span class="difficulty-badge">Generada desde documento</span>':''}</div><div id="game-timer" class="badge badge-pending">⏱ 30 s</div></div><div class="game-qtext">${escapeHtml(q.pregunta)}</div><div class="game-options">${SAFETY_GAME.displayOptions.map((o,i)=>`<button class="game-option" data-option="${i}"><b>${String.fromCharCode(65+i)}.</b> ${escapeHtml(o.text)}</button>`).join('')}</div><div id="game-feedback"></div>`;
   document.querySelectorAll('#game-question-box .game-option').forEach(b=>b.addEventListener('click',()=>answerSafetyQuestion(Number(b.dataset.option))));
+  clearSafetyTimer();
+  SAFETY_GAME.timerId=setInterval(()=>{
+    if(SAFETY_GAME.answered){clearSafetyTimer();return;}
+    const elapsed=Math.floor((Date.now()-SAFETY_GAME.startedAt)/1000),remaining=Math.max(0,SAFETY_GAME.timeLimit-elapsed),el=document.getElementById('game-timer');
+    if(el)el.textContent=`⏱ ${remaining} s`;
+    if(remaining<=0)expireSafetyQuestion();
+  },250);
 }
-async function answerSafetyQuestion(selected){
-  if(!esParticipanteReto()){showToast('Este perfil no participa en los retos','warning');return;}
-  if(SAFETY_GAME.answered||!SAFETY_GAME.current)return;SAFETY_GAME.answered=true;
-  const q=SAFETY_GAME.current,wrongs=questionWrongCount(q.id),correct=selected===q.correcta,pts=correct?pointsForWrongCount(wrongs):0;
-  document.querySelectorAll('#game-question-box .game-option').forEach((b,i)=>{b.disabled=true;if(i===q.correcta)b.classList.add('correct');if(i===selected&&!correct)b.classList.add('wrong');});
-  const feedback=document.getElementById('game-feedback');feedback.className='game-feedback '+(correct?'ok':'bad');feedback.innerHTML=`<strong>${correct?`¡Correcto! Ganaste ${pts} puntos.`:'Respuesta incorrecta.'}</strong><br>${escapeHtml(q.explicacion)}${!correct?'<br><small>Cuando esta pregunta vuelva a aparecer, otorgará menos puntos al responderla correctamente.</small>':''}`;
-  document.getElementById('game-next-action').style.display='flex';
+async function expireSafetyQuestion(){
+  if(SAFETY_GAME.answered||!SAFETY_GAME.current)return;
+  SAFETY_GAME.answered=true;clearSafetyTimer();
+  document.querySelectorAll('#game-question-box .game-option').forEach(b=>b.disabled=true);
+  const feedback=document.getElementById('game-feedback');feedback.className='game-feedback bad';feedback.innerHTML=`<strong>Tiempo agotado. Obtuviste 0 puntos.</strong><br>${escapeHtml(SAFETY_GAME.current.explicacion)}<br><small>Esta pregunta podrá volver a aparecer como refuerzo.</small>`;
+  await saveSafetyAttempt(-1,false,0,SAFETY_GAME.timeLimit);
+}
+async function answerSafetyQuestion(displayIndex){
+  if(!esParticipanteReto()){showToast('Este perfil no participa en los retos','warning');renderSafetyGame();return;}
+  if(SAFETY_GAME.answered||!SAFETY_GAME.current)return;
+  SAFETY_GAME.answered=true;clearSafetyTimer();
+  const q=SAFETY_GAME.current,chosen=SAFETY_GAME.displayOptions[displayIndex],selected=chosen.originalIndex,wrongs=questionWrongCount(q.id),correct=selected===q.correcta,seconds=Math.max(1,Math.ceil((Date.now()-SAFETY_GAME.startedAt)/1000)),pts=correct?pointsForResponse(seconds,wrongs):0;
+  document.querySelectorAll('#game-question-box .game-option').forEach((b,i)=>{b.disabled=true;const original=SAFETY_GAME.displayOptions[i].originalIndex;if(original===q.correcta)b.classList.add('correct');if(i===displayIndex&&!correct)b.classList.add('wrong');});
+  const feedback=document.getElementById('game-feedback');feedback.className='game-feedback '+(correct?'ok':'bad');feedback.innerHTML=`<strong>${correct?`¡Correcto! Ganaste ${pts} puntos en ${seconds} segundos.`:'Respuesta incorrecta. Obtuviste 0 puntos.'}</strong><br>${escapeHtml(q.explicacion)}${!correct?'<br><small>Esta pregunta volverá a aparecer y valdrá menos puntos cuando la respondas correctamente.</small>':''}<br><small>Reto diario completado. Regresa mañana para una nueva pregunta.</small>`;
+  await saveSafetyAttempt(selected,correct,pts,seconds);
+}
+async function saveSafetyAttempt(selected,correct,pts,seconds){
+  const q=SAFETY_GAME.current,wrongs=questionWrongCount(q.id);
   try{
-    const row={pregunta_id:q.id,usuario_login:APP.user.login,correcto:correct,puntos:pts,errores_previos:wrongs,respuesta:selected};
+    const row={pregunta_id:q.id,usuario_login:APP.user.login,correcto:correct,puntos:pts,errores_previos:wrongs,respuesta:selected<0?0:selected,tiempo_respuesta:seconds,fecha_reto:dayKeyLocal()};
     const {data,error}=await db.from('seguridad_intentos').insert([row]).select().single();if(error)throw error;
-    APP.data.seguridadIntentos.unshift(dbSeguridadIntentoToApp(data));renderSafetyGame();
-  }catch(err){console.error(err);showToast('No se pudo guardar el resultado. Verifica la configuración de Supabase.','error');}
+    APP.data.seguridadIntentos.unshift(dbSeguridadIntentoToApp(data));SAFETY_GAME.current=null;renderSafetyGame();
+  }catch(err){console.error(err);showToast(err.code==='23505'?'Ya registraste el reto de hoy.':'No se pudo guardar el resultado. Ejecuta el SQL V4 en Supabase.','error');SAFETY_GAME.current=null;renderSafetyGame();}
 }
 function openPreguntaSeguridadModal(){
-  if(!puedeGestionarSeguridad()){showToast('Solo supervisor y administrador pueden gestionar preguntas','error');return;}
+  if(!puedeGestionarSeguridad()){showToast('Solo supervisión o administración pueden gestionar preguntas','error');return;}
   limpiarPreguntaSeguridad();renderQuestionDocumentSelect();renderQuestionAdminList();renderGameParticipants();openModal('modal-seguridad-pregunta');
 }
 function renderQuestionDocumentSelect(){const sel=document.getElementById('game-q-doc');sel.innerHTML='<option value="">Sin documento asociado</option>'+(APP.data.seguridadDocumentos||[]).map(d=>`<option value="${d.id}">${escapeHtml(d.titulo)}</option>`).join('');}
@@ -2256,7 +2300,7 @@ async function doLogin() {
     id: userMatch.id,
     login: userMatch.login,
     name: `${userMatch.nombre || ''} ${userMatch.apellido || ''}`.trim(),
-    role: userMatch.rol,
+    role: normalizarRolSeguridad(userMatch.rol),
     initials,
     guardia: userMatch.guardia,
   };
