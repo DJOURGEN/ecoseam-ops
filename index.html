@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- ECOSEAM BUILD v13: asistente documental + aprendizaje adaptativo + seguimiento -->
+  <!-- ECOSEAM BUILD v17: procedencia libre + gerencia corregida -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1a5c2a">
@@ -880,7 +880,7 @@ img,canvas,svg,video{max-width:100%}
             <div class="form-group" style="margin:0"><label class="form-label">Hasta</label><input type="date" class="filter-select" id="patio-hasta" onchange="renderPatios()"></div>
             <div class="form-group" style="margin:0"><label class="form-label">Estado del vehículo</label><select class="filter-select" id="patio-tipo-mov" onchange="renderPatios()"><option value="">Todos</option><option value="en_patio">En patio</option><option value="salio">Con salida registrada</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Subclase</label><select class="filter-select" id="patio-subclase" onchange="renderPatios()"><option value="">Todas</option><option value="Metálico">Metálico</option><option value="No metálico">No metálico</option></select></div>
-            <div class="form-group" style="margin:0"><label class="form-label">Gerencia</label><select class="filter-select" id="patio-gerencia" onchange="renderPatios()"><option value="">Todas</option><option>Mantenimiento</option><option>Concentradora</option><option>Ingeniería & Proyectos</option><option>Campamento</option><option>DEG</option></select></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Gerencia</label><select class="filter-select" id="patio-gerencia" onchange="renderPatios()"><option value="">Todas</option><option>Mantenimiento</option><option>Concentradora</option><option>Ingeniería & Proyectos</option><option>Campamento</option><option>Medio Ambiente</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Patio recepción</label><select class="filter-select" id="patio-recepcion-filtro" onchange="renderPatios()"><option value="">Todos</option><option>4388</option><option>DEG</option><option>Otros</option></select></div>
             <div class="filters-spacer"></div>
             <button class="btn btn-outline btn-sm" onclick="clearPatioFilters()">Limpiar</button>
@@ -1403,10 +1403,10 @@ img,canvas,svg,video{max-width:100%}
       <div class="form-group"><label class="form-label">Peso (tn) *</label><input class="form-control" id="mov-peso" type="number" min="0" step="0.001" placeholder="0.000"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Procedencia *</label><select class="form-control" id="mov-procedencia" onchange="toggleOtraProcedencia()"><option value="">Seleccionar</option><option value="Medio Ambiente">Medio Ambiente</option><option value="Otros">Otros</option></select></div>
-      <div class="form-group"><label class="form-label">Gerencia *</label><select class="form-control" id="mov-gerencia"><option value="">Seleccionar</option><option>Mantenimiento</option><option>Concentradora</option><option>Ingeniería & Proyectos</option><option>Campamento</option><option>DEG</option></select></div>
+      <div class="form-group"><label class="form-label">Procedencia *</label><input class="form-control" id="mov-procedencia" type="text" placeholder="Ej.: Plataforma 4328, Mina, Taller Central..."></div>
+      <div class="form-group"><label class="form-label">Gerencia *</label><select class="form-control" id="mov-gerencia" onchange="toggleOtraGerencia()"><option value="">Seleccionar</option><option>Mantenimiento</option><option>Concentradora</option><option>Ingeniería & Proyectos</option><option>Campamento</option><option>Medio Ambiente</option><option value="Otros">Otros</option></select></div>
     </div>
-    <div class="form-group" id="mov-procedencia-otra-group" style="display:none"><label class="form-label">Especificar otra procedencia *</label><input class="form-control" id="mov-procedencia-otra" type="text" placeholder="Área, ubicación o frente de origen"></div>
+    <div class="form-group" id="mov-gerencia-otra-group" style="display:none"><label class="form-label">Especificar otra gerencia *</label><input class="form-control" id="mov-gerencia-otra" type="text" placeholder="Nombre de la gerencia o área responsable"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Hora de ingreso *</label><input class="form-control" id="mov-inicio" type="time"></div>
       <div class="form-group"><label class="form-label">Hora de salida</label><input class="form-control" id="mov-fin" type="time"><div class="form-hint">Déjala vacía al registrar el ingreso. Luego usa “Marcar salida” en la tabla.</div></div>
@@ -2858,11 +2858,11 @@ function openMovimientoModal(id=null){
   toggleOtroPatio();
   document.getElementById('mov-empresa').value=values.empresa;
   document.getElementById('mov-peso').value=values.peso;
-  const procedenciasBase=['Medio Ambiente'];
-  document.getElementById('mov-procedencia').value=procedenciasBase.includes(values.procedencia)?values.procedencia:(values.procedencia?'Otros':'');
-  document.getElementById('mov-procedencia-otra').value=procedenciasBase.includes(values.procedencia)?'':(values.procedencia||'');
-  toggleOtraProcedencia();
-  document.getElementById('mov-gerencia').value=values.gerencia;
+  document.getElementById('mov-procedencia').value=values.procedencia||'';
+  const gerenciasBase=['Mantenimiento','Concentradora','Ingeniería & Proyectos','Campamento','Medio Ambiente'];
+  document.getElementById('mov-gerencia').value=gerenciasBase.includes(values.gerencia)?values.gerencia:(values.gerencia?'Otros':'');
+  document.getElementById('mov-gerencia-otra').value=gerenciasBase.includes(values.gerencia)?'':(values.gerencia||'');
+  toggleOtraGerencia();
   document.getElementById('mov-inicio').value=values.inicio;
   document.getElementById('mov-fin').value=values.fin;
   openModal('modal-movimiento');
@@ -2880,9 +2880,9 @@ function toggleOtroVehiculo(){
   if(group) group.style.display=select?.value==='Otros'?'block':'none';
 }
 
-function toggleOtraProcedencia(){
-  const select=document.getElementById('mov-procedencia');
-  const group=document.getElementById('mov-procedencia-otra-group');
+function toggleOtraGerencia(){
+  const select=document.getElementById('mov-gerencia');
+  const group=document.getElementById('mov-gerencia-otra-group');
   if(group) group.style.display=select?.value==='Otros'?'block':'none';
 }
 
@@ -2900,8 +2900,8 @@ async function saveMovimiento(){
     patioRecepcion:(document.getElementById('mov-patio').value==='Otros'?document.getElementById('mov-patio-otro').value.trim():document.getElementById('mov-patio').value),
     empresa:document.getElementById('mov-empresa').value.trim(),
     peso:Number(document.getElementById('mov-peso').value),
-    procedencia:(document.getElementById('mov-procedencia').value==='Otros'?document.getElementById('mov-procedencia-otra').value.trim():document.getElementById('mov-procedencia').value),
-    gerencia:document.getElementById('mov-gerencia').value,
+    procedencia:document.getElementById('mov-procedencia').value.trim(),
+    gerencia:(document.getElementById('mov-gerencia').value==='Otros'?document.getElementById('mov-gerencia-otra').value.trim():document.getElementById('mov-gerencia').value),
     inicio:document.getElementById('mov-inicio').value,
     fin:document.getElementById('mov-fin').value,
     registradoPor:APP.user.login
