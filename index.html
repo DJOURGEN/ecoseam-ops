@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- ECOSEAM BUILD v11: coproductos sin IA + fotos + catálogo PDF + Drive -->
+  <!-- ECOSEAM BUILD v13: asistente documental + aprendizaje adaptativo + seguimiento -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1a5c2a">
@@ -444,6 +444,17 @@ tbody tr:hover{background:var(--surface-1)}
 @media(max-width:860px){.seg-grid,.game-layout{grid-template-columns:1fr}.seg-search-row{flex-direction:column}.seg-search-row .btn{width:100%}.game-kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:460px){.game-kpis{grid-template-columns:1fr 1fr}.game-qtext{font-size:17px}}
 
+/* ===== DASHBOARD DE APRENDIZAJE ===== */
+.learning-monitor-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px;margin-bottom:20px}
+.learning-status{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.learning-status.good{background:#eafaf1;color:#1e8449}.learning-status.warn{background:#fff8e1;color:#a05a00}.learning-status.bad{background:#fdedec;color:#b42318}.learning-status.none{background:#eef2f4;color:#52616b}
+.learning-topic-list{display:grid;gap:9px}.learning-topic-item{display:grid;grid-template-columns:minmax(130px,1fr) 2fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.learning-topic-item:last-child{border-bottom:none}.learning-bar{height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden}.learning-bar span{display:block;height:100%;border-radius:999px;background:var(--navy)}
+.monitor-note{padding:14px 16px;border-left:4px solid var(--info);background:#ebf5fb;border-radius:9px;color:#145a86;font-size:13px;margin-bottom:18px}
+.simple-answer{padding:15px 16px;border-radius:10px;background:#eafaf1;border-left:4px solid var(--success);margin-bottom:15px}.simple-answer strong{display:block;margin-bottom:5px;color:#145c2a}
+@media(max-width:980px){.learning-monitor-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.learning-monitor-grid{grid-template-columns:1fr}.learning-topic-item{grid-template-columns:1fr}.learning-topic-item .learning-bar{width:100%}}
+
 /* ===== MOBILE ===== */
 html,body{max-width:100%;overflow-x:hidden}
 .main,.content,[id^="view-"]{min-width:0;max-width:100%}
@@ -576,7 +587,7 @@ img,canvas,svg,video{max-width:100%}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v12 · Móvil adaptable · Sin IA</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v13 · Aprendizaje adaptativo</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -954,7 +965,7 @@ img,canvas,svg,video{max-width:100%}
         <div class="page-header">
           <div>
             <div class="page-title">Seguridad y aprendizaje</div>
-            <div class="page-subtitle">Consulta documentos internos y participa en el Reto Seguro mensual</div>
+            <div class="page-subtitle">Consulta documentos internos y fortalece el aprendizaje operativo</div>
           </div>
           <div style="display:flex;gap:9px;flex-wrap:wrap">
             <button class="btn btn-outline" id="btn-gestionar-preguntas" onclick="openPreguntaSeguridadModal()">⚙ Gestionar preguntas</button>
@@ -979,7 +990,7 @@ img,canvas,svg,video{max-width:100%}
 
           <div class="seg-grid">
             <div class="card seg-answer">
-              <div class="card-header"><div><div class="card-title">Respuesta encontrada</div><div class="card-subtitle">Extractos textuales con su documento de origen</div></div></div>
+              <div class="card-header"><div><div class="card-title">Respuesta encontrada</div><div class="card-subtitle">Explicación sencilla y respaldo documental</div></div></div>
               <div id="seg-respuesta" class="seg-answer-empty">Realiza una consulta para buscar en la biblioteca.</div>
             </div>
             <div class="card">
@@ -990,6 +1001,31 @@ img,canvas,svg,video{max-width:100%}
         </div>
 
         <div id="seg-panel-juego" style="display:none">
+          <div id="game-monitor-content" style="display:none">
+            <div class="monitor-note"><strong>Panel de seguimiento.</strong> Los perfiles de supervisión, gerencia y administración no participan en los retos ni acumulan puntos. Esta vista permite identificar operarios con baja participación o temas que requieren refuerzo.</div>
+            <div class="learning-monitor-grid">
+              <div class="game-kpi"><span>Operarios activos</span><strong id="monitor-operators">0</strong><div class="game-help">considerados en el seguimiento</div></div>
+              <div class="game-kpi"><span>Participación mensual</span><strong id="monitor-participation">0%</strong><div class="game-help">operarios con al menos una respuesta</div></div>
+              <div class="game-kpi"><span>Precisión promedio</span><strong id="monitor-accuracy">0%</strong><div class="game-help">respuestas correctas del mes</div></div>
+              <div class="game-kpi game-ticket"><span>Requieren seguimiento</span><strong id="monitor-followup">0</strong><div class="game-help">por baja precisión o poca participación</div></div>
+            </div>
+            <div class="grid-2" style="margin-bottom:20px">
+              <div class="card">
+                <div class="card-header"><div><div class="card-title">Seguimiento por operario</div><div class="card-subtitle">Puntos, avance, precisión y alertas del mes</div></div><button class="btn btn-outline btn-sm" onclick="exportarRankingSeguridad()">Exportar CSV</button></div>
+                <div class="table-wrap"><table><thead><tr><th>Operario</th><th>Puntos</th><th>Tickets</th><th>Nivel</th><th>Respondidas</th><th>Precisión</th><th>Estado</th></tr></thead><tbody id="monitor-operators-list"></tbody></table></div>
+              </div>
+              <div class="card">
+                <div class="card-header"><div><div class="card-title">Temas con mayor dificultad</div><div class="card-subtitle">Errores acumulados por tema para orientar refuerzos</div></div></div>
+                <div id="monitor-weak-topics" class="learning-topic-list"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div><div class="card-title">Operarios que requieren atención</div><div class="card-subtitle">Criterio: sin participación, menos de 5 respuestas o precisión menor al 70%</div></div></div>
+              <div id="monitor-followup-list"></div>
+            </div>
+          </div>
+
+          <div id="game-operator-content">
           <div class="game-kpis">
             <div class="game-kpi"><span>Puntos del mes</span><strong id="game-points">0</strong><div class="game-help" id="game-month-label"></div></div>
             <div class="game-kpi game-ticket"><span>Tickets obtenidos</span><strong id="game-tickets">0</strong><div class="game-help">1 ticket por cada 800 puntos</div></div>
@@ -1040,6 +1076,7 @@ img,canvas,svg,video{max-width:100%}
               </div>
             </div>
           </div>
+          </div><!-- /game-operator-content -->
         </div>
       </div>
 
@@ -1839,6 +1876,8 @@ function initSampleData() {
 
 /* ===== ASISTENTE DOCUMENTAL DE SEGURIDAD ===== */
 function puedeGestionarSeguridad(){return Boolean(APP.user&&['supervisor','admin'].includes(APP.user.role));}
+function esParticipanteReto(){return Boolean(APP.user&&APP.user.role==='operador');}
+function puedeVerSeguimientoReto(){return Boolean(APP.user&&['supervisor','gerencia','admin','administrativo'].includes(APP.user.role));}
 function normalizarBusqueda(v){
   return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9ñ\s]/g,' ').replace(/\s+/g,' ').trim();
 }
@@ -1912,6 +1951,21 @@ function palabrasClaveSeguridad(texto){
   return normalizarBusqueda(texto).split(/\s+/).filter(x=>x.length>5&&!stop.has(x)).sort((a,b)=>b.length-a.length);
 }
 function barajar(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function simplificarExplicacionSeguridad(texto){
+  let t=limpiarFrasePregunta(texto).replace(/\[(?:Página|Pagina)\s+\d+\]/gi,'').trim();
+  t=t.replace(/\bdeberá(?:n)?\b/gi,'debe').replace(/\bse deberá\b/gi,'se debe').replace(/\bproceder a\b/gi,'realizar').replace(/\bprevio a\b/gi,'antes de').replace(/\bposterior a\b/gi,'después de');
+  if(t.length>330)t=t.slice(0,327).replace(/\s+\S*$/,'')+'…';
+  const first=t.charAt(0).toUpperCase()+t.slice(1);
+  return `En palabras sencillas: ${first}`;
+}
+function construirResumenSencillo(resultados,terms){
+  if(!resultados.length)return '';
+  const frases=[];
+  resultados.slice(0,3).forEach(r=>frasesCandidatasSeguridad(r.contenido).slice(0,2).forEach(f=>{if(!frases.some(x=>normalizarBusqueda(x)===normalizarBusqueda(f)))frases.push(f);}));
+  const seleccion=frases.slice(0,3);
+  if(!seleccion.length)return simplificarExplicacionSeguridad(resultados[0].contenido);
+  return seleccion.map((f,i)=>`${i+1}. ${simplificarExplicacionSeguridad(f).replace(/^En palabras sencillas:\s*/,'')}`).join('<br>');
+}
 function crearPreguntasAutomaticas(doc,fragmentos,max=8){
   const corpus=fragmentos.map(f=>f.contenido).join('\n'),frases=frasesCandidatasSeguridad(corpus),keywords=[...new Set(palabrasClaveSeguridad(corpus))].slice(0,40);
   const rows=[];for(let i=0;i<frases.length&&rows.length<max;i++){
@@ -1929,7 +1983,7 @@ function crearPreguntasAutomaticas(doc,fragmentos,max=8){
       correctaTexto=key;opciones=barajar([key,...distractores.slice(0,3)]);
     }
     const correcta=opciones.indexOf(correctaTexto);if(correcta<0)continue;
-    rows.push({tema:doc.categoria||'Seguridad',pregunta,opciones,correcta,explicacion:`Fuente: ${doc.titulo}. ${f}`,documento_id:doc.id,activo:true,creado_por:APP.user.login,dificultad,generada_automaticamente:true,fuente_extracto:f});
+    rows.push({tema:doc.categoria||'Seguridad',pregunta,opciones,correcta,explicacion:`${simplificarExplicacionSeguridad(f)} Fuente: ${doc.titulo}.`,documento_id:doc.id,activo:true,creado_por:APP.user.login,dificultad,generada_automaticamente:true,fuente_extracto:f});
   }
   return rows;
 }
@@ -2012,7 +2066,8 @@ function buscarSeguridad(){
   }).filter(x=>x.score>0&&docsById[x.documentoId]).sort((a,b)=>b.score-a.score||b.hits-a.hits).slice(0,4);
   if(!ranked.length){out.innerHTML='<div class="alert alert-warning"><div><strong>No encontré una respuesta sustentada.</strong><br>Prueba con otras palabras o solicita que se cargue el procedimiento correspondiente.</div></div>';return;}
   out.className='';
-  out.innerHTML=`<div class="alert alert-success"><div><strong>Información relacionada encontrada</strong><br>Revisa los extractos y valida siempre la versión vigente del documento.</div></div>`+
+  const resumenSimple=construirResumenSencillo(ranked,terms);
+  out.innerHTML=`<div class="simple-answer"><strong>Explicación sencilla</strong><div>${resumenSimple}</div><div style="font-size:11px;margin-top:8px;color:var(--text-s)">Resumen elaborado únicamente con los documentos encontrados. Confirma siempre el procedimiento completo y su versión vigente.</div></div><div class="alert alert-success"><div><strong>Información de respaldo encontrada</strong><br>Debajo puedes revisar los extractos textuales y su documento de origen.</div></div>`+
     ranked.map((r,i)=>{const d=docsById[r.documentoId];return `<div class="seg-source">
       <div class="seg-source-title">${i+1}. ${escapeHtml(d.titulo)}${d.version?' · '+escapeHtml(d.version):''}</div>
       <div class="seg-source-text">${resaltarSeguridad(escapeHtml(r.contenido),terms)}</div>
@@ -2050,6 +2105,12 @@ function currentUserGameAttempts(){
 function questionWrongCount(questionId){return currentUserGameAttempts().filter(x=>x.preguntaId===Number(questionId)&&!x.correcto).length;}
 function pointsForWrongCount(n){return n<=0?100:n===1?70:n===2?40:20;}
 function renderSafetyGame(){
+  const operatorBox=document.getElementById('game-operator-content'),monitorBox=document.getElementById('game-monitor-content'),tab=document.getElementById('seg-tab-juego');
+  const participant=esParticipanteReto();
+  if(operatorBox)operatorBox.style.display=participant?'block':'none';
+  if(monitorBox)monitorBox.style.display=participant?'none':'block';
+  if(tab)tab.innerHTML=participant?'🎮 Reto Seguro':'📊 Seguimiento de aprendizaje';
+  if(!participant){renderLearningMonitor();return;}
   const tries=currentUserGameAttempts(),points=tries.reduce((a,x)=>a+(x.puntos||0),0),tickets=Math.floor(points/800),remainder=points%800,next=remainder===0&&points>0?800:800-remainder;
   const month=new Intl.DateTimeFormat('es-PE',{month:'long',year:'numeric'}).format(new Date());
   document.getElementById('game-points').textContent=points;
@@ -2064,7 +2125,29 @@ function renderSafetyGame(){
   const hist=document.getElementById('game-history');
   hist.innerHTML=tries.length?tries.slice(0,5).map(t=>{const q=APP.data.seguridadPreguntas.find(x=>x.id===t.preguntaId);return `<div class="game-history-item"><strong>${t.correcto?'✅':'❌'} ${escapeHtml(q?.tema||'Pregunta de seguridad')}</strong><div>${t.correcto?'Correcta':'Incorrecta'} · +${t.puntos} puntos · ${new Date(t.createdAt).toLocaleDateString('es-PE')}</div></div>`}).join(''):'<div class="game-help">Aún no hay respuestas registradas este mes.</div>';
 }
+function operariosReto(){return (APP.data.usuarios||[]).filter(u=>(u.role||u.rol)==='operador'&&u.activo!==false);}
+function estadisticaOperarioReto(login){
+  const key=monthKeyLocal(),tries=(APP.data.seguridadIntentos||[]).filter(x=>x.usuarioLogin===login&&String(x.createdAt||'').slice(0,7)===key),points=tries.reduce((a,x)=>a+(x.puntos||0),0),correct=tries.filter(x=>x.correcto).length;
+  const precision=tries.length?Math.round(correct/tries.length*100):0,level=obtenerNivelSeguridad(points);
+  let estado='Al día',clase='good',motivo='Buen avance';
+  if(!tries.length){estado='Sin participación';clase='none';motivo='Aún no registra respuestas este mes';}
+  else if(precision<70){estado='Reforzar';clase='bad';motivo=`Precisión baja (${precision}%)`;}
+  else if(tries.length<5){estado='Baja participación';clase='warn';motivo=`Solo ${tries.length} respuestas`;}
+  return {login,tries,points,correct,precision,level,tickets:Math.floor(points/800),estado,clase,motivo};
+}
+function renderLearningMonitor(){
+  const ops=operariosReto(),stats=ops.map(u=>({...estadisticaOperarioReto(u.login),nombre:[u.nombre||u.name,u.apellido].filter(Boolean).join(' ')||u.login}));
+  const participants=stats.filter(x=>x.tries.length),allTries=participants.flatMap(x=>x.tries),avg=allTries.length?Math.round(allTries.filter(x=>x.correcto).length/allTries.length*100):0,follow=stats.filter(x=>x.clase!=='good');
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};set('monitor-operators',ops.length);set('monitor-participation',ops.length?Math.round(participants.length/ops.length*100)+'%':'0%');set('monitor-accuracy',avg+'%');set('monitor-followup',follow.length);
+  const tbody=document.getElementById('monitor-operators-list');if(tbody)tbody.innerHTML=stats.length?stats.sort((a,b)=>b.points-a.points).map(r=>`<tr><td><strong>${escapeHtml(r.nombre)}</strong><br><small>${escapeHtml(r.login)}</small></td><td><strong>${r.points}</strong></td><td>${r.tickets}</td><td>${r.level.icono} ${escapeHtml(r.level.nombre)}</td><td>${r.tries.length}</td><td>${r.precision}%</td><td><span class="learning-status ${r.clase}">${r.estado}</span></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--text-m)">No hay operarios activos.</td></tr>';
+  const qmap=Object.fromEntries((APP.data.seguridadPreguntas||[]).map(q=>[q.id,q])),topics={};
+  allTries.forEach(t=>{const tema=qmap[t.preguntaId]?.tema||'Sin tema',g=topics[tema]||(topics[tema]={total:0,errors:0});g.total++;if(!t.correcto)g.errors++;});
+  const topicRows=Object.entries(topics).map(([tema,g])=>({tema,...g,rate:g.total?Math.round(g.errors/g.total*100):0})).sort((a,b)=>b.rate-a.rate||b.errors-a.errors).slice(0,8);
+  const tbox=document.getElementById('monitor-weak-topics');if(tbox)tbox.innerHTML=topicRows.length?topicRows.map(r=>`<div class="learning-topic-item"><strong>${escapeHtml(r.tema)}</strong><div class="learning-bar"><span style="width:${r.rate}%"></span></div><span>${r.errors}/${r.total} errores</span></div>`).join(''):'<div class="game-help">Aún no existen respuestas suficientes para identificar temas débiles.</div>';
+  const fbox=document.getElementById('monitor-followup-list');if(fbox)fbox.innerHTML=follow.length?follow.map(r=>`<div class="alert ${r.clase==='bad'?'alert-danger':r.clase==='warn'?'alert-warning':'alert-info'}"><div><strong>${escapeHtml(r.nombre)}</strong> · ${escapeHtml(r.motivo)}<br><small>Nivel: ${r.level.icono} ${escapeHtml(r.level.nombre)} · ${r.points} puntos · ${r.tickets} tickets</small></div></div>`).join(''):'<div class="alert alert-success"><div>No se detectan operarios que requieran seguimiento con los criterios actuales.</div></div>';
+}
 function startSafetyChallenge(){
+  if(!esParticipanteReto()){showToast('Este perfil solo puede visualizar el seguimiento del aprendizaje','warning');return;}
   const qs=(APP.data.seguridadPreguntas||[]).filter(q=>q.activo&&q.opciones.length>=3);
   if(!qs.length){document.getElementById('game-question-box').innerHTML='<div class="alert alert-warning"><div>No existen preguntas publicadas todavía. Un supervisor o administrador debe cargarlas desde “Gestionar preguntas”.</div></div>';return;}
   const recent=currentUserGameAttempts().slice(0,6).map(x=>x.preguntaId),target=dificultadObjetivoUsuario();
@@ -2086,6 +2169,7 @@ function renderCurrentQuestion(){
   document.querySelectorAll('#game-question-box .game-option').forEach(b=>b.addEventListener('click',()=>answerSafetyQuestion(Number(b.dataset.option))));
 }
 async function answerSafetyQuestion(selected){
+  if(!esParticipanteReto()){showToast('Este perfil no participa en los retos','warning');return;}
   if(SAFETY_GAME.answered||!SAFETY_GAME.current)return;SAFETY_GAME.answered=true;
   const q=SAFETY_GAME.current,wrongs=questionWrongCount(q.id),correct=selected===q.correcta,pts=correct?pointsForWrongCount(wrongs):0;
   document.querySelectorAll('#game-question-box .game-option').forEach((b,i)=>{b.disabled=true;if(i===q.correcta)b.classList.add('correct');if(i===selected&&!correct)b.classList.add('wrong');});
@@ -2115,13 +2199,11 @@ async function guardarPreguntaSeguridad(){
 }
 function renderQuestionAdminList(){const box=document.getElementById('game-question-admin-list'),qs=APP.data.seguridadPreguntas||[];box.innerHTML=qs.length?qs.map(q=>`<div class="question-admin-item"><div class="question-admin-head"><div><div class="question-admin-title">${escapeHtml(q.pregunta)}</div><div class="question-admin-meta">${escapeHtml(q.tema)} · ${['','Básica','Intermedia','Avanzada'][q.dificultad||1]} · ${q.opciones.length} opciones${q.generadaAutomaticamente?' · ✨ Automática':''}</div></div><div style="display:flex;gap:7px"><button onclick="editarPreguntaSeguridad(${q.id})" title="Editar">✏️</button><button onclick="eliminarPreguntaSeguridad(${q.id})" title="Retirar" style="color:var(--danger)">🗑</button></div></div></div>`).join(''):'<div class="game-help">Aún no hay preguntas publicadas.</div>';}
 function rankingSeguridadMes(){
-  const key=monthKeyLocal(),groups={};
-  (APP.data.seguridadIntentos||[]).filter(x=>String(x.createdAt||'').slice(0,7)===key).forEach(x=>{const g=groups[x.usuarioLogin]||(groups[x.usuarioLogin]={puntos:0,total:0,correctas:0});g.puntos+=x.puntos||0;g.total++;if(x.correcto)g.correctas++;});
-  return Object.entries(groups).map(([login,g])=>{const u=(APP.data.usuarios||[]).find(x=>x.login===login),level=obtenerNivelSeguridad(g.puntos);return {login,nombre:u?.nombre||u?.name||login,puntos:g.puntos,tickets:Math.floor(g.puntos/800),nivel:`${level.icono} ${level.nombre}`,correctas:g.correctas,total:g.total,precision:g.total?Math.round(g.correctas/g.total*100):0};}).sort((a,b)=>b.puntos-a.puntos||b.precision-a.precision);
+  return operariosReto().map(u=>{const g=estadisticaOperarioReto(u.login);return {login:u.login,nombre:[u.nombre||u.name,u.apellido].filter(Boolean).join(' ')||u.login,puntos:g.points,tickets:g.tickets,nivel:`${g.level.icono} ${g.level.nombre}`,correctas:g.correct,total:g.tries.length,precision:g.precision,estado:g.estado};}).sort((a,b)=>b.puntos-a.puntos||b.precision-a.precision);
 }
 function renderGameParticipants(){
   const box=document.getElementById('game-participants-list');if(!box)return;const rows=rankingSeguridadMes();
-  box.innerHTML=rows.length?rows.map((r,i)=>`<tr><td><strong>${i+1}</strong></td><td><strong>${escapeHtml(r.nombre)}</strong><br><small>${escapeHtml(r.login)}</small></td><td><strong>${r.puntos}</strong></td><td><span class="badge badge-done">${r.tickets}</span></td><td>${escapeHtml(r.nivel)}</td><td>${r.correctas}/${r.total}</td><td>${r.precision}%</td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--text-m)">Aún no hay participantes este mes.</td></tr>';
+  box.innerHTML=rows.length?rows.map((r,i)=>`<tr><td><strong>${i+1}</strong></td><td><strong>${escapeHtml(r.nombre)}</strong><br><small>${escapeHtml(r.login)}</small></td><td><strong>${r.puntos}</strong></td><td><span class="badge badge-done">${r.tickets}</span></td><td>${escapeHtml(r.nivel)}</td><td>${r.correctas}/${r.total}</td><td>${r.precision}%<br><small>${escapeHtml(r.estado||'')}</small></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--text-m)">Aún no hay participantes este mes.</td></tr>';
   const sum=document.getElementById('game-ranking-summary');if(sum){const totalPoints=rows.reduce((a,r)=>a+r.puntos,0),tickets=rows.reduce((a,r)=>a+r.tickets,0),avg=rows.length?Math.round(rows.reduce((a,r)=>a+r.precision,0)/rows.length):0;sum.innerHTML=`<div><span>Participantes</span><strong>${rows.length}</strong></div><div><span>Puntos acumulados</span><strong>${totalPoints}</strong></div><div><span>Tickets emitidos</span><strong>${tickets}</strong></div><div><span>Precisión promedio</span><strong>${avg}%</strong></div>`;}
 }
 function exportarRankingSeguridad(){
@@ -2247,6 +2329,8 @@ function setupUI() {
   document.getElementById('user-avatar-side').textContent = u.initials;
   document.getElementById('user-name-side').textContent = u.name;
   document.getElementById('user-role-side').textContent = u.role;
+  const gameTab=document.getElementById('seg-tab-juego');if(gameTab)gameTab.innerHTML=esParticipanteReto()?'🎮 Reto Seguro':'📊 Seguimiento de aprendizaje';
+  const manageBtn=document.getElementById('btn-gestionar-preguntas'),uploadBtn=document.getElementById('btn-subir-seguridad');if(manageBtn)manageBtn.style.display=puedeGestionarSeguridad()?'inline-flex':'none';if(uploadBtn)uploadBtn.style.display=puedeGestionarSeguridad()?'inline-flex':'none';
 
   // Update topbar date
   const now = new Date();
