@@ -431,11 +431,16 @@ tbody tr:hover{background:var(--surface-1)}
 .seg-doc-list{display:flex;flex-direction:column;gap:10px}.seg-doc{border:1px solid var(--border);border-radius:10px;padding:12px}
 .seg-doc-head{display:flex;justify-content:space-between;gap:8px}.seg-doc-name{font-weight:700;font-size:14px;word-break:break-word}
 .seg-doc-meta{font-size:11px;color:var(--text-m);margin-top:4px}.seg-doc-desc{font-size:12px;color:var(--text-s);margin-top:7px}
-.seg-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.seg-chip{padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.13);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
 .seg-upload-zone{border:2px dashed var(--border);border-radius:12px;padding:18px;background:var(--surface-1)}
 .seg-progress{height:9px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin-top:10px}.seg-progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 .seg-warning{font-size:12px;color:var(--warning);margin-top:8px}
-@media(max-width:860px){.seg-grid{grid-template-columns:1fr}.seg-search-row{flex-direction:column}.seg-search-row .btn{width:100%}}
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.seg-tab{padding:10px 16px;border:1.5px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-s);font-size:13px;font-weight:700}.seg-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.game-kpis{display:grid;grid-template-columns:repeat(4,minmax(135px,1fr));gap:12px;margin-bottom:18px}.game-kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}.game-kpi span{display:block;font-size:11px;color:var(--text-s);font-weight:700;text-transform:uppercase}.game-kpi strong{display:block;font-size:25px;color:var(--navy);margin-top:3px}.game-ticket{background:#fff8e1;border-color:#ffd180}.game-ticket strong{color:#b65c00}
+.game-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);gap:20px}.game-question{min-height:360px}.game-topic{display:inline-flex;padding:5px 10px;border-radius:999px;background:var(--accent-bg,#e7f5ea);color:var(--navy);font-size:11px;font-weight:800;margin-bottom:12px}.game-qtext{font-size:20px;font-weight:750;line-height:1.35;margin-bottom:18px}.game-options{display:grid;gap:10px}.game-option{width:100%;text-align:left;padding:13px 15px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-weight:600;transition:.15s}.game-option:hover:not(:disabled){border-color:var(--navy);background:var(--surface-1)}.game-option.correct{border-color:var(--success);background:#eafaf1;color:#1e8449}.game-option.wrong{border-color:var(--danger);background:#fdedec;color:#a32620}.game-option:disabled{cursor:default}.game-feedback{margin-top:15px;padding:13px 15px;border-radius:10px;font-size:13px}.game-feedback.ok{background:#eafaf1;color:#1e8449}.game-feedback.bad{background:#fff4e5;color:#8a4b00}.game-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;flex-wrap:wrap}.game-empty{text-align:center;padding:48px 18px;color:var(--text-s)}
+.game-progress-wrap{height:10px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin:9px 0 5px}.game-progress-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .25s}.game-help{font-size:12px;color:var(--text-s)}.game-history{display:flex;flex-direction:column;gap:9px}.game-history-item{border:1px solid var(--border);border-radius:10px;padding:10px 12px}.game-history-item strong{font-size:13px}.game-history-item div{font-size:11px;color:var(--text-s);margin-top:3px}.game-rules{font-size:13px;color:var(--text-s);line-height:1.55}.game-rules b{color:var(--text)}
+.question-admin-list{display:flex;flex-direction:column;gap:10px;max-height:310px;overflow:auto}.question-admin-item{border:1px solid var(--border);border-radius:10px;padding:11px}.question-admin-head{display:flex;justify-content:space-between;gap:10px}.question-admin-title{font-weight:700;font-size:13px}.question-admin-meta{font-size:11px;color:var(--text-m);margin-top:4px}
+@media(max-width:860px){.seg-grid,.game-layout{grid-template-columns:1fr}.seg-search-row{flex-direction:column}.seg-search-row .btn{width:100%}.game-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.game-kpis{grid-template-columns:1fr 1fr}.game-qtext{font-size:17px}}
 
 /* ===== MOBILE ===== */
 html,body{max-width:100%;overflow-x:hidden}
@@ -946,45 +951,81 @@ img,canvas,svg,video{max-width:100%}
       <div id="view-seguridad" style="display:none">
         <div class="page-header">
           <div>
-            <div class="page-title">Asistente de seguridad</div>
-            <div class="page-subtitle">Consulta rápida basada únicamente en los documentos internos cargados</div>
+            <div class="page-title">Seguridad y aprendizaje</div>
+            <div class="page-subtitle">Consulta documentos internos y participa en el Reto Seguro mensual</div>
           </div>
-          <button class="btn btn-primary" id="btn-subir-seguridad" onclick="openSeguridadUpload()">+ Subir documento</button>
-        </div>
-
-        <div class="seg-hero">
-          <div style="font-size:20px;font-weight:800">¿Qué necesitas revisar?</div>
-          <div style="font-size:13px;opacity:.82;margin-top:4px">Escribe una pregunta como “¿Qué hago ante alerta roja?” o “¿Cómo controlo la línea de fuego?”.</div>
-          <div class="seg-search-row">
-            <input class="form-control" id="seg-pregunta" type="search" placeholder="Escribe una pregunta de seguridad..." onkeydown="if(event.key==='Enter')buscarSeguridad()">
-            <button class="btn btn-success" onclick="buscarSeguridad()">Buscar respuesta</button>
-          </div>
-          <div class="seg-chips">
-            <button class="seg-chip" onclick="preguntarSeguridad('¿Qué hago ante una alerta roja por tormenta eléctrica?')">⚡ Alerta roja</button>
-            <button class="seg-chip" onclick="preguntarSeguridad('¿Qué debo controlar respecto a la línea de fuego?')">⚠ Línea de fuego</button>
-            <button class="seg-chip" onclick="preguntarSeguridad('¿Qué debo revisar antes de operar un equipo?')">🔎 Preoperacional</button>
+          <div style="display:flex;gap:9px;flex-wrap:wrap">
+            <button class="btn btn-outline" id="btn-gestionar-preguntas" onclick="openPreguntaSeguridadModal()">⚙ Gestionar preguntas</button>
+            <button class="btn btn-primary" id="btn-subir-seguridad" onclick="openSeguridadUpload()">+ Subir documento</button>
           </div>
         </div>
 
-        <div class="seg-grid">
-          <div class="card seg-answer">
-            <div class="card-header">
-              <div>
-                <div class="card-title">Respuesta encontrada</div>
-                <div class="card-subtitle">Se muestran extractos textuales y su documento de origen</div>
-              </div>
+        <div class="seg-tabs">
+          <button class="seg-tab active" id="seg-tab-consulta" onclick="showSeguridadTab('consulta')">🔎 Consulta rápida</button>
+          <button class="seg-tab" id="seg-tab-juego" onclick="showSeguridadTab('juego')">🎮 Reto Seguro</button>
+        </div>
+
+        <div id="seg-panel-consulta">
+          <div class="seg-hero">
+            <div style="font-size:20px;font-weight:800">¿Qué necesitas revisar?</div>
+            <div style="font-size:13px;opacity:.82;margin-top:4px">Escribe una pregunta y el sistema buscará únicamente en los documentos internos cargados.</div>
+            <div class="seg-search-row">
+              <input class="form-control" id="seg-pregunta" type="search" placeholder="Escribe una pregunta de seguridad..." onkeydown="if(event.key==='Enter')buscarSeguridad()">
+              <button class="btn btn-success" onclick="buscarSeguridad()">Buscar respuesta</button>
             </div>
-            <div id="seg-respuesta" class="seg-answer-empty">Realiza una consulta para buscar en la biblioteca.</div>
           </div>
 
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="card-title">Biblioteca disponible</div>
-                <div class="card-subtitle"><span id="seg-doc-count">0</span> documentos activos</div>
+          <div class="seg-grid">
+            <div class="card seg-answer">
+              <div class="card-header"><div><div class="card-title">Respuesta encontrada</div><div class="card-subtitle">Extractos textuales con su documento de origen</div></div></div>
+              <div id="seg-respuesta" class="seg-answer-empty">Realiza una consulta para buscar en la biblioteca.</div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div><div class="card-title">Biblioteca disponible</div><div class="card-subtitle"><span id="seg-doc-count">0</span> documentos activos</div></div></div>
+              <div id="seg-documentos" class="seg-doc-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="seg-panel-juego" style="display:none">
+          <div class="game-kpis">
+            <div class="game-kpi"><span>Puntos del mes</span><strong id="game-points">0</strong><div class="game-help" id="game-month-label"></div></div>
+            <div class="game-kpi game-ticket"><span>Tickets obtenidos</span><strong id="game-tickets">0</strong><div class="game-help">1 ticket por cada 800 puntos</div></div>
+            <div class="game-kpi"><span>Próximo ticket</span><strong id="game-next">800</strong><div class="game-help">puntos restantes</div></div>
+            <div class="game-kpi"><span>Preguntas respondidas</span><strong id="game-answered">0</strong><div class="game-help">durante el mes</div></div>
+          </div>
+
+          <div class="game-layout">
+            <div class="card game-question">
+              <div class="card-header"><div><div class="card-title">Reto Seguro</div><div class="card-subtitle">Responde, aprende y acumula puntos para el sorteo de fin de mes</div></div><span class="badge badge-done" id="game-question-value">Hasta 100 pts</span></div>
+              <div id="game-question-box" class="game-empty">Presiona “Comenzar reto” para recibir una pregunta.</div>
+              <div id="game-start-actions" style="display:flex;justify-content:center;margin-top:15px"><button class="btn btn-primary btn-lg" onclick="startSafetyChallenge()">Comenzar reto</button></div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div class="card">
+                <div class="card-title">Premio mensual</div>
+                <div style="font-size:30px;margin:12px 0 5px">🍗</div>
+                <div style="font-weight:800;font-size:18px">Sorteo de un pollo a la brasa</div>
+                <div class="game-rules" style="margin-top:9px">Cada <b>800 puntos</b> equivale a un ticket. Mientras más tickets obtengas, más oportunidades tendrás en el sorteo de fin de mes.</div>
+                <div class="game-progress-wrap"><div class="game-progress-fill" id="game-ticket-progress" style="width:0%"></div></div>
+                <div class="game-help" id="game-progress-text">0 de 800 puntos para el próximo ticket</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Cómo se asignan los puntos</div>
+                <div class="game-rules" style="margin-top:10px">
+                  <b>100 puntos:</b> respuesta correcta sin errores previos.<br>
+                  <b>70 puntos:</b> correcta después de 1 error previo.<br>
+                  <b>40 puntos:</b> correcta después de 2 errores previos.<br>
+                  <b>20 puntos:</b> correcta después de 3 o más errores previos.<br><br>
+                  Si una pregunta vuelve a aparecer porque antes fue respondida incorrectamente, su premio disminuye. Así se recompensa aprender desde el primer intento sin dejar de reforzar lo que causó dudas.
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title">Actividad reciente</div>
+                <div id="game-history" class="game-history" style="margin-top:10px"><div class="game-help">Aún no hay respuestas registradas este mes.</div></div>
               </div>
             </div>
-            <div id="seg-documentos" class="seg-doc-list"></div>
           </div>
         </div>
       </div>
@@ -1497,6 +1538,33 @@ img,canvas,svg,video{max-width:100%}
 <!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
 
+
+<!-- Modal: Gestionar pregunta del Reto Seguro -->
+<div class="modal-overlay" id="modal-seguridad-pregunta">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-header"><div class="modal-title">Gestionar preguntas del Reto Seguro</div><button class="modal-close" onclick="closeModal('modal-seguridad-pregunta')">×</button></div>
+    <input type="hidden" id="game-q-id">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tema *</label><input class="form-control" id="game-q-tema" placeholder="Ej. Tormentas eléctricas"></div>
+      <div class="form-group"><label class="form-label">Documento relacionado</label><select class="form-control" id="game-q-doc"><option value="">Sin documento asociado</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Pregunta *</label><textarea class="form-control" id="game-q-text" rows="3" placeholder="Escribe una situación o pregunta clara"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Opción A *</label><input class="form-control" id="game-q-a"></div>
+      <div class="form-group"><label class="form-label">Opción B *</label><input class="form-control" id="game-q-b"></div>
+      <div class="form-group"><label class="form-label">Opción C *</label><input class="form-control" id="game-q-c"></div>
+      <div class="form-group"><label class="form-label">Opción D (opcional)</label><input class="form-control" id="game-q-d"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Respuesta correcta *</label><select class="form-control" id="game-q-correct"><option value="0">Opción A</option><option value="1">Opción B</option><option value="2">Opción C</option><option value="3">Opción D</option></select></div>
+      <div class="form-group"><label class="form-label">Explicación *</label><textarea class="form-control" id="game-q-exp" rows="3" placeholder="Explica por qué es correcta y qué debe recordar el trabajador"></textarea></div>
+    </div>
+    <div class="alert alert-info"><div>Las preguntas no se crean automáticamente a partir de los documentos. El supervisor o administrador debe validarlas antes de publicarlas.</div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="limpiarPreguntaSeguridad()">Limpiar</button><button class="btn btn-primary" onclick="guardarPreguntaSeguridad()">Guardar pregunta</button></div>
+    <div style="border-top:1px solid var(--border);margin-top:18px;padding-top:18px"><div class="card-title" style="margin-bottom:10px">Preguntas publicadas</div><div id="game-question-admin-list" class="question-admin-list"></div></div><div style="border-top:1px solid var(--border);margin-top:18px;padding-top:18px"><div class="card-title" style="margin-bottom:10px">Participantes y tickets del mes</div><div class="table-wrap"><table><thead><tr><th>Participante</th><th>Puntos</th><th>Tickets</th></tr></thead><tbody id="game-participants-list"></tbody></table></div></div>
+  </div>
+</div>
+
 <!-- ==================== JAVASCRIPT ==================== -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1518,7 +1586,9 @@ const APP = {
     coproductos: [],
     coproMovimientos: [],
     seguridadDocumentos: [],
-    seguridadFragmentos: []
+    seguridadFragmentos: [],
+    seguridadPreguntas: [],
+    seguridadIntentos: []
   }
 };
 
@@ -1666,8 +1736,16 @@ function dbSeguridadFragmentoToApp(row){
   return {id:row.id,documentoId:Number(row.documento_id),orden:Number(row.orden||0),contenido:row.contenido||'',busqueda:row.busqueda||''};
 }
 
+
+function dbSeguridadPreguntaToApp(row){
+  return {id:row.id,tema:row.tema||'Seguridad',pregunta:row.pregunta||'',opciones:Array.isArray(row.opciones)?row.opciones:[],correcta:Number(row.correcta||0),explicacion:row.explicacion||'',documentoId:row.documento_id?Number(row.documento_id):null,activo:row.activo!==false,creadoPor:row.creado_por||'',createdAt:row.created_at||''};
+}
+function dbSeguridadIntentoToApp(row){
+  return {id:row.id,preguntaId:Number(row.pregunta_id),usuarioLogin:row.usuario_login||'',correcto:Boolean(row.correcto),puntos:Number(row.puntos||0),erroresPrevios:Number(row.errores_previos||0),respuesta:Number(row.respuesta),createdAt:row.created_at||''};
+}
+
 async function loadAllData() {
-  const [actRes, restRes, userRes, movRes, coproRes, coproMovRes, segDocRes, segFragRes] = await Promise.all([
+  const [actRes, restRes, userRes, movRes, coproRes, coproMovRes, segDocRes, segFragRes, segQRes, segTryRes] = await Promise.all([
     db.from('actividades').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('restricciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('usuarios').select('*').order('id', { ascending: true }),
@@ -1675,7 +1753,9 @@ async function loadAllData() {
     db.from('coproductos').select('*').order('id', { ascending: false }),
     db.from('movimientos_coproductos').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('seguridad_documentos').select('*').eq('activo',true).order('created_at',{ascending:false}),
-    db.from('seguridad_fragmentos').select('*').order('documento_id',{ascending:true}).order('orden',{ascending:true})
+    db.from('seguridad_fragmentos').select('*').order('documento_id',{ascending:true}).order('orden',{ascending:true}),
+    db.from('seguridad_preguntas').select('*').eq('activo',true).order('created_at',{ascending:false}),
+    db.from('seguridad_intentos').select('*').order('created_at',{ascending:false}).limit(5000)
   ]);
 
   if(actRes.error) console.error('Error cargando actividades:', actRes.error);
@@ -1686,6 +1766,8 @@ async function loadAllData() {
   if(coproMovRes.error) console.error('Error cargando movimientos de coproductos:', coproMovRes.error);
   if(segDocRes.error) console.warn('Módulo seguridad pendiente de configurar:', segDocRes.error.message);
   if(segFragRes.error) console.warn('Fragmentos de seguridad pendientes:', segFragRes.error.message);
+  if(segQRes.error) console.warn('Juego de seguridad pendiente de configurar:', segQRes.error.message);
+  if(segTryRes.error) console.warn('Intentos del juego pendientes:', segTryRes.error.message);
 
   APP.data.actividades = (actRes.data || []).map(dbActividadToApp);
   APP.data.restricciones = (restRes.data || []).map(dbRestriccionToApp);
@@ -1695,6 +1777,8 @@ async function loadAllData() {
   APP.data.coproMovimientos = (coproMovRes.data || []).map(dbCoproMovimientoToApp);
   APP.data.seguridadDocumentos = (segDocRes.data || []).map(dbSeguridadDocumentoToApp);
   APP.data.seguridadFragmentos = (segFragRes.data || []).map(dbSeguridadFragmentoToApp);
+  APP.data.seguridadPreguntas = (segQRes.data || []).map(dbSeguridadPreguntaToApp);
+  APP.data.seguridadIntentos = (segTryRes.data || []).map(dbSeguridadIntentoToApp);
 
   if(APP.currentView === 'actividades') renderActividades();
   if(APP.currentView === 'restricciones') renderRestricciones();
@@ -1821,6 +1905,7 @@ async function guardarDocumentoSeguridad(){
   finally{btn.disabled=false;}
 }
 function renderSeguridad(){
+  renderSafetyGame();
   const docs=APP.data.seguridadDocumentos||[],box=document.getElementById('seg-documentos'),count=document.getElementById('seg-doc-count');
   if(!box)return;if(count)count.textContent=docs.length;
   box.innerHTML=docs.length?docs.map(d=>`<div class="seg-doc">
@@ -1863,6 +1948,94 @@ async function eliminarDocumentoSeguridad(id){
   await loadAllData();renderSeguridad();showToast('Documento retirado','warning');
 }
 
+
+
+/* ===== RETO SEGURO ===== */
+const SAFETY_GAME={current:null,answered:false};
+function showSeguridadTab(tab){
+  const consulta=tab==='consulta';
+  document.getElementById('seg-panel-consulta').style.display=consulta?'block':'none';
+  document.getElementById('seg-panel-juego').style.display=consulta?'none':'block';
+  document.getElementById('seg-tab-consulta').classList.toggle('active',consulta);
+  document.getElementById('seg-tab-juego').classList.toggle('active',!consulta);
+  if(!consulta)renderSafetyGame();
+}
+function monthKeyLocal(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function currentUserGameAttempts(){
+  const key=monthKeyLocal();
+  return (APP.data.seguridadIntentos||[]).filter(x=>x.usuarioLogin===APP.user?.login && String(x.createdAt||'').slice(0,7)===key);
+}
+function questionWrongCount(questionId){return currentUserGameAttempts().filter(x=>x.preguntaId===Number(questionId)&&!x.correcto).length;}
+function pointsForWrongCount(n){return n<=0?100:n===1?70:n===2?40:20;}
+function renderSafetyGame(){
+  const tries=currentUserGameAttempts(),points=tries.reduce((a,x)=>a+(x.puntos||0),0),tickets=Math.floor(points/800),remainder=points%800,next=remainder===0&&points>0?800:800-remainder;
+  const month=new Intl.DateTimeFormat('es-PE',{month:'long',year:'numeric'}).format(new Date());
+  document.getElementById('game-points').textContent=points;
+  document.getElementById('game-tickets').textContent=tickets;
+  document.getElementById('game-next').textContent=next;
+  document.getElementById('game-answered').textContent=tries.length;
+  document.getElementById('game-month-label').textContent=month.charAt(0).toUpperCase()+month.slice(1);
+  document.getElementById('game-ticket-progress').style.width=(remainder/8)+'%';
+  document.getElementById('game-progress-text').textContent=`${remainder} de 800 puntos para el próximo ticket`;
+  const hist=document.getElementById('game-history');
+  hist.innerHTML=tries.length?tries.slice(0,5).map(t=>{const q=APP.data.seguridadPreguntas.find(x=>x.id===t.preguntaId);return `<div class="game-history-item"><strong>${t.correcto?'✅':'❌'} ${escapeHtml(q?.tema||'Pregunta de seguridad')}</strong><div>${t.correcto?'Correcta':'Incorrecta'} · +${t.puntos} puntos · ${new Date(t.createdAt).toLocaleDateString('es-PE')}</div></div>`}).join(''):'<div class="game-help">Aún no hay respuestas registradas este mes.</div>';
+}
+function startSafetyChallenge(){
+  const qs=(APP.data.seguridadPreguntas||[]).filter(q=>q.activo&&q.opciones.length>=3);
+  if(!qs.length){document.getElementById('game-question-box').innerHTML='<div class="alert alert-warning"><div>No existen preguntas publicadas todavía. Un supervisor o administrador debe cargarlas desde “Gestionar preguntas”.</div></div>';return;}
+  const recent=currentUserGameAttempts().slice(0,6).map(x=>x.preguntaId);
+  let pool=qs.filter(q=>!recent.includes(q.id));if(!pool.length)pool=qs;
+  // Prioriza algunas preguntas falladas para aplicar repetición espaciada.
+  const failed=pool.filter(q=>questionWrongCount(q.id)>0);
+  if(failed.length&&Math.random()<0.6)pool=failed;
+  SAFETY_GAME.current=pool[Math.floor(Math.random()*pool.length)];SAFETY_GAME.answered=false;renderCurrentQuestion();
+}
+function renderCurrentQuestion(){
+  const q=SAFETY_GAME.current;if(!q)return;
+  const wrongs=questionWrongCount(q.id),value=pointsForWrongCount(wrongs);
+  document.getElementById('game-question-value').textContent=`Hasta ${value} pts`;
+  document.getElementById('game-start-actions').style.display='none';
+  document.getElementById('game-question-box').innerHTML=`<div class="game-topic">${escapeHtml(q.tema)}</div><div class="game-qtext">${escapeHtml(q.pregunta)}</div><div class="game-options">${q.opciones.map((o,i)=>`<button class="game-option" data-option="${i}"><b>${String.fromCharCode(65+i)}.</b> ${escapeHtml(o)}</button>`).join('')}</div><div id="game-feedback"></div><div class="game-actions" id="game-next-action" style="display:none"><button class="btn btn-primary" onclick="startSafetyChallenge()">Siguiente pregunta</button></div>`;
+  document.querySelectorAll('#game-question-box .game-option').forEach(b=>b.addEventListener('click',()=>answerSafetyQuestion(Number(b.dataset.option))));
+}
+async function answerSafetyQuestion(selected){
+  if(SAFETY_GAME.answered||!SAFETY_GAME.current)return;SAFETY_GAME.answered=true;
+  const q=SAFETY_GAME.current,wrongs=questionWrongCount(q.id),correct=selected===q.correcta,pts=correct?pointsForWrongCount(wrongs):0;
+  document.querySelectorAll('#game-question-box .game-option').forEach((b,i)=>{b.disabled=true;if(i===q.correcta)b.classList.add('correct');if(i===selected&&!correct)b.classList.add('wrong');});
+  const feedback=document.getElementById('game-feedback');feedback.className='game-feedback '+(correct?'ok':'bad');feedback.innerHTML=`<strong>${correct?`¡Correcto! Ganaste ${pts} puntos.`:'Respuesta incorrecta.'}</strong><br>${escapeHtml(q.explicacion)}${!correct?'<br><small>Cuando esta pregunta vuelva a aparecer, otorgará menos puntos al responderla correctamente.</small>':''}`;
+  document.getElementById('game-next-action').style.display='flex';
+  try{
+    const row={pregunta_id:q.id,usuario_login:APP.user.login,correcto:correct,puntos:pts,errores_previos:wrongs,respuesta:selected};
+    const {data,error}=await db.from('seguridad_intentos').insert([row]).select().single();if(error)throw error;
+    APP.data.seguridadIntentos.unshift(dbSeguridadIntentoToApp(data));renderSafetyGame();
+  }catch(err){console.error(err);showToast('No se pudo guardar el resultado. Verifica la configuración de Supabase.','error');}
+}
+function openPreguntaSeguridadModal(){
+  if(!puedeGestionarSeguridad()){showToast('Solo supervisor y administrador pueden gestionar preguntas','error');return;}
+  limpiarPreguntaSeguridad();renderQuestionDocumentSelect();renderQuestionAdminList();renderGameParticipants();openModal('modal-seguridad-pregunta');
+}
+function renderQuestionDocumentSelect(){const sel=document.getElementById('game-q-doc');sel.innerHTML='<option value="">Sin documento asociado</option>'+(APP.data.seguridadDocumentos||[]).map(d=>`<option value="${d.id}">${escapeHtml(d.titulo)}</option>`).join('');}
+function limpiarPreguntaSeguridad(){['game-q-id','game-q-tema','game-q-text','game-q-a','game-q-b','game-q-c','game-q-d','game-q-exp'].forEach(id=>document.getElementById(id).value='');document.getElementById('game-q-correct').value='0';document.getElementById('game-q-doc').value='';}
+async function guardarPreguntaSeguridad(){
+  if(!puedeGestionarSeguridad())return;
+  const id=document.getElementById('game-q-id').value,tema=document.getElementById('game-q-tema').value.trim(),pregunta=document.getElementById('game-q-text').value.trim(),exp=document.getElementById('game-q-exp').value.trim();
+  const opciones=['game-q-a','game-q-b','game-q-c','game-q-d'].map(x=>document.getElementById(x).value.trim()).filter(Boolean),correcta=Number(document.getElementById('game-q-correct').value);
+  if(!tema||!pregunta||opciones.length<3||!exp){showToast('Completa tema, pregunta, al menos 3 opciones y explicación','warning');return;}
+  if(correcta>=opciones.length){showToast('La respuesta correcta seleccionada no tiene contenido','warning');return;}
+  const docVal=document.getElementById('game-q-doc').value,row={tema,pregunta,opciones,correcta,explicacion:exp,documento_id:docVal?Number(docVal):null,activo:true,creado_por:APP.user.login};
+  const query=id?db.from('seguridad_preguntas').update(row).eq('id',id):db.from('seguridad_preguntas').insert([row]);const {error}=await query;if(error){showToast('No se pudo guardar: '+error.message,'error');return;}
+  await loadAllData();limpiarPreguntaSeguridad();renderQuestionDocumentSelect();renderQuestionAdminList();showToast('Pregunta publicada','success');
+}
+function renderQuestionAdminList(){const box=document.getElementById('game-question-admin-list'),qs=APP.data.seguridadPreguntas||[];box.innerHTML=qs.length?qs.map(q=>`<div class="question-admin-item"><div class="question-admin-head"><div><div class="question-admin-title">${escapeHtml(q.pregunta)}</div><div class="question-admin-meta">${escapeHtml(q.tema)} · ${q.opciones.length} opciones</div></div><div style="display:flex;gap:7px"><button onclick="editarPreguntaSeguridad(${q.id})" title="Editar">✏️</button><button onclick="eliminarPreguntaSeguridad(${q.id})" title="Retirar" style="color:var(--danger)">🗑</button></div></div></div>`).join(''):'<div class="game-help">Aún no hay preguntas publicadas.</div>';}
+function renderGameParticipants(){
+  const box=document.getElementById('game-participants-list');if(!box)return;
+  const key=monthKeyLocal(),groups={};
+  (APP.data.seguridadIntentos||[]).filter(x=>String(x.createdAt||'').slice(0,7)===key).forEach(x=>{groups[x.usuarioLogin]=(groups[x.usuarioLogin]||0)+(x.puntos||0);});
+  const rows=Object.entries(groups).map(([login,puntos])=>{const u=(APP.data.usuarios||[]).find(x=>x.login===login);return {login,nombre:u?.nombre||u?.name||login,puntos,tickets:Math.floor(puntos/800)};}).sort((a,b)=>b.puntos-a.puntos);
+  box.innerHTML=rows.length?rows.map(r=>`<tr><td><strong>${escapeHtml(r.nombre)}</strong><br><small>${escapeHtml(r.login)}</small></td><td>${r.puntos}</td><td><span class="badge badge-done">${r.tickets}</span></td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--text-m)">Aún no hay participantes este mes.</td></tr>';
+}
+function editarPreguntaSeguridad(id){const q=APP.data.seguridadPreguntas.find(x=>x.id===id);if(!q)return;document.getElementById('game-q-id').value=q.id;document.getElementById('game-q-tema').value=q.tema;document.getElementById('game-q-text').value=q.pregunta;['a','b','c','d'].forEach((x,i)=>document.getElementById('game-q-'+x).value=q.opciones[i]||'');document.getElementById('game-q-correct').value=String(q.correcta);document.getElementById('game-q-exp').value=q.explicacion;document.getElementById('game-q-doc').value=q.documentoId||'';}
+async function eliminarPreguntaSeguridad(id){if(!confirm('¿Retirar esta pregunta del juego?'))return;const {error}=await db.from('seguridad_preguntas').update({activo:false}).eq('id',id);if(error){showToast('No se pudo retirar','error');return;}await loadAllData();renderQuestionAdminList();showToast('Pregunta retirada','warning');}
 
 /* ===== AUTH ===== */
 async function doLogin() {
@@ -2028,6 +2201,8 @@ function setupUI() {
   if(btnCopro) btnCopro.style.display = ['controlador','admin'].includes(u.role) ? 'inline-flex' : 'none';
   const btnSeg = document.getElementById('btn-subir-seguridad');
   if(btnSeg) btnSeg.style.display = ['supervisor','admin'].includes(u.role) ? 'inline-flex' : 'none';
+  const btnPreg = document.getElementById('btn-gestionar-preguntas');
+  if(btnPreg) btnPreg.style.display = puedeGestionarSeguridad() ? 'inline-flex' : 'none';
 
 
   // Set default date inputs
