@@ -587,7 +587,7 @@ img,canvas,svg,video{max-width:100%}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v13 · Aprendizaje adaptativo</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v14 · Salida rápida de vehículos</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -864,10 +864,10 @@ img,canvas,svg,video{max-width:100%}
       <div id="view-patios" style="display:none">
         <div class="page-header">
           <div>
-            <div class="page-title">Control de ingresos y salidas de material</div>
-            <div class="page-subtitle">Trazabilidad de movimientos, tonelajes y procedencia por patio</div>
+            <div class="page-title">Control de ingreso y salida de vehículos</div>
+            <div class="page-subtitle">Registra el ingreso una sola vez y marca la salida del mismo vehículo sin volver a escribir sus datos</div>
           </div>
-          <button class="btn btn-primary" id="btn-nuevo-movimiento" onclick="openMovimientoModal()">+ Registrar movimiento</button>
+          <button class="btn btn-primary" id="btn-nuevo-movimiento" onclick="openMovimientoModal()">+ Registrar ingreso</button>
         </div>
 
         <div id="patio-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
@@ -878,7 +878,7 @@ img,canvas,svg,video{max-width:100%}
           <div class="filters" style="padding:0;margin:0">
             <div class="form-group" style="margin:0"><label class="form-label">Desde</label><input type="date" class="filter-select" id="patio-desde" onchange="renderPatios()"></div>
             <div class="form-group" style="margin:0"><label class="form-label">Hasta</label><input type="date" class="filter-select" id="patio-hasta" onchange="renderPatios()"></div>
-            <div class="form-group" style="margin:0"><label class="form-label">Movimiento</label><select class="filter-select" id="patio-tipo-mov" onchange="renderPatios()"><option value="">Todos</option><option value="ingreso">Ingresos</option><option value="salida">Salidas</option></select></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Estado del vehículo</label><select class="filter-select" id="patio-tipo-mov" onchange="renderPatios()"><option value="">Todos</option><option value="en_patio">En patio</option><option value="salio">Con salida registrada</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Subclase</label><select class="filter-select" id="patio-subclase" onchange="renderPatios()"><option value="">Todas</option><option value="Metálico">Metálico</option><option value="No metálico">No metálico</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Gerencia</label><select class="filter-select" id="patio-gerencia" onchange="renderPatios()"><option value="">Todas</option><option>Mantenimiento</option><option>Concentradora</option><option>Ingeniería & Proyectos</option><option>Campamento</option><option>Patio de recepción 4388</option><option>DEG</option></select></div>
             <div class="filters-spacer"></div>
@@ -889,10 +889,10 @@ img,canvas,svg,video{max-width:100%}
         </div>
 
         <div class="patio-kpis">
-          <div class="stat-card success"><div class="stat-label">Ingresos</div><div class="stat-value" id="patio-kpi-ingresos">0</div><div class="stat-sub">movimientos filtrados</div></div>
-          <div class="stat-card amber"><div class="stat-label">Salidas</div><div class="stat-value" id="patio-kpi-salidas">0</div><div class="stat-sub">movimientos filtrados</div></div>
+          <div class="stat-card success"><div class="stat-label">Ingresos registrados</div><div class="stat-value" id="patio-kpi-ingresos">0</div><div class="stat-sub">vehículos filtrados</div></div>
+          <div class="stat-card amber"><div class="stat-label">Salidas registradas</div><div class="stat-value" id="patio-kpi-salidas">0</div><div class="stat-sub">vehículos que ya salieron</div></div>
           <div class="stat-card teal"><div class="stat-label">Toneladas ingresadas</div><div class="stat-value" id="patio-kpi-tn-in">0</div><div class="stat-sub">tn</div></div>
-          <div class="stat-card info"><div class="stat-label">Balance neto</div><div class="stat-value" id="patio-kpi-balance">0</div><div class="stat-sub">ingresos − salidas (tn)</div></div>
+          <div class="stat-card info"><div class="stat-label">Vehículos en patio</div><div class="stat-value" id="patio-kpi-balance">0</div><div class="stat-sub">sin hora de salida</div></div>
         </div>
 
         <div class="patio-chart-grid">
@@ -904,7 +904,7 @@ img,canvas,svg,video{max-width:100%}
         <div class="card" style="padding:0">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Fecha</th><th>Movimiento</th><th>Subclase</th><th>Clase</th><th>Residuo</th><th>Material</th><th>Vehículo</th><th>Empresa</th><th>Peso (tn)</th><th>Procedencia</th><th>Gerencia</th><th>Inicio</th><th>Fin</th><th>Registrado por</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Estado</th><th>Subclase</th><th>Clase</th><th>Residuo</th><th>Material</th><th>Vehículo</th><th>Empresa</th><th>Peso (tn)</th><th>Procedencia</th><th>Gerencia</th><th>Hora ingreso</th><th>Hora salida</th><th>Registrado por</th><th>Acciones</th></tr></thead>
               <tbody id="tbody-movimientos"></tbody>
             </table>
           </div>
@@ -1381,9 +1381,8 @@ img,canvas,svg,video{max-width:100%}
   <div class="modal" style="max-width:820px">
     <div class="modal-header"><div class="modal-title" id="mov-modal-title">Registrar movimiento de material</div><button class="modal-close" onclick="closeModal('modal-movimiento')">×</button></div>
     <input type="hidden" id="mov-id">
-    <div class="form-row-3">
-      <div class="form-group"><label class="form-label">Fecha *</label><input class="form-control" id="mov-fecha" type="date"></div>
-      <div class="form-group"><label class="form-label">Movimiento *</label><select class="form-control" id="mov-movimiento"><option value="ingreso">Ingreso</option><option value="salida">Salida</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Fecha de ingreso *</label><input class="form-control" id="mov-fecha" type="date"></div>
       <div class="form-group"><label class="form-label">Subclase *</label><select class="form-control" id="mov-subclase"><option value="">Seleccionar</option><option>Metálico</option><option>No metálico</option></select></div>
     </div>
     <div class="form-row-3">
@@ -1401,10 +1400,10 @@ img,canvas,svg,video{max-width:100%}
       <div class="form-group"><label class="form-label">Gerencia *</label><select class="form-control" id="mov-gerencia"><option value="">Seleccionar</option><option>Mantenimiento</option><option>Concentradora</option><option>Ingeniería & Proyectos</option><option>Campamento</option><option>Patio de recepción 4388</option><option>DEG</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Hora inicio *</label><input class="form-control" id="mov-inicio" type="time"></div>
-      <div class="form-group"><label class="form-label">Hora fin *</label><input class="form-control" id="mov-fin" type="time"></div>
+      <div class="form-group"><label class="form-label">Hora de ingreso *</label><input class="form-control" id="mov-inicio" type="time"></div>
+      <div class="form-group"><label class="form-label">Hora de salida</label><input class="form-control" id="mov-fin" type="time"><div class="form-hint">Déjala vacía al registrar el ingreso. Luego usa “Marcar salida” en la tabla.</div></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-movimiento')">Cancelar</button><button class="btn btn-primary" onclick="saveMovimiento()">Guardar movimiento</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-movimiento')">Cancelar</button><button class="btn btn-primary" onclick="saveMovimiento()">Guardar ingreso</button></div>
   </div>
 </div>
 
@@ -2829,12 +2828,13 @@ function canEditPatios(){ return APP.user && ['admin','controlador'].includes(AP
 function openMovimientoModal(id=null){
   if(!canEditPatios()){ showToast('Tu usuario tiene permiso solo de visualización','warning'); return; }
   document.getElementById('mov-id').value = id || '';
-  document.getElementById('mov-modal-title').textContent = id ? 'Editar movimiento de material' : 'Registrar movimiento de material';
+  document.getElementById('mov-modal-title').textContent = id ? 'Editar ingreso de vehículo' : 'Registrar ingreso de vehículo';
   const m = id ? APP.data.movimientos.find(x=>x.id===id) : null;
-  const today = new Date().toISOString().split('T')[0];
-  const values = m || {fecha:today,movimiento:'ingreso',subclase:'',clase:'',tipoResiduo:'',descripcion:'',vehiculo:'',empresa:'',peso:'',procedencia:'',gerencia:'',inicio:'',fin:''};
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const currentTime = now.toTimeString().slice(0,5);
+  const values = m || {fecha:today,movimiento:'ingreso',subclase:'',clase:'',tipoResiduo:'',descripcion:'',vehiculo:'',empresa:'',peso:'',procedencia:'',gerencia:'',inicio:currentTime,fin:''};
   document.getElementById('mov-fecha').value=values.fecha;
-  document.getElementById('mov-movimiento').value=values.movimiento;
   document.getElementById('mov-subclase').value=values.subclase;
   document.getElementById('mov-clase').value=values.clase;
   document.getElementById('mov-residuo').value=values.tipoResiduo;
@@ -2853,7 +2853,7 @@ async function saveMovimiento(){
   if(!canEditPatios()) return;
   const m={
     fecha:document.getElementById('mov-fecha').value,
-    movimiento:document.getElementById('mov-movimiento').value,
+    movimiento:'ingreso',
     subclase:document.getElementById('mov-subclase').value,
     clase:document.getElementById('mov-clase').value,
     tipoResiduo:document.getElementById('mov-residuo').value,
@@ -2867,44 +2867,63 @@ async function saveMovimiento(){
     fin:document.getElementById('mov-fin').value,
     registradoPor:APP.user.login
   };
-  if(!m.fecha||!m.subclase||!m.clase||!m.tipoResiduo||!m.descripcion||!m.vehiculo||!m.empresa||!m.peso||!m.procedencia||!m.gerencia||!m.inicio||!m.fin){showToast('Completa todos los campos obligatorios','error');return;}
+  if(!m.fecha||!m.subclase||!m.clase||!m.tipoResiduo||!m.descripcion||!m.vehiculo||!m.empresa||!m.peso||!m.procedencia||!m.gerencia||!m.inicio){showToast('Completa todos los campos obligatorios del ingreso','error');return;}
   if(m.peso<=0){showToast('El peso debe ser mayor que cero','error');return;}
   const id=document.getElementById('mov-id').value;
   const query=id?db.from('movimientos_material').update(appMovimientoToDb(m)).eq('id',id):db.from('movimientos_material').insert([appMovimientoToDb(m)]);
   const {error}=await query;
   if(error){console.error(error);showToast('Error al guardar. Verifica que la tabla movimientos_material exista','error');return;}
-  closeModal('modal-movimiento'); await loadAllData(); showToast(id?'Movimiento actualizado':'Movimiento registrado','success'); syncMovimientosToDrive({silent:true});
+  closeModal('modal-movimiento'); await loadAllData(); showToast(id?'Ingreso actualizado':'Ingreso registrado. Cuando el vehículo se retire, pulsa “Marcar salida”.','success'); syncMovimientosToDrive({silent:true});
 }
+
+async function marcarSalidaVehiculo(id){
+  if(!canEditPatios()) return;
+  const m=APP.data.movimientos.find(x=>x.id===id);
+  if(!m){showToast('No se encontró el ingreso seleccionado','error');return;}
+  if(m.fin){showToast('Este vehículo ya tiene una hora de salida registrada','warning');return;}
+  const hora=new Date().toTimeString().slice(0,5);
+  if(!confirm(`¿Registrar la salida del vehículo ${m.vehiculo} a las ${hora}?`)) return;
+  const {error}=await db.from('movimientos_material').update({hora_fin:hora}).eq('id',id);
+  if(error){console.error(error);showToast('No se pudo registrar la salida','error');return;}
+  await loadAllData();
+  showToast(`Salida registrada a las ${hora}`,'success');
+  syncMovimientosToDrive({silent:true});
+}
+
 async function deleteMovimiento(id){
   if(APP.user?.role!=='admin'){showToast('Solo administración puede eliminar registros','warning');return;}
-  if(!confirm('¿Eliminar este movimiento?'))return;
+  if(!confirm('¿Eliminar este ingreso?'))return;
   const {error}=await db.from('movimientos_material').delete().eq('id',id);
-  if(error){console.error(error);showToast('Error al eliminar','error');return;} await loadAllData(); showToast('Movimiento eliminado','warning'); syncMovimientosToDrive({silent:true});
+  if(error){console.error(error);showToast('Error al eliminar','error');return;} await loadAllData(); showToast('Ingreso eliminado','warning'); syncMovimientosToDrive({silent:true});
 }
 function getPatioFilteredData(){
   const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', t=document.getElementById('patio-tipo-mov')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'';
-  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||m.movimiento===t)&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||(t==='en_patio'?!m.fin:!!m.fin))&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
 }
 function getPatioChartData(){
   const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'';
-  return APP.data.movimientos.filter(m=>m.movimiento==='ingreso'&&(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||m.subclase===s)&&(!g||m.gerencia===g));
 }
 function renderPatios(){
   const data=getPatioFilteredData(); const editable=canEditPatios();
   const btn=document.getElementById('btn-nuevo-movimiento'); if(btn) btn.style.display=editable?'inline-flex':'none';
   const note=document.getElementById('patio-readonly-note'); if(note) note.style.display=editable?'none':'block';
-  const ingresos=data.filter(m=>m.movimiento==='ingreso'), salidas=data.filter(m=>m.movimiento==='salida');
-  const tnIn=ingresos.reduce((a,m)=>a+m.peso,0), tnOut=salidas.reduce((a,m)=>a+m.peso,0);
-  document.getElementById('patio-kpi-ingresos').textContent=ingresos.length;
+  const salidas=data.filter(m=>!!m.fin), enPatio=data.filter(m=>!m.fin);
+  const tnIn=data.reduce((a,m)=>a+m.peso,0);
+  document.getElementById('patio-kpi-ingresos').textContent=data.length;
   document.getElementById('patio-kpi-salidas').textContent=salidas.length;
   document.getElementById('patio-kpi-tn-in').textContent=tnIn.toFixed(2);
-  document.getElementById('patio-kpi-balance').textContent=(tnIn-tnOut).toFixed(2);
+  document.getElementById('patio-kpi-balance').textContent=enPatio.length;
   const tbody=document.getElementById('tbody-movimientos');
-  tbody.innerHTML=data.length?data.map(m=>`<tr><td>${formatDate(m.fecha)}</td><td><span class="badge mov-${m.movimiento}">${m.movimiento}</span></td><td>${m.subclase}</td><td>${m.clase}</td><td>${m.tipoResiduo}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${m.vehiculo}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${m.gerencia}</td><td>${m.inicio||'—'}</td><td>${m.fin||'—'}</td><td>${m.registradoPor||'—'}</td><td style="white-space:nowrap">${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?` <button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`).join(''):`<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--text-m)">No hay movimientos para los filtros seleccionados</td></tr>`;
+  tbody.innerHTML=data.length?data.map(m=>{
+    const estado=m.fin?'<span class="badge badge-done">Salió</span>':'<span class="badge badge-pending">En patio</span>';
+    const salidaBtn=editable&&!m.fin?`<button class="btn btn-success btn-sm" onclick="marcarSalidaVehiculo(${m.id})">✓ Marcar salida</button>`:'';
+    return `<tr><td>${formatDate(m.fecha)}</td><td>${estado}</td><td>${m.subclase}</td><td>${m.clase}</td><td>${m.tipoResiduo}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${m.vehiculo}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${m.gerencia}</td><td>${m.inicio||'—'}</td><td>${m.fin||'<span style="color:var(--warning);font-weight:700">Pendiente</span>'}</td><td>${m.registradoPor||'—'}</td><td style="white-space:nowrap;display:flex;gap:6px;flex-wrap:wrap">${salidaBtn}${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?`<button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`;
+  }).join(''):`<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--text-m)">No hay vehículos para los filtros seleccionados</td></tr>`;
   renderPatioCharts(getPatioChartData());
 }
 function renderPatioCharts(data){
-  const ingresos=data.filter(m=>m.movimiento==='ingreso');
+  const ingresos=data;
   const byResiduo={Pesado:0,Liviano:0}; ingresos.forEach(m=>byResiduo[m.tipoResiduo]=(byResiduo[m.tipoResiduo]||0)+m.peso);
   if(patioPieChart)patioPieChart.destroy();
   patioPieChart=new Chart(document.getElementById('chart-patio-residuo'),{type:'doughnut',data:{labels:Object.keys(byResiduo),datasets:[{data:Object.values(byResiduo),backgroundColor:['#1a5c2a','#69f0ae'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>`${c.label}: ${Number(c.raw).toFixed(2)} tn`}}}}});
@@ -2918,7 +2937,7 @@ function clearPatioFilters(){['patio-desde','patio-hasta','patio-tipo-mov','pati
 function exportMovimientosCSV(){
   const data=getPatioFilteredData(); if(!data.length){showToast('No hay datos para exportar','warning');return;}
   const headers=['Fecha','Movimiento','Subclase','Clase','Tipo residuo','Descripción','Vehículo','Empresa','Peso tn','Procedencia','Gerencia','Hora inicio','Hora fin','Registrado por'];
-  const rows=data.map(m=>[m.fecha,m.movimiento,m.subclase,m.clase,m.tipoResiduo,m.descripcion,m.vehiculo,m.empresa,m.peso,m.procedencia,m.gerencia,m.inicio,m.fin,m.registradoPor]);
+  const rows=data.map(m=>[m.fecha,m.fin?'Salió':'En patio',m.subclase,m.clase,m.tipoResiduo,m.descripcion,m.vehiculo,m.empresa,m.peso,m.procedencia,m.gerencia,m.inicio,m.fin||'',m.registradoPor]);
   const csv='\ufeff'+[headers,...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n'); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='movimientos_patios.csv';a.click();URL.revokeObjectURL(a.href);
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
