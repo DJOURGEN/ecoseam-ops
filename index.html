@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- ECOSEAM BUILD v22: exportación de programación con posiciones protegidas -->
+  <!-- ECOSEAM BUILD v23: usuarios, permisos e integración Google Sheets -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1a5c2a">
@@ -408,7 +408,7 @@ tbody tr:hover{background:var(--surface-1)}
 .guard-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:14px 18px 0}
 .guard-summary-item{background:#fff;border:1px solid #d8e7da;border-radius:11px;padding:10px;text-align:center}.guard-summary-item span{display:block;font-size:9px;color:#618069;text-transform:uppercase;font-weight:800}.guard-summary-item strong{display:block;font-size:14px;color:#123c20;margin-top:3px}
 .guard-safety{margin:14px 18px 0;border-radius:12px;padding:13px 14px;background:linear-gradient(110deg,#fff7df,#fff);border:1px solid #f0d792;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center}
-.guard-safety-icon{width:34px;height:34px;border-radius:9px;background:#f5b82e;display:grid;place-items:center;color:#593f08;line-height:1}.guard-safety-icon svg{display:block;width:25px;height:25px}.guard-safety span{display:block;font-size:9px;color:#8b6514;text-transform:uppercase;font-weight:900}.guard-safety strong{display:block;font-size:13px;color:#593f08;margin-top:2px;line-height:1.35}
+.guard-safety-icon{width:38px;height:38px;border-radius:10px;background:#f5b82e;display:grid;place-items:center;overflow:hidden;line-height:1}.guard-safety-icon img{display:block;width:34px;height:34px;object-fit:contain}.guard-safety span{display:block;font-size:9px;color:#8b6514;text-transform:uppercase;font-weight:900}.guard-safety strong{display:block;font-size:13px;color:#593f08;margin-top:2px;line-height:1.35}
 .guard-body{padding:15px 18px 18px}.guard-body-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 9px;font-size:11px;color:#153e21;font-weight:900;text-transform:uppercase;letter-spacing:.045em}.guard-body-title span{font-size:9px;color:#64806a;font-weight:700}
 .guard-task{background:#fff;border:1px solid #d6e5d9;border-left:5px solid var(--accent);border-radius:11px;padding:12px 13px;margin-bottom:9px}
 .guard-task-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-height:20px}.guard-area{display:inline-block;min-width:42px;padding:4px 8px;background:#e8f5eb;color:#15572a;border-radius:999px;font-size:9px;line-height:1.2;font-weight:900;text-align:center;text-transform:uppercase;white-space:nowrap}.guard-task-num{color:#91a997;font-size:11px;line-height:20px;font-weight:900;white-space:nowrap}
@@ -641,7 +641,7 @@ img,canvas,svg,video{max-width:100%}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v22 · Exportación estable</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v23 · Sheets y gestión de usuarios</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -792,10 +792,13 @@ img,canvas,svg,video{max-width:100%}
             <div class="page-title">Registro de actividades</div>
             <div class="page-subtitle">Control diario de operaciones</div>
           </div>
-          <button class="btn btn-primary" id="btn-nueva-actividad-page" onclick="openModal('modal-actividad')">
-            <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-            Registrar actividad
-          </button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" id="btn-sync-actividades-sheets" style="display:none" onclick="syncActividadesFromGoogleSheets()">↻ Importar Google Sheets</button>
+            <button class="btn btn-primary" id="btn-nueva-actividad-page" onclick="openModal('modal-actividad')">
+              <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+              Registrar actividad
+            </button>
+          </div>
         </div>
 
         <!-- Filters -->
@@ -839,6 +842,7 @@ img,canvas,svg,video{max-width:100%}
                   <th>Fin</th>
                   <th>Duración</th>
                   <th>HH Individual</th>
+                  <th>Origen</th>
                   <th>Estado</th>
                   <th>Revisión</th>
                   <th>Acciones</th>
@@ -849,6 +853,7 @@ img,canvas,svg,video{max-width:100%}
             </table>
           </div>
         </div>
+
       </div>
 
       <!-- PAGE: RESTRICCIONES -->
@@ -1308,6 +1313,21 @@ img,canvas,svg,video{max-width:100%}
             </table>
           </div>
         </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-header" style="align-items:flex-start">
+            <div><div class="card-title">Integración Google Sheets · Actividades</div><div class="card-subtitle">Importa a la tabla las actividades registradas en el Google Sheet sin duplicarlas.</div></div>
+            <span class="badge badge-process" id="sheets-config-status">Sin configurar</span>
+          </div>
+          <div class="form-group"><label class="form-label">URL de la aplicación web de Google Apps Script</label><input class="form-control" id="sheets-sync-url" type="url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Token privado de sincronización</label><input class="form-control" id="sheets-sync-token" type="password" placeholder="Debe coincidir con el token del Apps Script"></div>
+            <div class="form-group"><label class="form-label">Nombre de la hoja</label><input class="form-control" id="sheets-activities-sheet" value="Actividades" placeholder="Actividades"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <button class="btn btn-primary" onclick="saveGoogleSheetsSettings()">Guardar configuración</button><button class="btn btn-outline" onclick="syncActividadesFromGoogleSheets()">Importar ahora</button><button class="btn btn-outline" onclick="copyGoogleSheetsSql()">Copiar SQL de Supabase</button><button class="btn btn-outline" onclick="copyGoogleAppsScript()">Copiar Apps Script</button>
+          </div>
+          <div class="alert alert-info" style="margin-top:14px;margin-bottom:0"><div><strong>Configuración inicial:</strong> ejecuta una vez el SQL en Supabase; pega el Apps Script en Extensiones → Apps Script del Google Sheet; cambia su token; publícalo como aplicación web; pega arriba la URL generada y el mismo token.</div></div>
+        </div>
       </div>
 
     </div><!-- /content -->
@@ -1389,6 +1409,32 @@ img,canvas,svg,video{max-width:100%}
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-actividad')">Cancelar</button>
       <button class="btn btn-primary" onclick="saveActividad()">Guardar actividad</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Cambiar contraseña -->
+<div class="modal-overlay" id="modal-password">
+  <div class="modal" style="max-width:470px">
+    <div class="modal-header">
+      <div class="modal-title">Cambiar contraseña</div>
+      <button class="modal-close" onclick="closeModal('modal-password')">
+        <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <input type="hidden" id="password-user-id">
+    <div class="alert alert-info" style="margin-bottom:14px"><div id="password-user-label">Usuario</div></div>
+    <div class="form-group">
+      <label class="form-label">Nueva contraseña *</label>
+      <input class="form-control" id="password-new" type="password" minlength="4" autocomplete="new-password" placeholder="Mínimo 4 caracteres">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmar contraseña *</label>
+      <input class="form-control" id="password-confirm" type="password" minlength="4" autocomplete="new-password" placeholder="Repite la nueva contraseña">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-password')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveUserPassword()">Actualizar contraseña</button>
     </div>
   </div>
 </div>
@@ -1771,12 +1817,116 @@ const APP = {
 */
 const SUPABASE_URL = 'https://zqkutwiwiyiydhhrxcqs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_JT1RBs8d7onfnpe_caak7A_JgYWnddt';
-// Configuración opcional de sincronización con Google Sheets / Drive.
-// Pega aquí la URL de la aplicación web de Apps Script y el mismo token privado.
-const GOOGLE_SHEETS_SYNC_URL = '';
-const GOOGLE_SHEETS_SYNC_TOKEN = '';
+// Valores opcionales de respaldo. También pueden configurarse desde Administración.
+const GOOGLE_SHEETS_SYNC_URL_DEFAULT = '';
+const GOOGLE_SHEETS_SYNC_TOKEN_DEFAULT = '';
+const ECOSEAM_VEST_DATA_URL = 'data:image/png;base64,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';
+
+const GOOGLE_SHEETS_SQL = `-- ECOSEAM v23 · ejecutar una sola vez en Supabase > SQL Editor
+alter table public.actividades add column if not exists origen text not null default 'aplicativo';
+alter table public.actividades add column if not exists external_id text;
+create unique index if not exists actividades_external_id_uidx on public.actividades(external_id);`;
+
+const GOOGLE_APPS_SCRIPT_TEMPLATE = `// ECOSEAM · Conector Google Sheets -> Supabase
+// 1. Cambia el token. 2. Implementar > Nueva implementación > Aplicación web.
+// Ejecutar como: tú. Acceso: cualquier usuario con el enlace.
+const ECOSEAM_TOKEN = 'CAMBIAR_ESTE_TOKEN';
+
+function respuesta(datos) {
+  return ContentService.createTextOutput(JSON.stringify(datos)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  try {
+    if (!e || e.parameter.token !== ECOSEAM_TOKEN) return respuesta({ok:false,error:'Token no válido'});
+    if (e.parameter.accion !== 'leer_actividades') return respuesta({ok:false,error:'Acción no válida'});
+    const nombreHoja = e.parameter.hoja || 'Actividades';
+    const hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(nombreHoja);
+    if (!hoja) return respuesta({ok:false,error:'No existe la hoja '+nombreHoja});
+    let valores = hoja.getDataRange().getDisplayValues();
+    if (!valores.length) return respuesta({ok:true,filas:[]});
+    let encabezados = valores[0].map(v => String(v).trim());
+    let idCol = encabezados.findIndex(v => v.toUpperCase() === 'ID_EXTERNO');
+    if (idCol < 0) {
+      idCol = encabezados.length;
+      hoja.getRange(1,idCol+1).setValue('ID_EXTERNO');
+      valores = hoja.getDataRange().getDisplayValues();
+      encabezados = valores[0].map(v => String(v).trim());
+    }
+    const filas = [];
+    for (let i=1;i<valores.length;i++) {
+      const fila = valores[i];
+      if (!fila.some(v => String(v).trim() !== '')) continue;
+      let id = String(fila[idCol] || '').trim();
+      if (!id) {
+        id = Utilities.getUuid();
+        hoja.getRange(i+1,idCol+1).setValue(id);
+      }
+      const obj = {};
+      encabezados.forEach((h,j) => obj[h || ('COL_'+(j+1))] = j===idCol ? id : (fila[j] || ''));
+      filas.push(obj);
+    }
+    return respuesta({ok:true,hoja:nombreHoja,filas:filas});
+  } catch (error) {
+    return respuesta({ok:false,error:String(error && error.message || error)});
+  }
+}
+
+function doPost(e) {
+  try {
+    const datos = JSON.parse(e.postData.contents || '{}');
+    if (datos.token !== ECOSEAM_TOKEN) return respuesta({ok:false,error:'Token no válido'});
+    if (datos.accion !== 'sincronizar' || !Array.isArray(datos.filas)) return respuesta({ok:false,error:'Solicitud no válida'});
+    const libro = SpreadsheetApp.getActiveSpreadsheet();
+    const hoja = libro.getSheetByName(datos.hoja) || libro.insertSheet(datos.hoja);
+    const filas = datos.filas;
+    if (!filas.length) return respuesta({ok:true,registros:0});
+    const encabezados = Object.keys(filas[0]);
+    const valores = filas.map(f => encabezados.map(h => f[h] == null ? '' : f[h]));
+    hoja.clearContents();
+    hoja.getRange(1,1,1,encabezados.length).setValues([encabezados]);
+    hoja.getRange(2,1,valores.length,encabezados.length).setValues(valores);
+    hoja.setFrozenRows(1);
+    hoja.getRange(1,1,1,encabezados.length).setFontWeight('bold').setBackground('#1a5c2a').setFontColor('#ffffff');
+    hoja.autoResizeColumns(1,encabezados.length);
+    return respuesta({ok:true,registros:valores.length});
+  } catch (error) {
+    return respuesta({ok:false,error:String(error && error.message || error)});
+  }
+}`;
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function getGoogleSheetsSettings(){
+  return {
+    url: localStorage.getItem('ecoseam_sheets_url') || GOOGLE_SHEETS_SYNC_URL_DEFAULT,
+    token: localStorage.getItem('ecoseam_sheets_token') || GOOGLE_SHEETS_SYNC_TOKEN_DEFAULT,
+    sheet: localStorage.getItem('ecoseam_sheets_activities_sheet') || 'Actividades'
+  };
+}
+
+function loadGoogleSheetsSettingsUI(){
+  const cfg=getGoogleSheetsSettings();
+  const url=document.getElementById('sheets-sync-url'),token=document.getElementById('sheets-sync-token'),sheet=document.getElementById('sheets-activities-sheet'),status=document.getElementById('sheets-config-status');
+  if(url)url.value=cfg.url;if(token)token.value=cfg.token;if(sheet)sheet.value=cfg.sheet;
+  if(status){status.textContent=cfg.url&&cfg.token?'Configurado':'Sin configurar';status.className='badge '+(cfg.url&&cfg.token?'badge-done':'badge-process');}
+}
+
+function saveGoogleSheetsSettings(){
+  if(APP.user?.role!=='admin'){showToast('Solo administración puede configurar Google Sheets','error');return;}
+  const url=document.getElementById('sheets-sync-url').value.trim(),token=document.getElementById('sheets-sync-token').value.trim(),sheet=document.getElementById('sheets-activities-sheet').value.trim()||'Actividades';
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(url)){showToast('Pega una URL válida de la aplicación web de Apps Script','error');return;}
+  if(token.length<8){showToast('Usa un token de al menos 8 caracteres','error');return;}
+  localStorage.setItem('ecoseam_sheets_url',url);localStorage.setItem('ecoseam_sheets_token',token);localStorage.setItem('ecoseam_sheets_activities_sheet',sheet);
+  loadGoogleSheetsSettingsUI();showToast('Conexión con Google Sheets guardada en este equipo','success');
+}
+
+async function copySetupText(text,label){
+  try{await navigator.clipboard.writeText(text);showToast(label+' copiado','success');}
+  catch(_){const area=document.createElement('textarea');area.value=text;document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();showToast(label+' copiado','success');}
+}
+function copyGoogleSheetsSql(){return copySetupText(GOOGLE_SHEETS_SQL,'SQL de Supabase');}
+function copyGoogleAppsScript(){return copySetupText(GOOGLE_APPS_SCRIPT_TEMPLATE,'Apps Script');}
 
 function dbActividadToApp(row) {
   return {
@@ -1793,6 +1943,8 @@ function dbActividadToApp(row) {
     estado: row.estado || 'pendiente',
     revision: row.revision || null,
     comentario_rev: row.comentario_rev || '',
+    origen: row.origen || 'aplicativo',
+    externalId: row.external_id || '',
     calc: {
       duracion: Number(row.duracion || 0),
       hh: Number(row.hh || 0)
@@ -1801,7 +1953,7 @@ function dbActividadToApp(row) {
 }
 
 function appActividadToDb(a) {
-  return {
+  const row = {
     fecha: a.fecha,
     guardia: a.guardia,
     operador: a.operador,
@@ -1817,6 +1969,8 @@ function appActividadToDb(a) {
     revision: a.revision || null,
     comentario_rev: a.comentario_rev || ''
   };
+  if(a.externalId){row.origen=a.origen||'google_sheets';row.external_id=a.externalId;}
+  return row;
 }
 
 function dbRestriccionToApp(row) {
@@ -2527,7 +2681,7 @@ const NAV_CONFIG = {
   operador: ['actividades','seguridad'],
   controlador: ['actividades','patios','coproductos','seguridad'],
   supervisor: ['programacion','actividades','restricciones','patios','coproductos','seguridad','resumen'],
-  gerencia: ['programacion','actividades','restricciones','patios','coproductos','seguridad','reportes'],
+  gerencia: ['actividades','restricciones','patios','coproductos','seguridad','reportes'],
   admin: ['programacion','actividades','restricciones','patios','coproductos','seguridad','reportes','resumen','admin'],
 };
 
@@ -2626,6 +2780,8 @@ function setupUI() {
   const puedeRegistrarActividad = ['operador','controlador','admin'].includes(u.role);
   const btnNuevaPage = document.getElementById('btn-nueva-actividad-page');
   if(btnNuevaPage) btnNuevaPage.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
+  const btnSyncSheets = document.getElementById('btn-sync-actividades-sheets');
+  if(btnSyncSheets) btnSyncSheets.style.display = u.role==='admin' ? 'inline-flex' : 'none';
   const btnCopro = document.getElementById('btn-nuevo-coproducto');
   if(btnCopro) btnCopro.style.display = ['controlador','admin'].includes(u.role) ? 'inline-flex' : 'none';
   const btnSeg = document.getElementById('btn-subir-seguridad');
@@ -2658,6 +2814,7 @@ function setupUI() {
     document.getElementById('act-guardia').disabled = false;
   }
   toggleDashboardDateInputs();
+  if(u.role==='admin') loadGoogleSheetsSettingsUI();
 }
 
 /* ===== NAVIGATION ===== */
@@ -2981,7 +3138,7 @@ function renderActividades() {
   const role = APP.user.role;
   const tbody = document.getElementById('tbody-actividades');
   if(!data.length) {
-    tbody.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text-m)">Sin actividades registradas para los filtros seleccionados</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:32px;color:var(--text-m)">Sin actividades registradas para los filtros seleccionados</td></tr>`;
     return;
   }
   tbody.innerHTML = data.map(a=>`
@@ -2995,6 +3152,7 @@ function renderActividades() {
       <td>${a.fin||'—'}</td>
       <td>${a.calc.duracion?a.calc.duracion+' h':'—'}</td>
       <td style="font-weight:600;color:var(--teal)">${a.calc.hh||'—'}</td>
+      <td><span class="badge ${a.origen==='google_sheets'?'badge-process':'badge-done'}">${a.origen==='google_sheets'?'Google Sheets':'Aplicativo'}</span></td>
       <td><span class="badge badge-${a.estado.replace(' ','-')}">${a.estado}</span></td>
       <td>${a.revision?`<span class="badge badge-${a.revision}">${a.revision}</span>`:'<span style="color:var(--text-m);font-size:12px">Sin revisar</span>'}</td>
       <td style="white-space:nowrap">
@@ -3245,12 +3403,13 @@ function renderUsuarios() {
       <td style="font-weight:500">${u.nombre} ${u.apellido}</td>
       <td>
         <span id="pass-${u.id}" style="font-family:monospace;font-size:13px;letter-spacing:2px">••••••</span>
-        <button onclick="togglePass(${u.id},'${u.pass}')" style="background:none;border:none;cursor:pointer;color:var(--text-m);padding:2px 6px;font-size:11px" title="Ver/ocultar contraseña">👁</button>
+        <button onclick="togglePass(${u.id})" style="background:none;border:none;cursor:pointer;color:var(--text-m);padding:2px 6px;font-size:11px" title="Ver/ocultar contraseña">👁</button>
       </td>
       <td><span class="badge" style="${rolColors[u.rol]||'background:var(--surface-2);color:var(--text-s)'};text-transform:capitalize">${u.rol}</span></td>
       <td>${u.guardia === 'ambas' ? 'A y B' : 'Guardia '+u.guardia}</td>
       <td><span class="badge ${u.activo ? 'badge-done' : 'badge-open'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
       <td style="white-space:nowrap">
+        <button class="btn btn-outline btn-sm" style="font-size:12px;margin-right:4px" onclick="openPasswordModal(${u.id})">Cambiar clave</button>
         <button class="btn btn-outline btn-sm" style="font-size:12px;margin-right:4px" onclick="toggleUser(${u.id})">${u.activo ? 'Desactivar' : 'Activar'}</button>
         <button class="btn btn-sm" style="padding:5px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteUsuario(${u.id})">
           <svg viewBox="0 0 20 20" fill="none" width="13" height="13" style="margin-right:3px"><path d="M4 6h12M8 6V4h4v2M7 6v9a1 1 0 001 1h4a1 1 0 001-1V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Eliminar
@@ -3260,9 +3419,35 @@ function renderUsuarios() {
   `).join('');
 }
 
-function togglePass(id, pass) {
+function togglePass(id) {
+  const user=APP.data.usuarios.find(u=>u.id===id);if(!user)return;
   const el = document.getElementById('pass-'+id);
-  el.textContent = el.textContent === '••••••' ? pass : '••••••';
+  el.textContent = el.textContent === '••••••' ? user.pass : '••••••';
+}
+
+function openPasswordModal(id) {
+  const u = APP.data.usuarios.find(x => x.id === id);
+  if(!u) return;
+  document.getElementById('password-user-id').value = u.id;
+  document.getElementById('password-user-label').textContent = `Usuario: ${u.nombre} ${u.apellido||''} (${u.login})`;
+  document.getElementById('password-new').value = '';
+  document.getElementById('password-confirm').value = '';
+  openModal('modal-password');
+  setTimeout(()=>document.getElementById('password-new')?.focus(),80);
+}
+
+async function saveUserPassword() {
+  if(APP.user?.role!=='admin'){ showToast('Solo administración puede cambiar contraseñas','error'); return; }
+  const id = Number(document.getElementById('password-user-id').value);
+  const pass = document.getElementById('password-new').value;
+  const confirmPass = document.getElementById('password-confirm').value;
+  if(!id || pass.length < 4){ showToast('La contraseña debe tener al menos 4 caracteres','error'); return; }
+  if(pass !== confirmPass){ showToast('Las contraseñas no coinciden','error'); return; }
+  const {error}=await db.from('usuarios').update({pass}).eq('id',id);
+  if(error){ console.error(error); showToast('No se pudo actualizar la contraseña','error'); return; }
+  closeModal('modal-password');
+  await loadAllData();
+  showToast('Contraseña actualizada correctamente','success');
 }
 
 async function deleteUsuario(id) {
@@ -3658,6 +3843,8 @@ function renderProgramacion(){
   const hseUnicos=[...new Set(actividades.map(a=>a.hse).filter(Boolean))],supervisoresUnicos=[...new Set(actividades.map(a=>a.supervisor).filter(Boolean))];
   const taskCards=actividades.length?actividades.map((a,i)=>`<div class="guard-task"><div class="guard-task-top"><span class="guard-area">${escapeHtml(a.area||'Área por definir')}</span><span class="guard-task-num">${a._draft?'BORRADOR · ':''}ACT. ${String(i+1).padStart(2,'0')}</span></div><div class="guard-task-desc">${escapeHtml(a.descripcion||'Descripción pendiente')}</div><div class="guard-task-meta"><div class="guard-meta-block"><span class="guard-meta-label hse">Supervisión HSE</span><span class="guard-meta-value">${escapeHtml(a.hse||'Por definir')}</span></div><div class="guard-meta-block"><span class="guard-meta-label supervisor">Supervisor a cargo</span><span class="guard-meta-value">${escapeHtml(a.supervisor||'Por definir')}</span></div></div><div class="guard-people">${(a.personal||[]).map(n=>`<span class="guard-person">${escapeHtml(n)}</span>`).join('')}</div></div>`).join(''):`<div class="guard-empty">Aún no hay actividades programadas para esta fecha.</div>`;
   card.innerHTML=`<div class="guard-hero"><div class="guard-brand"><img src="logo-ecoseam.png" alt="ECOSEAM"><span class="guard-brand-tag">Control operacional</span></div><div class="guard-title">PROGRAMACIÓN<br>DE INICIO DE GUARDIA</div><div class="guard-date">FECHA · ${escapeHtml(fechaTexto)}</div></div><div class="guard-summary"><div class="guard-summary-item"><span>Supervisores asignados</span><strong>${supervisoresUnicos.length}</strong></div><div class="guard-summary-item"><span>Ingenieros HSE asignados</span><strong>${hseUnicos.length}</strong></div><div class="guard-summary-item"><span>Personal</span><strong>${personalUnico.length} involucrados</strong></div></div><div class="guard-safety"><div class="guard-safety-icon" title="Chaleco de seguridad"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 3h4c.2 1.4.8 2.2 2 2.2S17.8 4.4 18 3h4l6 8-4 3v15H8V14l-4-3 6-8z" fill="#ef6c00" stroke="#9a4300" stroke-width="1.2" stroke-linejoin="round"/><path d="M10.5 4.5 15 13v16M21.5 4.5 17 13v16M8 18h16" fill="none" stroke="#ffe082" stroke-width="2.2" stroke-linejoin="round"/></svg></div><div><span>Charla de seguridad del día</span><strong>${escapeHtml(header.charla||'Tema pendiente de registrar')}</strong></div></div><div class="guard-body"><div class="guard-body-title">Actividades operativas programadas <span>${actividades.length} actividades · ${areas.length} áreas</span></div>${taskCards}</div><div class="guard-foot">ECOSEAM · Planificación segura, clara y visible antes de iniciar la jornada</div>`;
+  const safetyIcon=card.querySelector('.guard-safety-icon');
+  if(safetyIcon)safetyIcon.innerHTML=`<img src="${ECOSEAM_VEST_DATA_URL}" alt="Chaleco de seguridad">`;
   const saved=APP.data.programaciones.filter(p=>p.fecha===fecha);
   list.innerHTML=saved.length?saved.map(p=>{const d=new Date(p.fecha+'T00:00:00'),acts=p.actividades||[],hse=[...new Set(acts.map(a=>a.hse||p.hse).filter(Boolean))];return `<div class="prog-row"><div class="prog-row-day"><strong>${String(d.getDate()).padStart(2,'0')}</strong><span>${d.toLocaleDateString('es-PE',{month:'short'}).replace('.','')}</span></div><div><div class="prog-row-title">${acts.length} ${acts.length===1?'actividad programada':'actividades programadas'}</div><div class="prog-row-meta">${[...new Set(acts.map(a=>a.area))].join(', ')} · ${[...new Set(acts.flatMap(a=>a.personal||[]))].length} personas · ${hse.length} HSE asignado${hse.length===1?'':'s'}</div></div><div class="prog-row-actions">${editable?`<button class="btn btn-outline btn-sm" onclick="editProgramacion(${p.id})">Editar</button><button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteProgramacion(${p.id})">×</button>`:''}</div></div>`;}).join(''):`<div class="wa-empty">Sin programaciones guardadas para la fecha seleccionada.</div>`;
 }
@@ -4010,21 +4197,82 @@ async function uploadCoproductoPhoto(file){
   return {url:data.publicUrl,path};
 }
 
+function sheetKey(value){return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function sheetRowValue(row,aliases){
+  const values={};Object.entries(row||{}).forEach(([key,value])=>values[sheetKey(key)]=value);
+  for(const alias of aliases){const value=values[sheetKey(alias)];if(value!==undefined&&String(value).trim()!=='')return String(value).trim();}
+  return '';
+}
+function parseSheetDate(value){
+  const text=String(value||'').trim();if(!text)return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(text))return text;
+  const match=text.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if(match)return `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+  const date=new Date(text);return Number.isNaN(date.getTime())?'':date.toISOString().slice(0,10);
+}
+function parseSheetTime(value){
+  const match=String(value||'').trim().match(/^(\d{1,2}):(\d{2})/);if(!match)return '';
+  return `${String(Math.min(23,Number(match[1]))).padStart(2,'0')}:${match[2]}`;
+}
+function normalizeSheetStatus(value){const text=sheetKey(value);return text.includes('final')?'finalizado':text.includes('proceso')?'en proceso':'pendiente';}
+
+async function syncActividadesFromGoogleSheets(options={}){
+  const silent=Boolean(options.silent);
+  if(APP.user?.role!=='admin'){if(!silent)showToast('Solo administración puede importar Google Sheets','warning');return false;}
+  const cfg=getGoogleSheetsSettings();
+  if(!cfg.url||!cfg.token){if(!silent)showToast('Configura primero la conexión en Administración','warning');return false;}
+  try{
+    if(!silent)showToast('Leyendo actividades del Google Sheet...','success');
+    const url=new URL(cfg.url);url.searchParams.set('accion','leer_actividades');url.searchParams.set('token',cfg.token);url.searchParams.set('hoja',cfg.sheet);url.searchParams.set('_',Date.now());
+    const response=await fetch(url.toString(),{method:'GET',cache:'no-store',redirect:'follow'});
+    if(!response.ok)throw new Error('Respuesta HTTP '+response.status);
+    const payload=await response.json();if(payload.ok===false)throw new Error(payload.error||'El conector rechazó la solicitud');
+    const rows=Array.isArray(payload)?payload:(Array.isArray(payload.filas)?payload.filas:[]);
+    const records=[];let skipped=0;
+    rows.forEach((row,index)=>{
+      const externalId=sheetRowValue(row,['ID_EXTERNO','ID ECOSEAM','ID','Código'])||`${cfg.sheet}-${index+2}`;
+      const fecha=parseSheetDate(sheetRowValue(row,['Fecha','Día']));
+      const loginRaw=sheetRowValue(row,['Usuario login','Usuario','Login']).toLowerCase();
+      let operador=sheetRowValue(row,['Operador','Personal','Nombre completo','Nombre']);
+      const userMatch=(APP.data.usuarios||[]).find(u=>String(u.login||'').toLowerCase()===loginRaw||sheetKey(`${u.nombre||''} ${u.apellido||''}`)===sheetKey(operador));
+      if(!operador&&userMatch)operador=`${userMatch.nombre||''} ${userMatch.apellido||''}`.trim();
+      const actividad=sheetRowValue(row,['Actividad','Descripción del trabajo','Trabajo realizado','Descripción']);
+      const area=sheetRowValue(row,['Área','Patio','Zona'])||'Otro';
+      const inicio=parseSheetTime(sheetRowValue(row,['Hora inicio','Inicio','Hora de inicio']));
+      const fin=parseSheetTime(sheetRowValue(row,['Hora fin','Fin','Hora de fin']));
+      if(!fecha||!operador||!actividad){skipped++;return;}
+      const duracion=calcTime(inicio,fin);
+      records.push({external_id:String(externalId),origen:'google_sheets',fecha,guardia:sheetRowValue(row,['Guardia','Turno']).toUpperCase().includes('B')?'B':'A',operador,operador_login:loginRaw||(userMatch?.login||''),area,actividad,inicio:inicio||null,fin:fin||null,duracion,hh:duracion,obs:sheetRowValue(row,['Observaciones','Observación','Obs']),estado:normalizeSheetStatus(sheetRowValue(row,['Estado'])),revision:null,comentario_rev:''});
+    });
+    if(!records.length){if(!silent)showToast(skipped?'No se importó: revisa Fecha, Operador y Actividad':'El Google Sheet no contiene filas','warning');return false;}
+    const {error}=await db.from('actividades').upsert(records,{onConflict:'external_id'});
+    if(error){
+      console.error(error);
+      if(/external_id|schema cache|column/i.test(error.message||''))throw new Error('Falta ejecutar el SQL de Google Sheets disponible en Administración');
+      throw error;
+    }
+    localStorage.setItem('ecoseam_sheets_last_sync',new Date().toISOString());
+    await loadAllData();
+    if(!silent)showToast(`${records.length} actividades sincronizadas${skipped?` · ${skipped} filas omitidas`:''}`,'success');
+    return true;
+  }catch(err){console.error(err);if(!silent)showToast('No se pudo importar: '+(err.message||'revisa la configuración'),'error');return false;}
+}
 
 async function syncMovimientosToDrive(options={}){
   const silent=Boolean(options.silent);
-  if(!GOOGLE_SHEETS_SYNC_URL){
+  const cfg=getGoogleSheetsSettings();
+  if(!cfg.url){
     if(!silent) showToast('Configura GOOGLE_SHEETS_SYNC_URL para sincronizar con Drive','warning');
     return false;
   }
   const rows=[...APP.data.movimientos].sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))||Number(a.id)-Number(b.id));
-  const payload={token:GOOGLE_SHEETS_SYNC_TOKEN,accion:'sincronizar',hoja:'Movimientos_material',actualizado_en:new Date().toISOString(),filas:rows.map(m=>({
+  const payload={token:cfg.token,accion:'sincronizar',hoja:'Movimientos_material',actualizado_en:new Date().toISOString(),filas:rows.map(m=>({
     id:m.id,fecha:m.fecha,movimiento:m.movimiento,subclase:m.subclase,clase:m.clase,tipo_residuo:m.tipoResiduo,
     descripcion:m.descripcion,tipo_vehiculo:m.vehiculo,placa:m.placa,patio_recepcion:m.patioRecepcion,empresa:m.empresa,peso_tn:m.peso,procedencia:m.procedencia,
     gerencia:m.gerencia,hora_inicio:m.inicio,hora_fin:m.fin,registrado_por:m.registradoPor
   }))};
   try{
-    await fetch(GOOGLE_SHEETS_SYNC_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    await fetch(cfg.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     if(!silent) showToast(`Sincronización enviada a Drive: ${rows.length} registros`,'success');
     return true;
   }catch(err){console.error(err);if(!silent)showToast('No se pudo sincronizar con Drive','error');return false;}
