@@ -1229,8 +1229,8 @@ img,canvas,svg,video{max-width:100%}
             <div class="form-group" id="prog-area-otra-group" style="display:none"><label class="form-label">Especificar otra área *</label><input class="form-control" id="prog-area-otra" placeholder="Nombre del área" oninput="previewProgramacionForm()"></div>
             <div class="form-group"><label class="form-label">Descripción del trabajo *</label><textarea class="form-control" id="prog-descripcion" rows="3" placeholder="Ej.: Carguío, descarga y acomodo de MMV"></textarea></div>
             <div class="form-row">
-              <div class="form-group"><label class="form-label">Ingeniero HSE de esta actividad *</label><select class="form-control" id="prog-actividad-hse"><option value="">Seleccionar</option><option>Jeyson Araujo</option><option>Nicol Baca</option><option>Arturo Pajares</option><option>Andres Soto</option></select></div>
-              <div class="form-group"><label class="form-label">Supervisor de esta actividad *</label><input class="form-control" id="prog-actividad-supervisor" placeholder="Nombre del supervisor"></div>
+              <div class="form-group"><label class="form-label">Ingeniero HSE de esta actividad *</label><select class="form-control" id="prog-actividad-hse"><option value="">Seleccionar</option><option>Jeyson Araujo</option><option>Nicol Baca</option><option>Arturo Pajares</option><option>Andres Soto</option><option>Karolinne Aranda</option></select></div>
+              <div class="form-group"><label class="form-label">Supervisor de esta actividad *</label><select class="form-control" id="prog-actividad-supervisor"><option value="">Seleccionar</option><option>Alan Rodriguez</option><option>Ericxs Chavez</option><option>Oscar Cueva</option><option>Elvin Rojas</option></select></div>
             </div>
 
             <div class="prog-section-title"><span>👥</span> Personal de esta actividad <span class="prog-counter" id="prog-person-count" style="margin-left:auto">0 personas</span></div>
@@ -2794,8 +2794,7 @@ function setupUI() {
   if(btnNuevaRest) btnNuevaRest.style.display = esGerenciaSoloLectura() ? 'none' : 'inline-flex';
   renderPersonalPicker();
   renderProgramacionDraftList();
-  const progActivitySupervisor = document.getElementById('prog-actividad-supervisor');
-  if(progActivitySupervisor) progActivitySupervisor.value = u.name;
+  setProgramacionSupervisor(u.name);
 
 
   // Set default date inputs
@@ -3736,12 +3735,20 @@ function currentProgramacionActivity(){
   };
 }
 
+function setProgramacionSupervisor(nombre=''){
+  const el=document.getElementById('prog-actividad-supervisor');if(!el)return;
+  const normalizar=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  const buscado=normalizar(nombre);
+  const opcion=[...el.options].find(o=>o.value&&(buscado.includes(normalizar(o.value))||normalizar(o.value).includes(buscado)));
+  el.value=opcion?.value||'';
+}
+
 function clearProgramacionActivityInputs(){
   document.getElementById('prog-area').value='';
   document.getElementById('prog-area-otra').value='';
   document.getElementById('prog-descripcion').value='';
   document.getElementById('prog-actividad-hse').value='';
-  document.getElementById('prog-actividad-supervisor').value=APP.user?.name||'';
+  setProgramacionSupervisor(APP.user?.name||'');
   toggleProgOtraArea();
   renderPersonalPicker();
 }
@@ -3770,7 +3777,7 @@ function loadProgramacionActividad(key){
   document.getElementById('prog-area-otra').value=base.includes(a.area)?'':a.area;
   document.getElementById('prog-descripcion').value=a.descripcion;
   document.getElementById('prog-actividad-hse').value=a.hse||'';
-  document.getElementById('prog-actividad-supervisor').value=a.supervisor||APP.user?.name||'';
+  setProgramacionSupervisor(a.supervisor||APP.user?.name||'');
   toggleProgOtraArea();renderPersonalPicker(a.personal||[]);renderProgramacionDraftList();
 }
 
