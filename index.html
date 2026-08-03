@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- ECOSEAM BUILD v23: usuarios, permisos e integración Google Sheets -->
+  <!-- ECOSEAM BUILD v25: actualización sin caché y continuidad exacta de sesión -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#1a5c2a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -245,6 +248,26 @@ tbody tr:hover{background:var(--surface-1)}
 
 /* Charts */
 .chart-container{position:relative;width:100%;height:240px}
+.hours-area-chart{display:grid;gap:8px}
+.hours-area-row{display:grid;grid-template-columns:minmax(86px,150px) 1fr 62px;gap:10px;align-items:center;font-size:12px}
+.hours-area-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-s);font-weight:600}
+.hours-area-track{height:17px;border-radius:10px;background:var(--surface-2);overflow:hidden}
+.hours-area-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--teal),#45c4ad);min-width:3px}
+.hours-area-value{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--teal)}
+.person-hours-list{display:grid;gap:9px}
+.person-hours-row{display:grid;grid-template-columns:minmax(125px,190px) minmax(160px,1fr) 82px;gap:10px;align-items:center;font-size:12px}
+.person-hours-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.person-hours-track{position:relative;display:flex;height:18px;border-radius:10px;background:var(--surface-2);overflow:hidden}
+.person-hours-effective{height:100%;background:linear-gradient(90deg,#1f8a3b,#57bd68)}
+.person-hours-missing{height:100%;background:#f5a623}
+.person-hours-target{position:absolute;top:-2px;bottom:-2px;width:2px;background:#173d20;right:0}
+.person-hours-value{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.person-hours-value.ok{color:var(--success)}.person-hours-value.missing{color:#b86f00}
+.person-hours-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--text-m)}
+.person-hours-legend span{display:inline-flex;align-items:center;gap:5px}.person-hours-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.compact-chart-stack{display:grid;gap:20px}.compact-chart-stack .card{margin:0}
+#view-dashboard .stat-grid{gap:12px;margin-bottom:16px}#view-dashboard .stat-card{padding:15px 16px}#view-dashboard .card{padding:16px}#view-dashboard .card-header{margin-bottom:12px}#view-dashboard .grid-2{gap:16px}
+@media(max-width:620px){.hours-area-row{grid-template-columns:80px 1fr 56px}.person-hours-row{grid-template-columns:100px 1fr 72px;gap:6px}}
 
 /* ===== PAGE: LOGIN ===== */
 .login-page{
@@ -383,6 +406,11 @@ tbody tr:hover{background:var(--surface-1)}
 .prog-draft-num{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--navy);color:#fff;font-size:11px;font-weight:900}
 .prog-draft-title{font-size:12px;font-weight:800;color:var(--navy);line-height:1.3}.prog-draft-meta{font-size:10px;color:var(--text-s);margin-top:3px}
 .prog-draft-remove{width:28px;height:28px;border-radius:8px;background:#fdedec;color:var(--danger);font-weight:900}
+.prog-talk-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.prog-talk-list{display:grid;gap:7px;margin:10px 0 16px}
+.prog-talk-item{display:grid;grid-template-columns:26px minmax(0,1fr) 28px;gap:8px;align-items:center;padding:8px 9px;border:1px solid #f0d792;border-radius:9px;background:#fffaf0;color:#65470b;font-size:12px;font-weight:650}
+.prog-talk-num{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:#f5b82e;color:#593f08;font-size:10px;font-weight:900}
+.prog-talk-remove{width:26px;height:26px;border-radius:7px;background:#fff0ed;color:var(--danger);font-weight:900}
 .prog-list{display:flex;flex-direction:column;gap:10px}
 .prog-row{border:1px solid var(--border);border-radius:11px;padding:12px;background:#fff;display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:12px;align-items:start}
 .prog-row-day{width:58px;height:58px;border-radius:12px;background:linear-gradient(145deg,var(--navy-l),var(--navy));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -408,6 +436,7 @@ tbody tr:hover{background:var(--surface-1)}
 .guard-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:14px 18px 0}
 .guard-summary-item{background:#fff;border:1px solid #d8e7da;border-radius:11px;padding:10px;text-align:center}.guard-summary-item span{display:block;font-size:9px;color:#618069;text-transform:uppercase;font-weight:800}.guard-summary-item strong{display:block;font-size:14px;color:#123c20;margin-top:3px}
 .guard-safety{margin:14px 18px 0;border-radius:12px;padding:13px 14px;background:linear-gradient(110deg,#fff7df,#fff);border:1px solid #f0d792;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center}
+.guard-safety-talks{display:grid;gap:3px;margin-top:3px}.guard-safety-talk{font-size:12px;color:#593f08;font-weight:700;line-height:1.3}.guard-safety-talk:before{content:"•";margin-right:6px;color:#d89000}
 .guard-safety-icon{width:38px;height:38px;border-radius:10px;background:#f5b82e;display:grid;place-items:center;overflow:hidden;line-height:1}.guard-safety-icon img{display:block;width:34px;height:34px;object-fit:contain}.guard-safety span{display:block;font-size:9px;color:#8b6514;text-transform:uppercase;font-weight:900}.guard-safety strong{display:block;font-size:13px;color:#593f08;margin-top:2px;line-height:1.35}
 .guard-body{padding:15px 18px 18px}.guard-body-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 9px;font-size:11px;color:#153e21;font-weight:900;text-transform:uppercase;letter-spacing:.045em}.guard-body-title span{font-size:9px;color:#64806a;font-weight:700}
 .guard-task{background:#fff;border:1px solid #d6e5d9;border-left:5px solid var(--accent);border-radius:11px;padding:12px 13px;margin-bottom:9px}
@@ -641,7 +670,7 @@ img,canvas,svg,video{max-width:100%}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v23 · Sheets y gestión de usuarios</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v25 · Sesión y vista persistentes</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -658,6 +687,7 @@ img,canvas,svg,video{max-width:100%}
       </button>
       <div class="topbar-title" id="topbar-title">Actividades</div>
       <div class="topbar-actions">
+        <span class="badge badge-done" style="white-space:nowrap">Actualizado v25</span>
         <span id="topbar-date" style="font-size:13px;color:var(--text-s)"></span>
         <button onclick="doLogout()" id="btn-logout" title="Cerrar sesión" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:var(--surface-2);color:var(--text-s);font-size:13px;font-weight:600;border:1.5px solid var(--border);transition:all .2s" onmouseenter="this.style.background='var(--danger)';this.style.color='#fff';this.style.borderColor='var(--danger)'" onmouseleave="this.style.background='var(--surface-2)';this.style.color='var(--text-s)';this.style.borderColor='var(--border)'">
           <svg viewBox="0 0 20 20" fill="none" width="15" height="15"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -702,7 +732,12 @@ img,canvas,svg,video{max-width:100%}
           <div class="stat-card accent">
             <div class="stat-label">Horas hombre del día</div>
             <div class="stat-value" id="kpi-hh">0</div>
-            <div class="stat-sub">↑ +12% vs ayer</div>
+            <div class="stat-sub">Horas efectivas filtradas</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-label">Cumplen meta de 10 h</div>
+            <div class="stat-value" id="kpi-compliance">0</div>
+            <div class="stat-sub" id="kpi-compliance-sub">de 0 personas</div>
           </div>
           <div class="stat-card teal">
             <div class="stat-label">Actividades finalizadas</div>
@@ -718,6 +753,11 @@ img,canvas,svg,video{max-width:100%}
             <div class="stat-label">Horas perdidas</div>
             <div class="stat-value" style="color:var(--danger)" id="kpi-lost">0</div>
             <div class="stat-sub">Por restricciones</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-label">Horas no efectivas</div>
+            <div class="stat-value" id="kpi-non-effective">0</div>
+            <div class="stat-sub">Brecha frente a la meta</div>
           </div>
           <div class="stat-card" style="border-left-color:var(--danger)">
             <div class="stat-label">Restricciones abiertas</div>
@@ -753,15 +793,19 @@ img,canvas,svg,video{max-width:100%}
         <div class="grid-2" style="margin-bottom:20px">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">Actividades por guardia</div>
+              <div><div class="card-title">Seguimiento de 10 horas por personal</div><div class="card-subtitle">Horas efectivas y horas faltantes por día registrado</div></div>
             </div>
-            <div id="chart-guardia"></div>
+            <div id="chart-personal-hours"></div>
           </div>
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Restricciones por tipo</div>
+          <div class="compact-chart-stack">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Actividades por guardia</div></div>
+              <div id="chart-guardia"></div>
             </div>
-            <div id="chart-restrict-tipo"></div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Restricciones por tipo</div></div>
+              <div id="chart-restrict-tipo"></div>
+            </div>
           </div>
         </div>
 
@@ -1239,8 +1283,12 @@ img,canvas,svg,video{max-width:100%}
 
             <div id="prog-draft-list" class="prog-draft-list"></div>
 
-            <div class="prog-section-title" style="margin-top:20px"><span>🦺</span> Seguridad del día</div>
-            <div class="form-group"><label class="form-label">Charla de seguridad del día *</label><input class="form-control" id="prog-charla" placeholder="Ej.: Línea de fuego y trabajo seguro" oninput="previewProgramacionForm()"></div>
+            <div class="prog-section-title" style="margin-top:20px"><span>🦺</span> Seguridad del día <span class="prog-counter" id="prog-talk-count" style="margin-left:auto">0 charlas</span></div>
+            <div class="prog-talk-entry">
+              <div class="form-group" style="margin:0"><label class="form-label">Nueva charla de seguridad *</label><input class="form-control" id="prog-charla" placeholder="Ej.: Línea de fuego y trabajo seguro" oninput="previewProgramacionForm()" onkeydown="if(event.key==='Enter'){event.preventDefault();addProgramacionCharla()}"></div>
+              <button class="btn btn-warning" type="button" onclick="addProgramacionCharla()">＋ Agregar</button>
+            </div>
+            <div id="prog-charlas-list" class="prog-talk-list"></div>
             <div style="display:flex;gap:9px;flex-wrap:wrap">
               <button class="btn btn-primary" onclick="saveProgramacion()">Guardar reporte del día</button>
               <button class="btn btn-outline" onclick="resetProgramacionForm()">Limpiar</button>
@@ -1809,6 +1857,21 @@ const APP = {
   }
 };
 
+const SESSION_KEYS={user:'ecoseam_session',view:'ecoseam_current_view',scrollPrefix:'ecoseam_scroll_'};
+function saveCurrentViewPosition(){
+  if(!APP.user||!APP.currentView)return;
+  const content=document.getElementById('content');
+  sessionStorage.setItem(SESSION_KEYS.view,APP.currentView);
+  if(content)sessionStorage.setItem(SESSION_KEYS.scrollPrefix+APP.currentView,String(content.scrollTop||0));
+}
+function restoreCurrentViewPosition(view){
+  requestAnimationFrame(()=>{
+    const content=document.getElementById('content');if(!content)return;
+    const saved=Number(sessionStorage.getItem(SESSION_KEYS.scrollPrefix+view)||0);
+    content.scrollTop=Number.isFinite(saved)?saved:0;
+  });
+}
+
 /* ===== SUPABASE CONFIG =====
    IMPORTANTE:
    - SUPABASE_URL debe ir sin /rest/v1/ al final.
@@ -2012,11 +2075,14 @@ function dbProgramacionToApp(row) {
     hse:a.hse||row.hse||'',
     supervisor:a.supervisor||row.supervisor||''
   }));
+  const charlaRaw=Array.isArray(row.charla_seguridad)?row.charla_seguridad:String(row.charla_seguridad||'').split(/\n+/);
+  const charlas=charlaRaw.map(x=>String(x||'').trim()).filter(Boolean);
   return {
     id: row.id,
     fecha: row.fecha,
     actividades,
-    charla: row.charla_seguridad || '',
+    charla: charlas[0] || '',
+    charlas,
     hse: row.hse || '',
     supervisor: row.supervisor || '',
     creadoPor: row.creado_por || '',
@@ -2031,7 +2097,7 @@ function appProgramacionToDb(p) {
     fecha: p.fecha,
     descripcion: first.descripcion,
     personal: personalUnico,
-    charla_seguridad: p.charla,
+    charla_seguridad: (p.charlas?.length?p.charlas:[p.charla]).filter(Boolean).join('\n'),
     hse: first.hse,
     supervisor: first.supervisor,
     area: first.area,
@@ -2620,7 +2686,7 @@ async function doLogin() {
     initials,
     guardia: userMatch.guardia,
   };
-  sessionStorage.setItem('ecoseam_session',JSON.stringify(APP.user));
+  sessionStorage.setItem(SESSION_KEYS.user,JSON.stringify(APP.user));
 
   document.getElementById('page-login').style.display = 'none';
   document.getElementById('page-app').style.display = 'flex';
@@ -2633,8 +2699,10 @@ async function doLogin() {
 } 
 
 function doLogout() {
-  sessionStorage.removeItem('ecoseam_session');
-  sessionStorage.removeItem('ecoseam_current_view');
+  sessionStorage.removeItem(SESSION_KEYS.user);
+  sessionStorage.removeItem(SESSION_KEYS.view);
+  Object.keys(sessionStorage).filter(k=>k.startsWith(SESSION_KEYS.scrollPrefix)).forEach(k=>sessionStorage.removeItem(k));
+  history.replaceState(null,'',location.pathname+location.search);
   APP.user = null;
   document.getElementById('page-app').style.display = 'none';
   document.getElementById('page-login').style.display = 'flex';
@@ -2644,25 +2712,23 @@ function doLogout() {
 }
 
 async function restoreSession(){
-  const raw=sessionStorage.getItem('ecoseam_session');
+  const raw=sessionStorage.getItem(SESSION_KEYS.user);
   if(!raw)return;
   try{
     const saved=JSON.parse(raw);
-    const {data,error}=await db.from('usuarios').select('*').eq('id',saved.id).eq('login',saved.login).eq('activo',true).limit(1);
-    const userMatch=data?.[0];
-    if(error||!userMatch)throw new Error('Sesión no válida');
-    APP.user={id:userMatch.id,login:userMatch.login,name:`${userMatch.nombre||''} ${userMatch.apellido||''}`.trim(),role:normalizarRolSeguridad(userMatch.rol),initials:((userMatch.nombre||'U')[0]+(userMatch.apellido?userMatch.apellido[0]:'')).toUpperCase(),guardia:userMatch.guardia};
-    sessionStorage.setItem('ecoseam_session',JSON.stringify(APP.user));
+    if(!saved?.id||!saved?.login||!saved?.role)throw new Error('Sesión incompleta');
+    APP.user=saved;
     document.getElementById('page-login').style.display='none';
     document.getElementById('page-app').style.display='flex';
     await loadAllData();
     setupUI();
-    const remembered=sessionStorage.getItem('ecoseam_current_view');
+    const hashView=location.hash.replace(/^#/,'');
+    const remembered=hashView||sessionStorage.getItem(SESSION_KEYS.view);
     const allowed=NAV_CONFIG[APP.user.role]||NAV_CONFIG.operador;
     navigateTo(remembered&&allowed.includes(remembered)?remembered:(APP.user.role==='controlador'?'patios':'actividades'));
   }catch(err){
-    sessionStorage.removeItem('ecoseam_session');
-    sessionStorage.removeItem('ecoseam_current_view');
+    sessionStorage.removeItem(SESSION_KEYS.user);
+    sessionStorage.removeItem(SESSION_KEYS.view);
     APP.user=null;
   }
 }
@@ -2794,6 +2860,7 @@ function setupUI() {
   if(btnNuevaRest) btnNuevaRest.style.display = esGerenciaSoloLectura() ? 'none' : 'inline-flex';
   renderPersonalPicker();
   renderProgramacionDraftList();
+  renderProgramacionCharlas();
   setProgramacionSupervisor(u.name);
 
 
@@ -2825,8 +2892,10 @@ function navigateTo(view) {
     showToast('No tienes permiso para acceder a este módulo','warning');
     return;
   }
+  if(APP.currentView&&APP.currentView!==view)saveCurrentViewPosition();
   APP.currentView = view;
-  sessionStorage.setItem('ecoseam_current_view',view);
+  sessionStorage.setItem(SESSION_KEYS.view,view);
+  history.replaceState(null,'','#'+view);
 
   // Hide all views
   document.querySelectorAll('[id^="view-"]').forEach(el => el.style.display = 'none');
@@ -2857,6 +2926,7 @@ function navigateTo(view) {
   if(view === 'resumen') renderResumenWhatsapp();
   if(view === 'seguridad') renderSeguridad();
   if(view === 'programacion') { renderProgramacionDraftList(); renderProgramacion(); }
+  restoreCurrentViewPosition(view);
 }
 
 /* ===== SIDEBAR MOBILE ===== */
@@ -3522,6 +3592,39 @@ function getDashboardFilteredData() {
   return { acts, rests, periodo, desde, hasta };
 }
 
+function buildPersonHoursSummary(acts,periodo){
+  const normalizar=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  const people=new Map();
+  const ensure=(key,name)=>{if(!people.has(key))people.set(key,{key,name:name||key,dates:new Map()});return people.get(key);};
+  acts.forEach(a=>{
+    const key=normalizar(a.operadorLogin||a.operador);if(!key)return;
+    const person=ensure(key,a.operador||a.operadorLogin);
+    person.dates.set(a.fecha,(person.dates.get(a.fecha)||0)+Number(a.calc?.hh||0));
+  });
+
+  // En la vista de hoy también muestra operarios activos sin registros, para detectar las 10 h faltantes.
+  const area=document.getElementById('filter-area-dash')?.value||'',guardia=document.getElementById('filter-guardia-dash')?.value||'';
+  if(periodo==='hoy'&&!area){
+    (APP.data.usuarios||[]).filter(u=>u.activo!==false&&u.rol==='operador').forEach(u=>{
+      const ug=String(u.guardia||'').toUpperCase();
+      const ambas=ug==='AMBAS'||ug==='A Y B'||ug==='A/B';
+      const guardiaUsuario=ug.replace('GUARDIA','').trim();
+      if(guardia&&!ambas&&guardiaUsuario!==guardia)return;
+      ensure(normalizar(u.login||`${u.nombre} ${u.apellido}`),`${u.nombre||''} ${u.apellido||''}`.trim()||u.login);
+    });
+  }
+
+  return [...people.values()].map(person=>{
+    const daily=[...person.dates.values()];
+    if(periodo==='hoy'&&!daily.length)daily.push(0);
+    const days=daily.length,target=days*10,effective=daily.reduce((s,h)=>s+h,0);
+    const credited=daily.reduce((s,h)=>s+Math.min(Math.max(h,0),10),0);
+    const nonEffective=daily.reduce((s,h)=>s+Math.max(10-h,0),0);
+    const overtime=daily.reduce((s,h)=>s+Math.max(h-10,0),0);
+    return {...person,days,target,effective,credited,nonEffective,overtime,compliant:days>0&&nonEffective<0.005};
+  }).sort((a,b)=>b.nonEffective-a.nonEffective||a.name.localeCompare(b.name,'es'));
+}
+
 function updateDashboard() {
   toggleDashboardDateInputs();
   const { acts: todayActs, rests: todayRest, periodo, desde, hasta } = getDashboardFilteredData();
@@ -3532,14 +3635,20 @@ function updateDashboard() {
   const horasLost = todayRest.reduce((s,r)=>s+(r.calc.horas_perdidas||0),0);
   const openRest = todayRest.filter(r=>r.estado==='abierto').length;
   const personal = new Set(todayActs.map(a => a.operadorLogin || a.operador).filter(Boolean)).size;
+  const personHours=buildPersonHoursSummary(todayActs,periodo);
+  const compliant=personHours.filter(p=>p.compliant).length;
+  const nonEffective=personHours.reduce((s,p)=>s+p.nonEffective,0);
 
-  document.getElementById('kpi-hh').textContent = hhTotal;
+  document.getElementById('kpi-hh').textContent = hhTotal.toFixed(2);
+  document.getElementById('kpi-compliance').textContent = compliant;
+  document.getElementById('kpi-compliance-sub').textContent = `de ${personHours.length} personas`;
   document.getElementById('kpi-done').textContent = done;
   document.getElementById('kpi-done-sub').textContent = `de ${todayActs.length} registradas`;
   document.getElementById('kpi-pend').textContent = pend;
-  document.getElementById('kpi-lost').textContent = horasLost;
+  document.getElementById('kpi-lost').textContent = horasLost.toFixed(2);
+  document.getElementById('kpi-non-effective').textContent = nonEffective.toFixed(2);
   document.getElementById('kpi-rest').textContent = openRest;
-  document.getElementById('kpi-personal').textContent = personal;
+  document.getElementById('kpi-personal').textContent = Math.max(personal,personHours.length);
 
   let subtitle = 'Resumen filtrado';
   if(periodo === 'hoy') subtitle = 'Resumen de hoy';
@@ -3547,20 +3656,28 @@ function updateDashboard() {
   if(periodo === 'rango') subtitle = desde && hasta ? `Resumen del ${formatDate(desde)} al ${formatDate(hasta)}` : 'Selecciona fecha inicial y final';
   document.getElementById('dash-subtitle').textContent = subtitle;
 
-  renderDashCharts(todayActs, todayRest);
+  renderDashCharts(todayActs, todayRest, personHours);
   renderRecentActivities(todayActs);
   renderActiveRestrictions(todayRest);
 }
 
-function renderDashCharts(acts, rests) {
+function renderDashCharts(acts, rests, personHours=[]) {
   // HH por área
-  const areas = ['4388','DEG','Plataforma de Armados','PPL'];
-  const hhByArea = areas.map(a=>acts.filter(x=>x.area===a).reduce((s,x)=>s+(x.calc.hh||0),0));
+  const canonicalArea=a=>String(a||'').toLowerCase()==='plataforma de armados'?'Plataforma de Armados':String(a||'');
+  const baseAreas=['4388','DEG','Plataforma de Armados','PPL'];
+  const areas=[...new Set([...baseAreas,...acts.map(a=>canonicalArea(a.area)).filter(Boolean)])];
+  const hhByArea = areas.map(a=>acts.filter(x=>canonicalArea(x.area)===a).reduce((s,x)=>s+(x.calc.hh||0),0));
   const maxHH = Math.max(...hhByArea,1);
   document.getElementById('chart-hh-area').innerHTML=`
-    <div class="bar-chart">${hhByArea.map((v,i)=>`<div class="bar teal" style="height:${Math.max(v/maxHH*100,4)}%;opacity:${0.5+i*0.15}" title="${areas[i]}: ${v} HH"></div>`).join('')}</div>
-    <div class="bar-labels">${areas.map((a,i)=>`<div class="bar-label" style="font-size:10px">${a.split(' ')[0]}<br><strong>${hhByArea[i]}</strong></div>`).join('')}</div>
+    <div class="hours-area-chart">${areas.map((a,i)=>`<div class="hours-area-row" title="${escapeHtml(a)}: ${hhByArea[i].toFixed(2)} HH"><span class="hours-area-name">${escapeHtml(a)}</span><div class="hours-area-track"><div class="hours-area-fill" style="width:${hhByArea[i]>0?Math.max(hhByArea[i]/maxHH*100,2):0}%"></div></div><span class="hours-area-value">${hhByArea[i].toFixed(2)} h</span></div>`).join('')}</div>
   `;
+
+  // Cumplimiento de la meta diaria por persona
+  const personBox=document.getElementById('chart-personal-hours');
+  if(personBox)personBox.innerHTML=personHours.length?`<div class="person-hours-list">${personHours.map(p=>{
+    const effectivePct=p.target?Math.min(p.credited/p.target*100,100):0,missingPct=p.target?Math.min(p.nonEffective/p.target*100,100):0;
+    return `<div class="person-hours-row" title="Efectivas registradas: ${p.effective.toFixed(2)} h · No efectivas: ${p.nonEffective.toFixed(2)} h · Meta: ${p.target.toFixed(2)} h"><span class="person-hours-name">${escapeHtml(p.name)}</span><div class="person-hours-track"><div class="person-hours-effective" style="width:${effectivePct}%"></div><div class="person-hours-missing" style="width:${missingPct}%"></div><span class="person-hours-target"></span></div><span class="person-hours-value ${p.compliant?'ok':'missing'}">${p.compliant?'Cumple':`−${p.nonEffective.toFixed(2)} h`}</span></div>`;
+  }).join('')}</div><div class="person-hours-legend"><span><i style="background:#2e9b46"></i>Horas efectivas para la meta</span><span><i style="background:#f5a623"></i>Horas no efectivas/faltantes</span><span>Meta: 10 h por persona y día con seguimiento</span></div>`:'<div class="wa-empty">Sin personal para el filtro seleccionado.</div>';
 
   // Estado de actividades (donut-style)
   const fin = acts.filter(a=>a.estado==='finalizado').length;
@@ -3718,6 +3835,7 @@ function programacionFechaActual(){
 
 /* ===== PROGRAMACIÓN DIARIA V19: VARIAS ACTIVIDADES POR REPORTE ===== */
 let PROGRAMACION_ACTIVIDADES_DRAFT=[];
+let PROGRAMACION_CHARLAS_DRAFT=[];
 
 function updateProgramacionActivityCount(){
   const n=PROGRAMACION_ACTIVIDADES_DRAFT.length,el=document.getElementById('prog-activity-count');
@@ -3733,6 +3851,29 @@ function currentProgramacionActivity(){
     hse:document.getElementById('prog-actividad-hse')?.value||'',
     supervisor:document.getElementById('prog-actividad-supervisor')?.value.trim()||''
   };
+}
+
+function currentProgramacionCharlas(){
+  const pendiente=document.getElementById('prog-charla')?.value.trim()||'';
+  return [...new Set([...PROGRAMACION_CHARLAS_DRAFT,pendiente].map(x=>String(x||'').trim()).filter(Boolean))];
+}
+
+function renderProgramacionCharlas(){
+  const box=document.getElementById('prog-charlas-list'),count=document.getElementById('prog-talk-count');
+  if(count)count.textContent=`${PROGRAMACION_CHARLAS_DRAFT.length} ${PROGRAMACION_CHARLAS_DRAFT.length===1?'charla':'charlas'}`;
+  if(!box)return;
+  box.innerHTML=PROGRAMACION_CHARLAS_DRAFT.length?PROGRAMACION_CHARLAS_DRAFT.map((charla,i)=>`<div class="prog-talk-item"><span class="prog-talk-num">${String(i+1).padStart(2,'0')}</span><span>${escapeHtml(charla)}</span><button type="button" class="prog-talk-remove" title="Quitar charla" onclick="removeProgramacionCharla(${i})">×</button></div>`).join(''):'<div class="wa-empty">Agrega una o más charlas de seguridad.</div>';
+}
+
+function addProgramacionCharla(){
+  const input=document.getElementById('prog-charla'),charla=input?.value.trim()||'';
+  if(!charla){showToast('Escribe el tema de la charla de seguridad','warning');return;}
+  if(!PROGRAMACION_CHARLAS_DRAFT.includes(charla))PROGRAMACION_CHARLAS_DRAFT.push(charla);
+  input.value='';renderProgramacionCharlas();previewProgramacionForm();
+}
+
+function removeProgramacionCharla(index){
+  PROGRAMACION_CHARLAS_DRAFT.splice(index,1);renderProgramacionCharlas();previewProgramacionForm();
 }
 
 function setProgramacionSupervisor(nombre=''){
@@ -3789,11 +3930,13 @@ function renderProgramacionDraftList(){
 }
 
 function getProgramacionFormData(){
+  const charlas=currentProgramacionCharlas();
   return {
     id:document.getElementById('prog-id')?.value||null,
     fecha:document.getElementById('prog-fecha')?.value||'',
     actividades:PROGRAMACION_ACTIVIDADES_DRAFT.map(({_key,...a})=>a),
-    charla:document.getElementById('prog-charla')?.value.trim()||'',
+    charla:charlas[0]||'',
+    charlas,
     hse:PROGRAMACION_ACTIVIDADES_DRAFT[0]?.hse||'',
     supervisor:PROGRAMACION_ACTIVIDADES_DRAFT[0]?.supervisor||'',
     creadoPor:APP.user?.login||''
@@ -3808,7 +3951,7 @@ function previewProgramacionForm(){
 async function saveProgramacion(){
   if(!canEditProgramacion()){showToast('Tu usuario tiene permiso solo de visualización','warning');return;}
   const p=getProgramacionFormData();
-  if(!p.fecha||!p.charla){showToast('Completa la fecha y la charla de seguridad','error');return;}
+  if(!p.fecha||!p.charlas.length){showToast('Completa la fecha y agrega al menos una charla de seguridad','error');return;}
   if(!p.actividades.length){showToast('Agrega al menos una actividad a la programación','error');return;}
   if(p.actividades.some(a=>!a.hse||!a.supervisor)){showToast('Todas las actividades deben tener HSE y supervisor','error');return;}
   const query=p.id?db.from('programaciones_diarias').update(appProgramacionToDb(p)).eq('id',p.id):db.from('programaciones_diarias').insert([appProgramacionToDb(p)]);
@@ -3823,9 +3966,10 @@ function editProgramacion(id){
   if(!canEditProgramacion()){showToast('Tu usuario tiene permiso solo de visualización','warning');return;}
   const p=APP.data.programaciones.find(x=>x.id===id);if(!p)return;
   document.getElementById('prog-id').value=p.id;document.getElementById('prog-fecha').value=p.fecha;
-  document.getElementById('prog-charla').value=p.charla;
+  document.getElementById('prog-charla').value='';
+  PROGRAMACION_CHARLAS_DRAFT=[...(p.charlas?.length?p.charlas:[p.charla]).filter(Boolean)];
   PROGRAMACION_ACTIVIDADES_DRAFT=(p.actividades||[]).map((a,i)=>({...a,_key:Date.now()+i}));
-  clearProgramacionActivityInputs();renderProgramacionDraftList();renderProgramacion();
+  clearProgramacionActivityInputs();renderProgramacionDraftList();renderProgramacionCharlas();renderProgramacion();
   document.getElementById('programacion-form-card').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -3834,7 +3978,7 @@ function resetProgramacionForm(keepDate=true){
   document.getElementById('prog-id').value='';
   document.getElementById('prog-fecha').value=keepDate?(document.getElementById('prog-reporte-fecha').value||today):today;
   document.getElementById('prog-charla').value='';
-  PROGRAMACION_ACTIVIDADES_DRAFT=[];clearProgramacionActivityInputs();renderProgramacionDraftList();renderProgramacion();
+  PROGRAMACION_ACTIVIDADES_DRAFT=[];PROGRAMACION_CHARLAS_DRAFT=[];clearProgramacionActivityInputs();renderProgramacionDraftList();renderProgramacionCharlas();renderProgramacion();
 }
 
 function renderProgramacion(){
@@ -3844,18 +3988,19 @@ function renderProgramacion(){
   if(formCard)formCard.style.display=editable?'block':'none';if(badge)badge.style.display=editable?'none':'inline-flex';
   let rows=APP.data.programaciones.filter(p=>p.fecha===fecha);
   const draft=editable?getProgramacionFormData():null;
-  if(draft&&draft.fecha===fecha&&(draft.actividades.length||draft.charla||draft.hse))rows=[{...draft,id:null,_draft:true},...rows.filter(x=>String(x.id)!==String(draft.id))];
+  if(draft&&draft.fecha===fecha&&(draft.actividades.length||draft.charlas.length||draft.hse))rows=[{...draft,id:null,_draft:true},...rows.filter(x=>String(x.id)!==String(draft.id))];
   const fechaTexto=new Date(fecha+'T00:00:00').toLocaleDateString('es-PE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   const header=rows[0]||{};
+  const charlas=[...new Set(rows.flatMap(p=>(p.charlas?.length?p.charlas:[p.charla]).filter(Boolean)))];
   const actividades=rows.flatMap(p=>(p.actividades||[]).map(a=>({...a,hse:a.hse||p.hse,supervisor:a.supervisor||p.supervisor,_draft:p._draft})));
   const personalUnico=[...new Set(actividades.flatMap(a=>a.personal||[]))],areas=[...new Set(actividades.map(a=>a.area).filter(Boolean))];
   const hseUnicos=[...new Set(actividades.map(a=>a.hse).filter(Boolean))],supervisoresUnicos=[...new Set(actividades.map(a=>a.supervisor).filter(Boolean))];
   const taskCards=actividades.length?actividades.map((a,i)=>`<div class="guard-task"><div class="guard-task-top"><span class="guard-area">${escapeHtml(a.area||'Área por definir')}</span><span class="guard-task-num">${a._draft?'BORRADOR · ':''}ACT. ${String(i+1).padStart(2,'0')}</span></div><div class="guard-task-desc">${escapeHtml(a.descripcion||'Descripción pendiente')}</div><div class="guard-task-meta"><div class="guard-meta-block"><span class="guard-meta-label hse">Supervisión HSE</span><span class="guard-meta-value">${escapeHtml(a.hse||'Por definir')}</span></div><div class="guard-meta-block"><span class="guard-meta-label supervisor">Supervisor a cargo</span><span class="guard-meta-value">${escapeHtml(a.supervisor||'Por definir')}</span></div></div><div class="guard-people">${(a.personal||[]).map(n=>`<span class="guard-person">${escapeHtml(n)}</span>`).join('')}</div></div>`).join(''):`<div class="guard-empty">Aún no hay actividades programadas para esta fecha.</div>`;
-  card.innerHTML=`<div class="guard-hero"><div class="guard-brand"><img src="logo-ecoseam.png" alt="ECOSEAM"><span class="guard-brand-tag">Control operacional</span></div><div class="guard-title">PROGRAMACIÓN<br>DE INICIO DE GUARDIA</div><div class="guard-date">FECHA · ${escapeHtml(fechaTexto)}</div></div><div class="guard-summary"><div class="guard-summary-item"><span>Supervisores asignados</span><strong>${supervisoresUnicos.length}</strong></div><div class="guard-summary-item"><span>Ingenieros HSE asignados</span><strong>${hseUnicos.length}</strong></div><div class="guard-summary-item"><span>Personal</span><strong>${personalUnico.length} involucrados</strong></div></div><div class="guard-safety"><div class="guard-safety-icon" title="Chaleco de seguridad"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 3h4c.2 1.4.8 2.2 2 2.2S17.8 4.4 18 3h4l6 8-4 3v15H8V14l-4-3 6-8z" fill="#ef6c00" stroke="#9a4300" stroke-width="1.2" stroke-linejoin="round"/><path d="M10.5 4.5 15 13v16M21.5 4.5 17 13v16M8 18h16" fill="none" stroke="#ffe082" stroke-width="2.2" stroke-linejoin="round"/></svg></div><div><span>Charla de seguridad del día</span><strong>${escapeHtml(header.charla||'Tema pendiente de registrar')}</strong></div></div><div class="guard-body"><div class="guard-body-title">Actividades operativas programadas <span>${actividades.length} actividades · ${areas.length} áreas</span></div>${taskCards}</div><div class="guard-foot">ECOSEAM · Planificación segura, clara y visible antes de iniciar la jornada</div>`;
+  card.innerHTML=`<div class="guard-hero"><div class="guard-brand"><img src="logo-ecoseam.png" alt="ECOSEAM"><span class="guard-brand-tag">Control operacional</span></div><div class="guard-title">PROGRAMACIÓN<br>DE INICIO DE GUARDIA</div><div class="guard-date">FECHA · ${escapeHtml(fechaTexto)}</div></div><div class="guard-summary"><div class="guard-summary-item"><span>Supervisores asignados</span><strong>${supervisoresUnicos.length}</strong></div><div class="guard-summary-item"><span>Ingenieros HSE asignados</span><strong>${hseUnicos.length}</strong></div><div class="guard-summary-item"><span>Personal</span><strong>${personalUnico.length} involucrados</strong></div></div><div class="guard-safety"><div class="guard-safety-icon" title="Chaleco de seguridad"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 3h4c.2 1.4.8 2.2 2 2.2S17.8 4.4 18 3h4l6 8-4 3v15H8V14l-4-3 6-8z" fill="#ef6c00" stroke="#9a4300" stroke-width="1.2" stroke-linejoin="round"/><path d="M10.5 4.5 15 13v16M21.5 4.5 17 13v16M8 18h16" fill="none" stroke="#ffe082" stroke-width="2.2" stroke-linejoin="round"/></svg></div><div><span>${charlas.length===1?'Charla de seguridad del día':'Charlas de seguridad del día'}</span><div class="guard-safety-talks">${charlas.length?charlas.map(c=>`<div class="guard-safety-talk">${escapeHtml(c)}</div>`).join(''):'<strong>Tema pendiente de registrar</strong>'}</div></div></div><div class="guard-body"><div class="guard-body-title">Actividades operativas programadas <span>${actividades.length} actividades · ${areas.length} áreas</span></div>${taskCards}</div><div class="guard-foot">ECOSEAM · Planificación segura, clara y visible antes de iniciar la jornada</div>`;
   const safetyIcon=card.querySelector('.guard-safety-icon');
   if(safetyIcon)safetyIcon.innerHTML=`<img src="${ECOSEAM_VEST_CUTOUT_DATA_URL}" alt="Chaleco de seguridad">`;
   const saved=APP.data.programaciones.filter(p=>p.fecha===fecha);
-  list.innerHTML=saved.length?saved.map(p=>{const d=new Date(p.fecha+'T00:00:00'),acts=p.actividades||[],hse=[...new Set(acts.map(a=>a.hse||p.hse).filter(Boolean))];return `<div class="prog-row"><div class="prog-row-day"><strong>${String(d.getDate()).padStart(2,'0')}</strong><span>${d.toLocaleDateString('es-PE',{month:'short'}).replace('.','')}</span></div><div><div class="prog-row-title">${acts.length} ${acts.length===1?'actividad programada':'actividades programadas'}</div><div class="prog-row-meta">${[...new Set(acts.map(a=>a.area))].join(', ')} · ${[...new Set(acts.flatMap(a=>a.personal||[]))].length} personas · ${hse.length} HSE asignado${hse.length===1?'':'s'}</div></div><div class="prog-row-actions">${editable?`<button class="btn btn-outline btn-sm" onclick="editProgramacion(${p.id})">Editar</button><button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteProgramacion(${p.id})">×</button>`:''}</div></div>`;}).join(''):`<div class="wa-empty">Sin programaciones guardadas para la fecha seleccionada.</div>`;
+  list.innerHTML=saved.length?saved.map(p=>{const d=new Date(p.fecha+'T00:00:00'),acts=p.actividades||[],hse=[...new Set(acts.map(a=>a.hse||p.hse).filter(Boolean))],talks=(p.charlas?.length?p.charlas:[p.charla]).filter(Boolean);return `<div class="prog-row"><div class="prog-row-day"><strong>${String(d.getDate()).padStart(2,'0')}</strong><span>${d.toLocaleDateString('es-PE',{month:'short'}).replace('.','')}</span></div><div><div class="prog-row-title">${acts.length} ${acts.length===1?'actividad programada':'actividades programadas'}</div><div class="prog-row-meta">${[...new Set(acts.map(a=>a.area))].join(', ')} · ${[...new Set(acts.flatMap(a=>a.personal||[]))].length} personas · ${hse.length} HSE · ${talks.length} ${talks.length===1?'charla':'charlas'}</div></div><div class="prog-row-actions">${editable?`<button class="btn btn-outline btn-sm" onclick="editProgramacion(${p.id})">Editar</button><button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteProgramacion(${p.id})">×</button>`:''}</div></div>`;}).join(''):`<div class="wa-empty">Sin programaciones guardadas para la fecha seleccionada.</div>`;
 }
 
 async function programacionCanvas(){
@@ -4421,28 +4566,29 @@ document.getElementById('login-user').addEventListener('keydown', e => {
 document.getElementById('login-pass').addEventListener('keydown', e => {
   if(e.key === 'Enter') doLogin();
 });
+let sessionScrollTimer;
+document.getElementById('content')?.addEventListener('scroll',()=>{
+  clearTimeout(sessionScrollTimer);
+  sessionScrollTimer=setTimeout(saveCurrentViewPosition,120);
+},{passive:true});
+window.addEventListener('pagehide',saveCurrentViewPosition);
 restoreSession();
 </script>
 
-<!-- Service Worker registration -->
+<!-- Limpieza del caché antiguo: las nuevas versiones deben cargarse desde la red -->
 <script>
-if('serviceWorker' in navigator) {
-  window.addEventListener('load', ()=>{
-    // Inline service worker as data URL
-    const sw = `
-      const CACHE = 'ecoseam-v1';
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
-      });
-    `;
-    const blob = new Blob([sw], {type:'application/javascript'});
-    const url = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(url).catch(()=>{});
-  });
-}
+window.addEventListener('load',async()=>{
+  try{
+    if('serviceWorker' in navigator){
+      const registrations=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(registration=>registration.unregister()));
+    }
+    if('caches' in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.filter(key=>key.startsWith('ecoseam-')).map(key=>caches.delete(key)));
+    }
+  }catch(error){console.warn('No se pudo limpiar el caché anterior:',error);}
+});
 </script>
 </body>
 </html>
