@@ -450,7 +450,7 @@ tbody tr:hover{background:var(--surface-1)}
 
 
 /* ===== CONTROL DE PATIOS ===== */
-.patio-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px}
+.patio-kpis{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px;margin-bottom:20px}
 .patio-chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
 .patio-chart-box{position:relative;min-height:310px}
 .patio-chart-box canvas{max-height:280px}
@@ -463,72 +463,36 @@ tbody tr:hover{background:var(--surface-1)}
 
 
 
-/* ===== OCUPABILIDAD AUTOMÁTICA / PLANO INTERACTIVO ===== */
-.occ-hero{
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:18px 20px;margin-bottom:18px;border-radius:14px;
-  background:linear-gradient(135deg,#0d3d1a,#1a5c2a 65%,#2e7d32);color:#fff;
-  box-shadow:var(--shadow);
-}
-.occ-hero-title{font-size:20px;font-weight:850}.occ-hero-sub{font-size:12px;opacity:.78;margin-top:4px;max-width:760px}
+/* ===== OCUPABILIDAD AUTOMÁTICA ===== */
+.occ-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;margin-bottom:18px;border-radius:14px;background:linear-gradient(135deg,#0d3d1a,#1a5c2a 65%,#2e7d32);color:#fff;box-shadow:var(--shadow)}
+.occ-hero-title{font-size:20px;font-weight:850}.occ-hero-sub{font-size:12px;opacity:.8;margin-top:4px;max-width:760px}
 .occ-live{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.14);font-size:11px;font-weight:800;white-space:nowrap}
 .occ-live:before{content:"";width:8px;height:8px;border-radius:50%;background:#69f0ae;box-shadow:0 0 0 5px rgba(105,240,174,.14)}
 .occ-kpis{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px;margin-bottom:18px}
-.occ-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.65fr);gap:18px;align-items:start;margin-bottom:18px}
-.occ-map-card{padding:16px;overflow:hidden}
-.occ-map-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
-.occ-legend{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--text-s)}
-.occ-legend span{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:var(--surface-1);border:1px solid var(--border)}
-.occ-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.occ-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.7fr);gap:18px;align-items:start;margin-bottom:18px}
+.occ-map-card{padding:16px;overflow:hidden}.occ-map-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.occ-legend{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--text-s)}.occ-legend span{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:var(--surface-1);border:1px solid var(--border)}.occ-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
 .occ-map-wrap{position:relative;border:1px solid var(--border);border-radius:13px;background:#eef4ef;overflow:hidden}
-.occ-map-wrap:before{
-  content:"";position:absolute;inset:0;pointer-events:none;opacity:.25;
-  background-image:linear-gradient(#adc5b2 1px,transparent 1px),linear-gradient(90deg,#adc5b2 1px,transparent 1px);
-  background-size:30px 30px;
-}
-.occ-map{position:relative;width:100%;height:auto;min-height:430px;display:block}
-.occ-map-road{fill:#d7ddd8;stroke:#9cac9f;stroke-width:2;stroke-dasharray:10 7}
-.occ-map-label{font-size:13px;font-weight:800;fill:#183f23;pointer-events:none}
-.occ-map-pct{font-size:17px;font-weight:900;fill:#0d2414;pointer-events:none}
-.occ-map-small{font-size:10px;font-weight:700;fill:#4d6c53;pointer-events:none}
-.occ-zone{cursor:pointer;outline:none}
-.occ-zone .occ-zone-shape{stroke:#fff;stroke-width:4;transition:.18s;filter:drop-shadow(0 3px 5px rgba(13,61,26,.12))}
+.occ-map-wrap:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.24;background-image:linear-gradient(#adc5b2 1px,transparent 1px),linear-gradient(90deg,#adc5b2 1px,transparent 1px);background-size:30px 30px}
+.occ-map{position:relative;width:100%;height:auto;min-height:430px;display:block}.occ-map-road{fill:#d7ddd8;stroke:#9cac9f;stroke-width:2;stroke-dasharray:10 7}
+.occ-map-label{font-size:13px;font-weight:800;fill:#183f23;pointer-events:none}.occ-map-pct{font-size:17px;font-weight:900;fill:#0d2414;pointer-events:none}.occ-map-small{font-size:10px;font-weight:700;fill:#4d6c53;pointer-events:none}
+.occ-zone{cursor:pointer;outline:none}.occ-zone .occ-zone-shape{stroke:#fff;stroke-width:4;transition:.18s;filter:drop-shadow(0 3px 5px rgba(13,61,26,.12))}
 .occ-zone:hover .occ-zone-shape,.occ-zone:focus .occ-zone-shape{stroke:#123d20;stroke-width:6;filter:drop-shadow(0 6px 9px rgba(13,61,26,.2))}
-.occ-zone.status-ok .occ-zone-shape{fill:#bfe8c9}
-.occ-zone.status-alert .occ-zone-shape{fill:#ffe08a}
-.occ-zone.status-critical .occ-zone-shape{fill:#f4a4a4}
-.occ-zone.selected .occ-zone-shape{stroke:#0d3d1a;stroke-width:8}
-.occ-detail{position:sticky;top:0}
-.occ-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.occ-status-pill{padding:5px 9px;border-radius:999px;font-size:10px;font-weight:900}
-.occ-status-pill.ok{background:#eafaf1;color:#1e8449}
-.occ-status-pill.alert{background:#fff8e1;color:#9b6200}
-.occ-status-pill.critical{background:#fdedec;color:#b42318}
-.occ-meter{height:15px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin:12px 0 5px;position:relative}
-.occ-meter:after{content:"";position:absolute;left:40%;top:0;bottom:0;width:2px;background:#173d20}
-.occ-meter span{display:block;height:100%;border-radius:999px;transition:width .3s}
-.occ-meter span.ok{background:#2e7d32}.occ-meter span.alert{background:#f5a623}.occ-meter span.critical{background:#c62828}
+.occ-zone.status-ok .occ-zone-shape{fill:#bfe8c9}.occ-zone.status-alert .occ-zone-shape{fill:#ffe08a}.occ-zone.status-critical .occ-zone-shape{fill:#f4a4a4}.occ-zone.selected .occ-zone-shape{stroke:#0d3d1a;stroke-width:8}
+.occ-detail{position:sticky;top:0}.occ-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.occ-status-pill{padding:5px 9px;border-radius:999px;font-size:10px;font-weight:900}.occ-status-pill.ok{background:#eafaf1;color:#1e8449}.occ-status-pill.alert{background:#fff8e1;color:#9b6200}.occ-status-pill.critical{background:#fdedec;color:#b42318}
+.occ-meter{height:15px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin:12px 0 5px;position:relative}.occ-meter:after{content:"";position:absolute;left:40%;top:0;bottom:0;width:2px;background:#173d20}
+.occ-meter span{display:block;height:100%;border-radius:999px;transition:width .3s}.occ-meter span.ok{background:#2e7d32}.occ-meter span.alert{background:#f5a623}.occ-meter span.critical{background:#c62828}
 .occ-meter-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--text-m)}
-.occ-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}
-.occ-detail-metric{padding:10px;border:1px solid var(--border);background:var(--surface-1);border-radius:9px}
-.occ-detail-metric span{display:block;font-size:9px;color:var(--text-s);font-weight:800;text-transform:uppercase}
-.occ-detail-metric strong{display:block;font-size:17px;color:var(--navy);margin-top:3px}
-.occ-movement-list{display:grid;gap:7px;margin-top:10px;max-height:250px;overflow:auto}
-.occ-movement{display:grid;grid-template-columns:72px 1fr auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:10px}
-.occ-movement.ingreso{border-left:4px solid var(--success)}.occ-movement.evacuacion{border-left:4px solid var(--warning)}
-.occ-movement strong{font-size:11px}.occ-movement small{display:block;color:var(--text-m);margin-top:2px}
-.occ-area-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px}
-.occ-area-card{border:1.5px solid var(--border);border-radius:11px;padding:12px;background:#fff;cursor:pointer;transition:.16s}
-.occ-area-card:hover,.occ-area-card.active{border-color:var(--navy);box-shadow:0 5px 18px rgba(26,92,42,.12);transform:translateY(-1px)}
-.occ-area-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.occ-area-name{font-size:12px;font-weight:850;color:var(--navy);line-height:1.25}
-.occ-area-percent{font-size:18px;font-weight:900}.occ-area-meta{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--text-s);margin-top:7px}
-.occ-area-progress{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin-top:8px}.occ-area-progress span{display:block;height:100%;border-radius:999px}
-.occ-method{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.occ-method-step{padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-1)}
-.occ-method-step b{display:block;color:var(--navy);font-size:12px;margin-bottom:4px}.occ-method-step span{font-size:11px;color:var(--text-s)}
-.occ-calc-preview{padding:10px 12px;border-radius:9px;background:#edf7ef;border-left:4px solid var(--success);font-size:12px;color:#174f25;margin-top:8px}
-.occ-calc-preview.out{background:#fff5e8;border-left-color:var(--warning);color:#7a4800}
+.occ-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}.occ-detail-metric{padding:10px;border:1px solid var(--border);background:var(--surface-1);border-radius:9px}.occ-detail-metric span{display:block;font-size:9px;color:var(--text-s);font-weight:800;text-transform:uppercase}.occ-detail-metric strong{display:block;font-size:17px;color:var(--navy);margin-top:3px}
+.occ-movement-list{display:grid;gap:7px;margin-top:10px;max-height:250px;overflow:auto}.occ-movement{display:grid;grid-template-columns:72px 1fr auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:10px}.occ-movement.ingreso{border-left:4px solid var(--success)}.occ-movement.evacuacion{border-left:4px solid var(--warning)}.occ-movement strong{font-size:11px}.occ-movement small{display:block;color:var(--text-m);margin-top:2px}
+.occ-area-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px}.occ-area-card{border:1.5px solid var(--border);border-radius:11px;padding:12px;background:#fff;cursor:pointer;transition:.16s}.occ-area-card:hover,.occ-area-card.active{border-color:var(--navy);box-shadow:0 5px 18px rgba(26,92,42,.12);transform:translateY(-1px)}
+.occ-area-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.occ-area-name{font-size:12px;font-weight:850;color:var(--navy);line-height:1.25}.occ-area-percent{font-size:18px;font-weight:900}.occ-area-meta{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--text-s);margin-top:7px}.occ-area-progress{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin-top:8px}.occ-area-progress span{display:block;height:100%;border-radius:999px}
+.occ-source-note{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;background:#ebf5fb;color:#145a86;border-left:4px solid var(--info);font-size:12px;margin-bottom:18px}
+.occ-table-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#fff3e0;color:#b45309;font-size:10px;font-weight:800}
+.occ-preview{padding:10px 12px;border-radius:9px;background:#fff5e8;border-left:4px solid var(--warning);font-size:12px;color:#7a4800}
 @media(max-width:1050px){.occ-layout{grid-template-columns:1fr}.occ-detail{position:static}}
-@media(max-width:820px){.occ-kpis{grid-template-columns:repeat(2,1fr)}.occ-method{grid-template-columns:1fr}.occ-map{min-height:360px}}
+@media(max-width:820px){.occ-kpis{grid-template-columns:repeat(2,1fr)}.occ-map{min-height:360px}}
 @media(max-width:520px){.occ-kpis{grid-template-columns:1fr}.occ-hero{align-items:flex-start;flex-direction:column}.occ-map{min-width:760px}.occ-map-wrap{overflow-x:auto}.occ-detail-grid{grid-template-columns:1fr 1fr}}
 
 /* ===== MÓDULO COPRODUCTOS 3D ===== */
@@ -906,6 +870,7 @@ img,canvas,svg,video{max-width:100%}
             <div class="page-subtitle">Control diario de operaciones</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" id="btn-sync-actividades-sheets" style="display:none" onclick="syncActividadesFromGoogleSheets()">↻ Importar Google Sheets</button>
             <button class="btn btn-primary" id="btn-nueva-actividad-page" onclick="openModal('modal-actividad')">
               <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
               Registrar actividad
@@ -1036,10 +1001,10 @@ img,canvas,svg,video{max-width:100%}
       <div id="view-patios" style="display:none">
         <div class="page-header">
           <div>
-            <div class="page-title">Control de movimientos de material y vehículos</div>
-            <div class="page-subtitle">Registra ingresos o evacuaciones de toneladas; la hora de salida del vehículo se controla en el mismo registro</div>
+            <div class="page-title">Control de ingreso y salida de vehículos</div>
+            <div class="page-subtitle">Registra el ingreso una sola vez y marca la salida del mismo vehículo sin volver a escribir sus datos</div>
           </div>
-          <button class="btn btn-primary" id="btn-nuevo-movimiento" onclick="openMovimientoModal()">+ Registrar movimiento</button>
+          <button class="btn btn-primary" id="btn-nuevo-movimiento" onclick="openMovimientoModal()">+ Registrar ingreso</button>
         </div>
 
         <div id="patio-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
@@ -1050,7 +1015,6 @@ img,canvas,svg,video{max-width:100%}
           <div class="filters" style="padding:0;margin:0">
             <div class="form-group" style="margin:0"><label class="form-label">Desde</label><input type="date" class="filter-select" id="patio-desde" onchange="renderPatios()"></div>
             <div class="form-group" style="margin:0"><label class="form-label">Hasta</label><input type="date" class="filter-select" id="patio-hasta" onchange="renderPatios()"></div>
-            <div class="form-group" style="margin:0"><label class="form-label">Movimiento de material</label><select class="filter-select" id="patio-movimiento-filtro" onchange="renderPatios()"><option value="">Todos</option><option value="ingreso">Ingreso</option><option value="evacuacion">Evacuación</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Estado del vehículo</label><select class="filter-select" id="patio-tipo-mov" onchange="renderPatios()"><option value="">Todos</option><option value="en_patio">En patio</option><option value="salio">Con salida registrada</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Subclase</label><select class="filter-select" id="patio-subclase" onchange="renderPatios()"><option value="">Todas</option><option value="Metálico">Metálico</option><option value="No metálico">No metálico</option></select></div>
             <div class="form-group" style="margin:0"><label class="form-label">Gerencia</label><select class="filter-select" id="patio-gerencia" onchange="renderPatios()"><option value="">Todas</option><option>Concentradora</option><option>Cadena de Abastecimiento</option><option>Ingeniería y Proyectos</option><option>Mantenimiento</option><option>Medio Ambiente</option><option>Transporte y Campamento</option><option>Operaciones Mina</option><option>Logística</option><option>Geología</option><option>Geotecnia e Hidrogeología</option><option>Presa de Relaves</option><option>Planeamiento</option><option>Seguridad Industrial</option><option>Salud</option><option>Sistemas y Telecomunicaciones</option></select></div>
@@ -1058,51 +1022,55 @@ img,canvas,svg,video{max-width:100%}
             <div class="filters-spacer"></div>
             <button class="btn btn-outline btn-sm" onclick="clearPatioFilters()">Limpiar</button>
             <button class="btn btn-outline btn-sm" onclick="exportMovimientosCSV()">Exportar Excel</button>
+            <button class="btn btn-primary btn-sm" onclick="syncMovimientosToDrive()">Sincronizar Drive</button>
           </div>
         </div>
 
         <div class="patio-kpis">
-          <div class="stat-card success"><div class="stat-label">Ingresos de material</div><div class="stat-value" id="patio-kpi-ingresos">0</div><div class="stat-sub">movimientos filtrados</div></div>
-          <div class="stat-card amber"><div class="stat-label">Evacuaciones</div><div class="stat-value" id="patio-kpi-evacuaciones">0</div><div class="stat-sub">movimientos filtrados</div></div>
+          <div class="stat-card success"><div class="stat-label">Ingresos registrados</div><div class="stat-value" id="patio-kpi-ingresos">0</div><div class="stat-sub">vehículos filtrados</div></div>
+          <div class="stat-card amber"><div class="stat-label">Salidas registradas</div><div class="stat-value" id="patio-kpi-salidas">0</div><div class="stat-sub">vehículos que ya salieron</div></div>
           <div class="stat-card teal"><div class="stat-label">Toneladas ingresadas</div><div class="stat-value" id="patio-kpi-tn-in">0</div><div class="stat-sub">tn</div></div>
-          <div class="stat-card amber"><div class="stat-label">Toneladas evacuadas</div><div class="stat-value" id="patio-kpi-tn-out">0</div><div class="stat-sub">tn</div></div>
           <div class="stat-card info"><div class="stat-label">Vehículos en patio</div><div class="stat-value" id="patio-kpi-balance">0</div><div class="stat-sub">sin hora de salida</div></div>
         </div>
 
         <div class="patio-chart-grid">
           <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Tipo de residuo</div><div class="card-subtitle">Distribución del tonelaje ingresado: pesado y liviano</div></div></div><canvas id="chart-patio-residuo"></canvas></div>
-          <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Ingresos y evacuaciones por día</div><div class="card-subtitle">Comparación diaria de toneladas</div></div></div><canvas id="chart-patio-ingresos"></canvas></div>
+          <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Ingresos por día</div><div class="card-subtitle">Toneladas ingresadas por fecha</div></div></div><canvas id="chart-patio-ingresos"></canvas></div>
         </div>
         <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Toneladas por gerencia</div><div class="card-subtitle">Solo ingresos · ordenada de mayor a menor tonelaje</div></div></div><div id="chart-patio-gerencia" class="pyramid-chart"></div></div>
 
         <div class="card" style="padding:0">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Fecha</th><th>Movimiento</th><th>Estado vehículo</th><th>Área de ocupabilidad</th><th>Impacto (m²)</th><th>Patio</th><th>Placa</th><th>Subclase</th><th>Clase</th><th>Residuo</th><th>Material</th><th>Vehículo</th><th>Empresa</th><th>Peso (tn)</th><th>Procedencia</th><th>Gerencia</th><th>Hora ingreso</th><th>Hora salida</th><th>Registrado por</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Estado</th><th>Patio recepción</th><th>Placa</th><th>Subclase</th><th>Clase</th><th>Residuo</th><th>Material</th><th>Vehículo</th><th>Empresa</th><th>Peso (tn)</th><th>Procedencia</th><th>Gerencia</th><th>Hora ingreso</th><th>Hora salida</th><th>Registrado por</th><th>Acciones</th></tr></thead>
               <tbody id="tbody-movimientos"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-
       <!-- PAGE: OCUPABILIDAD -->
       <div id="view-ocupabilidad" style="display:none">
         <div class="page-header">
           <div>
             <div class="page-title">Ocupabilidad del Patio 4388</div>
-            <div class="page-subtitle">Actualización automática según toneladas ingresadas y evacuadas por cada área</div>
+            <div class="page-subtitle">Los ingresos se toman automáticamente de Control de patios; las evacuaciones se registran únicamente aquí</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-outline" onclick="renderOcupabilidad()">↻ Actualizar</button>
-            <button class="btn btn-primary" id="btn-ocupabilidad-mov" onclick="navigateTo('patios');setTimeout(()=>openMovimientoModal(),80)">Registrar movimiento</button>
+            <button class="btn btn-primary" id="btn-nueva-evacuacion" onclick="openEvacuacionModal()">+ Registrar evacuación</button>
           </div>
+        </div>
+
+        <div class="occ-source-note">
+          <div>ℹ️</div>
+          <div><strong>Control de patios no fue modificado.</strong> Esta pestaña lee los registros de ingreso existentes del Patio 4388, clasifica el material según su descripción y aplica las evacuaciones guardadas en el módulo de ocupabilidad.</div>
         </div>
 
         <div class="occ-hero">
           <div>
-            <div class="occ-hero-title">Control visual para operación y cliente</div>
-            <div class="occ-hero-sub">El sistema convierte automáticamente las toneladas a m² por tipo de material y aplica el balance: área base + ingresos − evacuaciones. Límite operacional: 40%.</div>
+            <div class="occ-hero-title">Control visual de ocupabilidad</div>
+            <div class="occ-hero-sub">Área actual = área base al 25/07/2026 + m² generados por ingresos − m² liberados por evacuaciones. Límite operacional: 40%.</div>
           </div>
           <div class="occ-live" id="occ-last-update">Datos en tiempo real</div>
         </div>
@@ -1117,36 +1085,29 @@ img,canvas,svg,video{max-width:100%}
         <div class="occ-layout">
           <div class="card occ-map-card">
             <div class="occ-map-head">
-              <div>
-                <div class="card-title">Plano interactivo de áreas</div>
-                <div class="card-subtitle">Selecciona un área para revisar su cálculo, movimientos y estado</div>
-              </div>
-              <div class="occ-legend">
-                <span><i style="background:#bfe8c9"></i> Menor a 35%</span>
-                <span><i style="background:#ffe08a"></i> 35% a 40%</span>
-                <span><i style="background:#f4a4a4"></i> Mayor a 40%</span>
-              </div>
+              <div><div class="card-title">Plano interactivo de áreas</div><div class="card-subtitle">Selecciona un área para revisar el cálculo y sus movimientos</div></div>
+              <div class="occ-legend"><span><i style="background:#bfe8c9"></i> Menor a 35%</span><span><i style="background:#ffe08a"></i> 35% a 40%</span><span><i style="background:#f4a4a4"></i> Mayor a 40%</span></div>
             </div>
             <div class="occ-map-wrap">
               <svg class="occ-map" viewBox="0 0 1200 700" aria-label="Plano esquemático interactivo del Patio 4388">
                 <path class="occ-map-road" d="M20 205 H1180 V220 H20 Z M505 20 V680 H520 V20 Z"/>
                 <text x="1015" y="675" class="occ-map-small">INGRESO / VÍA PRINCIPAL →</text>
-                <g class="occ-zone" data-area-id="tuberias_hdpe" role="button" tabindex="0" onclick="selectOcupabilidadArea('tuberias_hdpe')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('tuberias_hdpe')"><rect class="occ-zone-shape" x="35" y="35" width="230" height="150" rx="16"/><text x="150" y="92" text-anchor="middle" class="occ-map-label"><tspan x="150">TUBERÍAS</tspan><tspan x="150" dy="18">HDPE</tspan></text><text id="occ-map-pct-tuberias_hdpe" x="150" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="rrmm_varios_op" role="button" tabindex="0" onclick="selectOcupabilidadArea('rrmm_varios_op')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('rrmm_varios_op')"><rect class="occ-zone-shape" x="290" y="35" width="195" height="150" rx="16"/><text x="387" y="90" text-anchor="middle" class="occ-map-label"><tspan x="387">RRMM VARIOS</tspan><tspan x="387" dy="18">OP</tspan></text><text id="occ-map-pct-rrmm_varios_op" x="387" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="fajas" role="button" tabindex="0" onclick="selectOcupabilidadArea('fajas')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('fajas')"><rect class="occ-zone-shape" x="540" y="35" width="245" height="150" rx="16"/><text x="662" y="100" text-anchor="middle" class="occ-map-label">FAJAS</text><text id="occ-map-pct-fajas" x="662" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="linners_tub_op" role="button" tabindex="0" onclick="selectOcupabilidadArea('linners_tub_op')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('linners_tub_op')"><rect class="occ-zone-shape" x="810" y="35" width="355" height="150" rx="16"/><text x="987" y="92" text-anchor="middle" class="occ-map-label"><tspan x="987">LINNERS Y</tspan><tspan x="987" dy="18">TUB OP</tspan></text><text id="occ-map-pct-linners_tub_op" x="987" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="rrmm_livianos" role="button" tabindex="0" onclick="selectOcupabilidadArea('rrmm_livianos')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('rrmm_livianos')"><rect class="occ-zone-shape" x="35" y="240" width="450" height="275" rx="18"/><text x="260" y="350" text-anchor="middle" class="occ-map-label"><tspan x="260">RRMM VARIOS</tspan><tspan x="260" dy="20">LIVIANOS</tspan></text><text id="occ-map-pct-rrmm_livianos" x="260" y="425" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="comp_chancado" role="button" tabindex="0" onclick="selectOcupabilidadArea('comp_chancado')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('comp_chancado')"><rect class="occ-zone-shape" x="540" y="240" width="235" height="120" rx="15"/><text x="657" y="285" text-anchor="middle" class="occ-map-label"><tspan x="657">COMPONENTES</tspan><tspan x="657" dy="17">CHANCADO</tspan></text><text id="occ-map-pct-comp_chancado" x="657" y="337" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="coproductos" role="button" tabindex="0" onclick="selectOcupabilidadArea('coproductos')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('coproductos')"><rect class="occ-zone-shape" x="800" y="240" width="170" height="120" rx="15"/><text x="885" y="292" text-anchor="middle" class="occ-map-label">COPRODUCTOS</text><text id="occ-map-pct-coproductos" x="885" y="337" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="linners_2_3" role="button" tabindex="0" onclick="selectOcupabilidadArea('linners_2_3')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('linners_2_3')"><rect class="occ-zone-shape" x="995" y="240" width="170" height="120" rx="15"/><text x="1080" y="280" text-anchor="middle" class="occ-map-label"><tspan x="1080">LINNERS</tspan><tspan x="1080" dy="17">TIPO 2 Y 3</tspan></text><text id="occ-map-pct-linners_2_3" x="1080" y="337" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="almacen_hdpe" role="button" tabindex="0" onclick="selectOcupabilidadArea('almacen_hdpe')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('almacen_hdpe')"><rect class="occ-zone-shape" x="540" y="390" width="320" height="250" rx="18"/><text x="700" y="490" text-anchor="middle" class="occ-map-label"><tspan x="700">ALMACÉN DE</tspan><tspan x="700" dy="19">TUBERÍA HDPE</tspan></text><text id="occ-map-pct-almacen_hdpe" x="700" y="565" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="acopio_hdpe" role="button" tabindex="0" onclick="selectOcupabilidadArea('acopio_hdpe')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('acopio_hdpe')"><rect class="occ-zone-shape" x="885" y="390" width="280" height="115" rx="15"/><text x="1025" y="432" text-anchor="middle" class="occ-map-label"><tspan x="1025">ACOPIO TEMPORAL</tspan><tspan x="1025" dy="17">HDPE</tspan></text><text id="occ-map-pct-acopio_hdpe" x="1025" y="482" text-anchor="middle" class="occ-map-pct">0%</text></g>
-                <g class="occ-zone" data-area-id="jebes" role="button" tabindex="0" onclick="selectOcupabilidadArea('jebes')" onkeydown="if(event.key==='Enter')selectOcupabilidadArea('jebes')"><rect class="occ-zone-shape" x="885" y="525" width="280" height="115" rx="15"/><text x="1025" y="570" text-anchor="middle" class="occ-map-label">JEBES</text><text id="occ-map-pct-jebes" x="1025" y="617" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="tuberias_hdpe" role="button" tabindex="0" onclick="selectOcupabilidadArea('tuberias_hdpe')"><rect class="occ-zone-shape" x="35" y="35" width="230" height="150" rx="16"/><text x="150" y="92" text-anchor="middle" class="occ-map-label"><tspan x="150">TUBERÍAS</tspan><tspan x="150" dy="18">HDPE</tspan></text><text id="occ-map-pct-tuberias_hdpe" x="150" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="rrmm_varios_op" role="button" tabindex="0" onclick="selectOcupabilidadArea('rrmm_varios_op')"><rect class="occ-zone-shape" x="290" y="35" width="195" height="150" rx="16"/><text x="387" y="90" text-anchor="middle" class="occ-map-label"><tspan x="387">RRMM VARIOS</tspan><tspan x="387" dy="18">OP</tspan></text><text id="occ-map-pct-rrmm_varios_op" x="387" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="fajas" role="button" tabindex="0" onclick="selectOcupabilidadArea('fajas')"><rect class="occ-zone-shape" x="540" y="35" width="245" height="150" rx="16"/><text x="662" y="100" text-anchor="middle" class="occ-map-label">FAJAS</text><text id="occ-map-pct-fajas" x="662" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="linners_tub_op" role="button" tabindex="0" onclick="selectOcupabilidadArea('linners_tub_op')"><rect class="occ-zone-shape" x="810" y="35" width="355" height="150" rx="16"/><text x="987" y="92" text-anchor="middle" class="occ-map-label"><tspan x="987">LINNERS Y</tspan><tspan x="987" dy="18">TUB OP</tspan></text><text id="occ-map-pct-linners_tub_op" x="987" y="147" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="rrmm_livianos" role="button" tabindex="0" onclick="selectOcupabilidadArea('rrmm_livianos')"><rect class="occ-zone-shape" x="35" y="240" width="450" height="275" rx="18"/><text x="260" y="350" text-anchor="middle" class="occ-map-label"><tspan x="260">RRMM VARIOS</tspan><tspan x="260" dy="20">LIVIANOS</tspan></text><text id="occ-map-pct-rrmm_livianos" x="260" y="425" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="comp_chancado" role="button" tabindex="0" onclick="selectOcupabilidadArea('comp_chancado')"><rect class="occ-zone-shape" x="540" y="240" width="235" height="120" rx="15"/><text x="657" y="285" text-anchor="middle" class="occ-map-label"><tspan x="657">COMPONENTES</tspan><tspan x="657" dy="17">CHANCADO</tspan></text><text id="occ-map-pct-comp_chancado" x="657" y="337" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="coproductos" role="button" tabindex="0" onclick="selectOcupabilidadArea('coproductos')"><rect class="occ-zone-shape" x="800" y="240" width="170" height="120" rx="15"/><text x="885" y="292" text-anchor="middle" class="occ-map-label">COPRODUCTOS</text><text id="occ-map-pct-coproductos" x="885" y="337" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="linners_2_3" role="button" tabindex="0" onclick="selectOcupabilidadArea('linners_2_3')"><rect class="occ-zone-shape" x="995" y="240" width="170" height="120" rx="15"/><text x="1080" y="280" text-anchor="middle" class="occ-map-label"><tspan x="1080">LINNERS</tspan><tspan x="1080" dy="17">TIPO 2 Y 3</tspan></text><text id="occ-map-pct-linners_2_3" x="1080" y="337" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="almacen_hdpe" role="button" tabindex="0" onclick="selectOcupabilidadArea('almacen_hdpe')"><rect class="occ-zone-shape" x="540" y="390" width="320" height="250" rx="18"/><text x="700" y="490" text-anchor="middle" class="occ-map-label"><tspan x="700">ALMACÉN DE</tspan><tspan x="700" dy="19">TUBERÍA HDPE</tspan></text><text id="occ-map-pct-almacen_hdpe" x="700" y="565" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="acopio_hdpe" role="button" tabindex="0" onclick="selectOcupabilidadArea('acopio_hdpe')"><rect class="occ-zone-shape" x="885" y="390" width="280" height="115" rx="15"/><text x="1025" y="432" text-anchor="middle" class="occ-map-label"><tspan x="1025">ACOPIO TEMPORAL</tspan><tspan x="1025" dy="17">HDPE</tspan></text><text id="occ-map-pct-acopio_hdpe" x="1025" y="482" text-anchor="middle" class="occ-map-pct">0%</text></g>
+                <g class="occ-zone" data-area-id="jebes" role="button" tabindex="0" onclick="selectOcupabilidadArea('jebes')"><rect class="occ-zone-shape" x="885" y="525" width="280" height="115" rx="15"/><text x="1025" y="570" text-anchor="middle" class="occ-map-label">JEBES</text><text id="occ-map-pct-jebes" x="1025" y="617" text-anchor="middle" class="occ-map-pct">0%</text></g>
               </svg>
             </div>
-            <div class="form-hint" style="margin-top:9px">Vista esquemática interactiva. Los porcentajes y colores sí se calculan con los movimientos registrados.</div>
+            <div class="form-hint" style="margin-top:9px">Vista interactiva esquemática basada en las áreas del control de ocupabilidad.</div>
           </div>
-          <div class="card occ-detail" id="occ-detail-panel"><div id="occ-selected-detail"></div></div>
+          <div class="card occ-detail"><div id="occ-selected-detail"></div></div>
         </div>
 
         <div class="card" style="margin-bottom:18px">
@@ -1154,12 +1115,15 @@ img,canvas,svg,video{max-width:100%}
           <div id="occ-area-grid" class="occ-area-grid"></div>
         </div>
 
-        <div class="card">
-          <div class="card-title">Cómo se actualiza automáticamente</div>
-          <div class="occ-method">
-            <div class="occ-method-step"><b>1. Registrar toneladas</b><span>En Control de patios se selecciona Ingreso o Evacuación y el área donde se almacena el material.</span></div>
-            <div class="occ-method-step"><b>2. Convertir tn a m²</b><span>El sistema aplica el factor específico del área: m² = toneladas ÷ factor tn/m².</span></div>
-            <div class="occ-method-step"><b>3. Actualizar el balance</b><span>Área final = área base + m² de ingresos − m² de evacuaciones. El color cambia frente al límite de 40%.</span></div>
+        <div class="card" style="padding:0">
+          <div class="card-header" style="padding:18px 20px 0">
+            <div><div class="card-title">Evacuaciones registradas</div><div class="card-subtitle">Estos registros reducen únicamente el área seleccionada</div></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Área</th><th>Descripción</th><th>Toneladas</th><th>m² reducidos</th><th>Registrado por</th><th>Acciones</th></tr></thead>
+              <tbody id="tbody-ocupabilidad-evacuaciones"></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1720,53 +1684,60 @@ img,canvas,svg,video{max-width:100%}
 
 <!-- Modal: Movimiento de patio -->
 <div class="modal-overlay" id="modal-movimiento">
-  <div class="modal" style="max-width:860px">
+  <div class="modal" style="max-width:820px">
     <div class="modal-header"><div class="modal-title" id="mov-modal-title">Registrar movimiento de material</div><button class="modal-close" onclick="closeModal('modal-movimiento')">×</button></div>
     <input type="hidden" id="mov-id">
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tipo de movimiento *</label><select class="form-control" id="mov-tipo-movimiento" onchange="updateMovimientoModeUI()"><option value="ingreso">Ingreso de material</option><option value="evacuacion">Evacuación de material</option></select></div>
-      <div class="form-group"><label class="form-label">Fecha del movimiento *</label><input class="form-control" id="mov-fecha" type="date"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Área de ocupabilidad *</label>
-        <div style="display:flex;gap:7px">
-          <select class="form-control" id="mov-area-ocupabilidad" onchange="updateMovimientoImpactPreview()">
-            <option value="">Seleccionar área</option>
-            <option value="tuberias_hdpe">TUBERIAS HDPE</option><option value="rrmm_varios_op">RRMM Varios OP</option><option value="fajas">FAJAS</option><option value="linners_tub_op">Linners y Tub OP</option><option value="rrmm_livianos">RRMM Varios - Livianos</option><option value="comp_chancado">Comp-Chancado Primario</option><option value="coproductos">COPRODUCTOS</option><option value="linners_2_3">Linners tipo 2 y tipo 3</option><option value="almacen_hdpe">Almacén de tubería HDPE</option><option value="acopio_hdpe">Acopio temporal HDPE</option><option value="jebes">Jebes</option>
-          </select>
-          <button type="button" class="btn btn-outline btn-sm" onclick="autoSelectOcupabilidadArea(true)" title="Clasificar según la descripción">Automático</button>
-        </div>
-        <div class="form-hint">Esta selección determina en qué área se suman o restan los m².</div>
-      </div>
-      <div class="form-group"><label class="form-label">Subclase *</label><select class="form-control" id="mov-subclase" onchange="autoSelectOcupabilidadArea()"><option value="">Seleccionar</option><option>Metálico</option><option>No metálico</option></select></div>
+      <div class="form-group"><label class="form-label">Fecha de ingreso *</label><input class="form-control" id="mov-fecha" type="date"></div>
+      <div class="form-group"><label class="form-label">Subclase *</label><select class="form-control" id="mov-subclase"><option value="">Seleccionar</option><option>Metálico</option><option>No metálico</option></select></div>
     </div>
     <div class="form-row-3">
       <div class="form-group"><label class="form-label">Clase *</label><select class="form-control" id="mov-clase"><option value="">Seleccionar</option><option>Peligroso</option><option>No peligroso</option></select></div>
-      <div class="form-group"><label class="form-label">Tipo de residuo *</label><select class="form-control" id="mov-residuo" onchange="autoSelectOcupabilidadArea()"><option value="">Seleccionar</option><option>Pesado</option><option>Liviano</option></select></div>
-      <div class="form-group"><label class="form-label">Tipo de vehículo *</label><select class="form-control" id="mov-vehiculo" onchange="toggleOtroVehiculo()"><option value="">Seleccionar</option><option>Plataforma</option><option>Grúa</option><option>Amarillo</option><option>Camión tolva</option><option value="Otros">Otros</option></select></div>
+      <div class="form-group"><label class="form-label">Tipo de residuo *</label><select class="form-control" id="mov-residuo"><option value="">Seleccionar</option><option>Pesado</option><option>Liviano</option></select></div>
+      <div class="form-group"><label class="form-label">Tipo de vehículo *</label><select class="form-control" id="mov-vehiculo" onchange="toggleOtroVehiculo()"><option value="">Seleccionar</option><option>Plataforma</option><option>Grúa</option><option>Amarillo</option><option value="Otros">Otros</option></select></div>
     </div>
-    <div class="form-group" id="mov-vehiculo-otro-group" style="display:none"><label class="form-label">Especificar otro tipo de vehículo *</label><input class="form-control" id="mov-vehiculo-otro" type="text" placeholder="Ej.: camioneta, cisterna..."></div>
+    <div class="form-group" id="mov-vehiculo-otro-group" style="display:none"><label class="form-label">Especificar otro tipo de vehículo *</label><input class="form-control" id="mov-vehiculo-otro" type="text" placeholder="Ej.: camión tolva, camioneta, cisterna..."></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Placa del vehículo *</label><input class="form-control" id="mov-placa" type="text" maxlength="12" placeholder="Ej.: ABC-123" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9-]/g,'')"></div>
-      <div class="form-group"><label class="form-label">Patio *</label><select class="form-control" id="mov-patio" onchange="toggleOtroPatio()"><option value="">Seleccionar</option><option>4388</option><option>DEG</option><option value="Otros">Otros</option></select></div>
+      <div class="form-group"><label class="form-label">Patio de recepción *</label><select class="form-control" id="mov-patio" onchange="toggleOtroPatio()"><option value="">Seleccionar</option><option>4388</option><option>DEG</option><option value="Otros">Otros</option></select></div>
     </div>
     <div class="form-group" id="mov-patio-otro-group" style="display:none"><label class="form-label">Especificar otro patio *</label><input class="form-control" id="mov-patio-otro" type="text" placeholder="Nombre o código del patio"></div>
-    <div class="form-group"><label class="form-label">Descripción del material *</label><input class="form-control" id="mov-descripcion" type="text" placeholder="Ej.: 6 liners, tuberías HDPE, barandas, chatarra liviana..." oninput="autoSelectOcupabilidadArea();updateMovimientoImpactPreview()"></div>
+    <div class="form-group"><label class="form-label">Descripción del material *</label><input class="form-control" id="mov-descripcion" type="text" placeholder="Ej.: chatarra metálica, HDPE, bolas de acero..."></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Empresa transportista *</label><input class="form-control" id="mov-empresa" type="text" placeholder="Nombre de la empresa"></div>
-      <div class="form-group"><label class="form-label">Peso (tn) *</label><input class="form-control" id="mov-peso" type="number" min="0" step="0.001" placeholder="0.000" oninput="updateMovimientoImpactPreview()"></div>
+      <div class="form-group"><label class="form-label">Empresa que lo trajo *</label><input class="form-control" id="mov-empresa" type="text" placeholder="Nombre de la empresa"></div>
+      <div class="form-group"><label class="form-label">Peso (tn) *</label><input class="form-control" id="mov-peso" type="number" min="0" step="0.001" placeholder="0.000"></div>
     </div>
-    <div id="mov-ocupabilidad-calc" class="occ-calc-preview">Selecciona el área e ingresa las toneladas para calcular el impacto.</div>
-    <div class="form-row" style="margin-top:16px">
-      <div class="form-group"><label class="form-label">Procedencia / destino *</label><input class="form-control" id="mov-procedencia" type="text" placeholder="Ej.: Plataforma 4328, Mina, destino final..."></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Procedencia *</label><input class="form-control" id="mov-procedencia" type="text" placeholder="Ej.: Plataforma 4328, Mina, Taller Central..."></div>
       <div class="form-group"><label class="form-label">Gerencia *</label><select class="form-control" id="mov-gerencia"><option value="">Seleccionar</option><option>Concentradora</option><option>Cadena de Abastecimiento</option><option>Ingeniería y Proyectos</option><option>Mantenimiento</option><option>Medio Ambiente</option><option>Transporte y Campamento</option><option>Operaciones Mina</option><option>Logística</option><option>Geología</option><option>Geotecnia e Hidrogeología</option><option>Presa de Relaves</option><option>Planeamiento</option><option>Seguridad Industrial</option><option>Salud</option><option>Sistemas y Telecomunicaciones</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Hora de ingreso del vehículo *</label><input class="form-control" id="mov-inicio" type="time"></div>
-      <div class="form-group"><label class="form-label">Hora de salida del vehículo</label><input class="form-control" id="mov-fin" type="time"><div class="form-hint">Puede completarse después mediante “Marcar salida”.</div></div>
+      <div class="form-group"><label class="form-label">Hora de ingreso *</label><input class="form-control" id="mov-inicio" type="time"></div>
+      <div class="form-group"><label class="form-label">Hora de salida</label><input class="form-control" id="mov-fin" type="time"><div class="form-hint">Déjala vacía al registrar el ingreso. Luego usa “Marcar salida” en la tabla.</div></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-movimiento')">Cancelar</button><button class="btn btn-primary" id="btn-save-movimiento" onclick="saveMovimiento()">Guardar movimiento</button></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-movimiento')">Cancelar</button><button class="btn btn-primary" onclick="saveMovimiento()">Guardar ingreso</button></div>
+  </div>
+</div>
+
+<!-- Modal: Evacuación de ocupabilidad -->
+<div class="modal-overlay" id="modal-ocupabilidad-evacuacion">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header"><div class="modal-title" id="occ-evac-modal-title">Registrar evacuación</div><button class="modal-close" onclick="closeModal('modal-ocupabilidad-evacuacion')">×</button></div>
+    <input type="hidden" id="occ-evac-id">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Fecha *</label><input class="form-control" id="occ-evac-fecha" type="date"></div>
+      <div class="form-group"><label class="form-label">Área que se reduce *</label>
+        <select class="form-control" id="occ-evac-area" onchange="updateEvacuacionPreview()">
+          <option value="">Seleccionar</option>
+          <option value="tuberias_hdpe">TUBERIAS HDPE</option><option value="rrmm_varios_op">RRMM Varios OP</option><option value="fajas">FAJAS</option><option value="linners_tub_op">Linners y Tub OP</option><option value="rrmm_livianos">RRMM Varios - Livianos</option><option value="comp_chancado">Comp-Chancado Primario</option><option value="coproductos">COPRODUCTOS</option><option value="linners_2_3">Linners tipo 2 y tipo 3</option><option value="almacen_hdpe">Almacén de tubería HDPE</option><option value="acopio_hdpe">Acopio temporal HDPE</option><option value="jebes">Jebes</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Descripción del material evacuado *</label><input class="form-control" id="occ-evac-descripcion" type="text" placeholder="Ej.: 6 liners, chatarra liviana, 3 tubos HDPE..."></div>
+    <div class="form-group"><label class="form-label">Toneladas evacuadas *</label><input class="form-control" id="occ-evac-toneladas" type="number" min="0" step="0.001" placeholder="0.000" oninput="updateEvacuacionPreview()"></div>
+    <div id="occ-evac-preview" class="occ-preview">Selecciona el área e ingresa las toneladas para calcular los m² liberados.</div>
+    <div class="form-group" style="margin-top:16px"><label class="form-label">Observación</label><textarea class="form-control" id="occ-evac-observacion" rows="3" placeholder="Detalle adicional, guía, destino o comentario"></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-ocupabilidad-evacuacion')">Cancelar</button><button class="btn btn-primary" onclick="saveOcupabilidadEvacuacion()">Guardar evacuación</button></div>
   </div>
 </div>
 
@@ -1995,6 +1966,7 @@ const APP = {
     restricciones: [],
     usuarios: [],
     movimientos: [],
+    ocupabilidadEvacuaciones: [],
     coproductos: [],
     coproMovimientos: [],
     seguridadDocumentos: [],
@@ -2261,7 +2233,6 @@ function dbMovimientoToApp(row) {
     subclase: row.subclase || '', clase: row.clase || '', tipoResiduo: row.tipo_residuo || '',
     descripcion: row.descripcion || '', vehiculo: row.tipo_vehiculo || '', placa: row.placa || '', patioRecepcion: row.patio_recepcion || '', empresa: row.empresa || '',
     peso: Number(row.peso_tn || 0), procedencia: row.procedencia || '', gerencia: normalizeGerenciaPatio(row.gerencia),
-    areaOcupabilidad: row.area_ocupabilidad || '',
     inicio: row.hora_inicio ? String(row.hora_inicio).slice(0,5) : '',
     fin: row.hora_fin ? String(row.hora_fin).slice(0,5) : '',
     registradoPor: row.registrado_por || '', createdAt: row.created_at || ''
@@ -2272,8 +2243,31 @@ function appMovimientoToDb(m) {
     fecha:m.fecha, movimiento:m.movimiento, subclase:m.subclase, clase:m.clase,
     tipo_residuo:m.tipoResiduo, descripcion:m.descripcion, tipo_vehiculo:m.vehiculo, placa:m.placa, patio_recepcion:m.patioRecepcion,
     empresa:m.empresa, peso_tn:m.peso, procedencia:m.procedencia, gerencia:m.gerencia,
-    area_ocupabilidad:m.areaOcupabilidad || null,
     hora_inicio:m.inicio || null, hora_fin:m.fin || null, registrado_por:m.registradoPor
+  };
+}
+
+
+function dbOcupabilidadEvacuacionToApp(row){
+  return {
+    id: row.id,
+    fecha: row.fecha,
+    areaId: row.area_id || '',
+    descripcion: row.descripcion || '',
+    toneladas: Number(row.toneladas || 0),
+    observacion: row.observacion || '',
+    registradoPor: row.registrado_por || '',
+    createdAt: row.created_at || ''
+  };
+}
+function appOcupabilidadEvacuacionToDb(e){
+  return {
+    fecha: e.fecha,
+    area_id: e.areaId,
+    descripcion: e.descripcion,
+    toneladas: e.toneladas,
+    observacion: e.observacion || '',
+    registrado_por: e.registradoPor || ''
   };
 }
 
@@ -2324,11 +2318,12 @@ function dbSeguridadIntentoToApp(row){
 }
 
 async function loadAllData() {
-  const [actRes, restRes, userRes, movRes, coproRes, coproMovRes, segDocRes, segFragRes, segQRes, segTryRes, progRes] = await Promise.all([
+  const [actRes, restRes, userRes, movRes, occEvacRes, coproRes, coproMovRes, segDocRes, segFragRes, segQRes, segTryRes, progRes] = await Promise.all([
     db.from('actividades').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('restricciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('usuarios').select('*').order('id', { ascending: true }),
     db.from('movimientos_material').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
+    db.from('ocupabilidad_evacuaciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('coproductos').select('*').order('id', { ascending: false }),
     db.from('movimientos_coproductos').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('seguridad_documentos').select('*').eq('activo',true).order('created_at',{ascending:false}),
@@ -2342,6 +2337,7 @@ async function loadAllData() {
   if(restRes.error) console.error('Error cargando restricciones:', restRes.error);
   if(userRes.error) console.error('Error cargando usuarios:', userRes.error);
   if(movRes.error) console.error('Error cargando movimientos:', movRes.error);
+  if(occEvacRes.error) console.warn('Evacuaciones de ocupabilidad pendientes de configurar:', occEvacRes.error.message);
   if(coproRes.error) console.error('Error cargando coproductos:', coproRes.error);
   if(coproMovRes.error) console.error('Error cargando movimientos de coproductos:', coproMovRes.error);
   if(segDocRes.error) console.warn('Módulo seguridad pendiente de configurar:', segDocRes.error.message);
@@ -2354,6 +2350,7 @@ async function loadAllData() {
   APP.data.restricciones = (restRes.data || []).map(dbRestriccionToApp);
   APP.data.usuarios = userRes.data || [];
   APP.data.movimientos = (movRes.data || []).map(dbMovimientoToApp);
+  APP.data.ocupabilidadEvacuaciones = (occEvacRes.data || []).map(dbOcupabilidadEvacuacionToApp);
   APP.data.coproductos = (coproRes.data || []).map(dbCoproductoToApp);
   APP.data.coproMovimientos = (coproMovRes.data || []).map(dbCoproMovimientoToApp);
   APP.data.seguridadDocumentos = (segDocRes.data || []).map(dbSeguridadDocumentoToApp);
@@ -2798,6 +2795,11 @@ async function doLogin() {
   const errEl      = document.getElementById('login-error');
   errEl.style.display = 'none';
 
+  // Un inicio de sesión explícito siempre reemplaza cualquier sesión anterior.
+  sessionStorage.removeItem(SESSION_KEYS.user);
+  sessionStorage.removeItem(SESSION_KEYS.view);
+  APP.user = null;
+
   if(!loginInput || !passInput) {
     errEl.textContent = 'Ingresa tu usuario y contraseña.';
     errEl.style.display = 'block';
@@ -2810,7 +2812,7 @@ async function doLogin() {
     .eq('login', loginInput)
     .eq('pass', passInput)
     .eq('activo', true)
-    .limit(1);
+    .limit(2);
 
   if(error) {
     console.error(error);
@@ -2819,8 +2821,14 @@ async function doLogin() {
     return;
   }
 
+  if((data || []).length > 1) {
+    errEl.textContent = 'Existe más de un usuario con el mismo login y contraseña. Solicita al administrador corregir el usuario duplicado.';
+    errEl.style.display = 'block';
+    return;
+  }
+
   const userMatch = data?.[0];
-  if(!userMatch) {
+  if(!userMatch || String(userMatch.login||'').toLowerCase() !== loginInput) {
     errEl.textContent = 'Usuario o contraseña incorrectos.';
     errEl.style.display = 'block';
     document.getElementById('login-pass').value = '';
@@ -2867,8 +2875,28 @@ async function restoreSession(){
   if(!raw)return;
   try{
     const saved=JSON.parse(raw);
-    if(!saved?.id||!saved?.login||!saved?.role)throw new Error('Sesión incompleta');
-    APP.user=saved;
+    if(!saved?.id||!saved?.login)throw new Error('Sesión incompleta');
+
+    // Validar que la sesión guardada todavía pertenece al mismo usuario activo.
+    const {data,error}=await db.from('usuarios')
+      .select('*')
+      .eq('id',saved.id)
+      .eq('login',saved.login)
+      .eq('activo',true)
+      .limit(1);
+    if(error||!data?.[0])throw new Error('Sesión inválida');
+
+    const current=data[0];
+    APP.user={
+      id:current.id,
+      login:current.login,
+      name:`${current.nombre||''} ${current.apellido||''}`.trim(),
+      role:normalizarRolSeguridad(current.rol),
+      initials:((current.nombre||'U')[0]+(current.apellido?current.apellido[0]:'')).toUpperCase(),
+      guardia:current.guardia
+    };
+    sessionStorage.setItem(SESSION_KEYS.user,JSON.stringify(APP.user));
+
     document.getElementById('page-login').style.display='none';
     document.getElementById('page-app').style.display='flex';
     await loadAllData();
@@ -2881,6 +2909,8 @@ async function restoreSession(){
     sessionStorage.removeItem(SESSION_KEYS.user);
     sessionStorage.removeItem(SESSION_KEYS.view);
     APP.user=null;
+    document.getElementById('page-app').style.display='none';
+    document.getElementById('page-login').style.display='flex';
   }
 }
 
@@ -3002,6 +3032,8 @@ function setupUI() {
   const puedeRegistrarActividad = ['operador','controlador','admin'].includes(u.role);
   const btnNuevaPage = document.getElementById('btn-nueva-actividad-page');
   if(btnNuevaPage) btnNuevaPage.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
+  const btnSyncSheets = document.getElementById('btn-sync-actividades-sheets');
+  if(btnSyncSheets) btnSyncSheets.style.display = u.role==='admin' ? 'inline-flex' : 'none';
   const btnCopro = document.getElementById('btn-nuevo-coproducto');
   if(btnCopro) btnCopro.style.display = ['controlador','admin'].includes(u.role) ? 'inline-flex' : 'none';
   const btnSeg = document.getElementById('btn-subir-seguridad');
@@ -3034,6 +3066,7 @@ function setupUI() {
     document.getElementById('act-guardia').disabled = false;
   }
   toggleDashboardDateInputs();
+  if(u.role==='admin') loadGoogleSheetsSettingsUI();
 }
 
 /* ===== NAVIGATION ===== */
@@ -3428,102 +3461,31 @@ function renderRestricciones() {
 }
 
 
-/* ===== CONTROL DE PATIOS Y OCUPABILIDAD ===== */
+/* ===== CONTROL DE PATIOS ===== */
 let patioPieChart = null;
 let patioBarChart = null;
-let OCC_SELECTED_AREA_ID = 'rrmm_livianos';
-
 const GERENCIAS_PATIO=['Concentradora','Cadena de Abastecimiento','Ingeniería y Proyectos','Mantenimiento','Medio Ambiente','Transporte y Campamento','Operaciones Mina','Logística','Geología','Geotecnia e Hidrogeología','Presa de Relaves','Planeamiento','Seguridad Industrial','Salud','Sistemas y Telecomunicaciones'];
-
-const OCC_BASE_DATE='2026-07-25';
-const OCC_LIMIT=0.40;
-const OCC_AREAS=[
-  {id:'tuberias_hdpe',name:'TUBERIAS HDPE',short:'Tuberías HDPE',totalM2:567.55,baseM2:299.25,factor:0.20},
-  {id:'rrmm_varios_op',name:'RRMM Varios  OP',short:'RRMM Varios OP',totalM2:251.69,baseM2:93.15,factor:0.75},
-  {id:'fajas',name:'FAJAS',short:'Fajas',totalM2:601.58,baseM2:323.75,factor:0.50},
-  {id:'linners_tub_op',name:'Linners y Tub OP',short:'Linners y Tub OP',totalM2:195.87,baseM2:88.88,factor:1.00},
-  {id:'rrmm_livianos',name:'RRMM Varios - Livianos',short:'Chatarra liviana',totalM2:1659.14,baseM2:780.27,factor:0.20},
-  {id:'comp_chancado',name:'Comp-Chancado Primario',short:'Comp. Chancado',totalM2:382.28,baseM2:206.91,factor:0.60},
-  {id:'coproductos',name:'COPRODUCTOS',short:'Coproductos',totalM2:111.70,baseM2:36.12,factor:0.50},
-  {id:'linners_2_3',name:'Linners tipo 2 y tipo 3',short:'Linners tipo 2 y 3',totalM2:336.50,baseM2:122.08,factor:1.00},
-  {id:'almacen_hdpe',name:'Almacen de tuberia HDPE',short:'Almacén HDPE',totalM2:907.46,baseM2:505.44,factor:0.20},
-  {id:'acopio_hdpe',name:'Acopio temporal HDPE',short:'Acopio temporal HDPE',totalM2:144.00,baseM2:72.00,factor:0.20},
-  {id:'jebes',name:'Jebes',short:'Jebes',totalM2:149.50,baseM2:51.75,factor:0.30},
-];
-
-const OCC_HISTORICAL_EVACUATIONS=[
-  {fecha:'2026-07-27',areaId:'linners_tub_op',tn:5.06,descripcion:'6 liners (4.26 tn) + 1 liner (0.80 tn)'},
-  {fecha:'2026-07-27',areaId:'rrmm_livianos',tn:22.42,descripcion:'Saldo evacuado como chatarra liviana'},
-  {fecha:'2026-07-28',areaId:'linners_tub_op',tn:16.24,descripcion:'6 liners (8.04 tn) + 3 liners (2.40 tn) + 2 liners (5.80 tn)'},
-  {fecha:'2026-07-28',areaId:'tuberias_hdpe',tn:3.00,descripcion:'HDPE evacuado'},
-  {fecha:'2026-07-28',areaId:'rrmm_livianos',tn:8.19,descripcion:'Saldo evacuado como chatarra liviana'},
-  {fecha:'2026-08-01',areaId:'linners_tub_op',tn:13.15,descripcion:'2 liners (2.80 tn) + 9 liners (9.45 tn) + 1 liner (0.90 tn)'},
-  {fecha:'2026-08-01',areaId:'rrmm_livianos',tn:15.36,descripcion:'Saldo evacuado como chatarra liviana'},
-  {fecha:'2026-08-02',areaId:'linners_tub_op',tn:33.60,descripcion:'Cuatro grupos de 6 liners: 9.00 + 7.80 + 9.00 + 7.80 tn'},
-  {fecha:'2026-08-02',areaId:'tuberias_hdpe',tn:2.10,descripcion:'3 tubos HDPE'},
-  {fecha:'2026-08-02',areaId:'rrmm_varios_op',tn:17.94,descripcion:'Saldo evacuado como MMV varios'},
-];
-
 function normalizeGerenciaPatio(value){
   const legacy={'Ingeniería & Proyectos':'Ingeniería y Proyectos','Campamento':'Transporte y Campamento'};
   return legacy[value]||value||'';
 }
-function canEditPatios(){ return APP.user && ['admin','controlador'].includes(APP.user.role); }
-function normalizeMovimientoMaterial(value){
-  const v=String(value||'ingreso').toLowerCase();
-  return ['evacuacion','evacuación','salida'].includes(v)?'evacuacion':'ingreso';
-}
-function occNormalizeText(value){
-  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-}
-function getOccAreaById(id){ return OCC_AREAS.find(a=>a.id===id)||null; }
-function getOccAreaFromStored(value){
-  const raw=String(value||'').trim();
-  if(!raw)return null;
-  return OCC_AREAS.find(a=>a.id===raw||occNormalizeText(a.name)===occNormalizeText(raw)||occNormalizeText(a.short)===occNormalizeText(raw))||null;
-}
-function inferAreaOcupabilidad(m){
-  const explicit=getOccAreaFromStored(m?.areaOcupabilidad);
-  if(explicit)return explicit;
-  const t=occNormalizeText(`${m?.descripcion||''} ${m?.tipoResiduo||''} ${m?.subclase||''}`);
-  if(/liner.*(tipo\s*2|tipo\s*3)|tipo\s*2.*liner|tipo\s*3.*liner/.test(t))return getOccAreaById('linners_2_3');
-  if(/liner|linner|revestimiento/.test(t))return getOccAreaById('linners_tub_op');
-  if(/acopio.*hdpe/.test(t))return getOccAreaById('acopio_hdpe');
-  if(/almacen.*hdpe/.test(t))return getOccAreaById('almacen_hdpe');
-  if(/hdpe|tuberia.*polietileno|tubo.*polietileno/.test(t))return getOccAreaById('tuberias_hdpe');
-  if(/faja|correa transportadora/.test(t))return getOccAreaById('fajas');
-  if(/jebe|caucho|manguera|cono ciclon/.test(t))return getOccAreaById('jebes');
-  if(/chancado|chancador|crusher/.test(t))return getOccAreaById('comp_chancado');
-  if(/coproduct/.test(t))return getOccAreaById('coproductos');
-  if(/livian|baranda|escalera|anaquel|malla|calamina|locker|cama|estante|bandeja|perno|clavo|lata|estructura pequena|rejilla/.test(t))return getOccAreaById('rrmm_livianos');
-  return getOccAreaById(String(m?.tipoResiduo||'').toLowerCase().includes('livian')?'rrmm_livianos':'rrmm_varios_op');
-}
-function getMovimientoImpactoM2(m){
-  const area=inferAreaOcupabilidad(m);
-  if(!area||!Number.isFinite(Number(m?.peso)))return 0;
-  return Number(m.peso)/area.factor;
-}
-function getOccStatus(pct){
-  if(pct>OCC_LIMIT)return {key:'critical',label:'Sobre el límite'};
-  if(pct>=0.35)return {key:'alert',label:'Próximo al límite'};
-  return {key:'ok',label:'Dentro del límite'};
-}
 
+function canEditPatios(){ return APP.user && ['admin','controlador'].includes(APP.user.role); }
 function openMovimientoModal(id=null){
   if(!canEditPatios()){ showToast('Tu usuario tiene permiso solo de visualización','warning'); return; }
   document.getElementById('mov-id').value = id || '';
+  document.getElementById('mov-modal-title').textContent = id ? 'Editar ingreso de vehículo' : 'Registrar ingreso de vehículo';
   const m = id ? APP.data.movimientos.find(x=>x.id===id) : null;
   const now = new Date();
   const today = now.toISOString().split('T')[0];
   const currentTime = now.toTimeString().slice(0,5);
-  const values = m || {fecha:today,movimiento:'ingreso',subclase:'',clase:'',tipoResiduo:'',descripcion:'',vehiculo:'',placa:'',patioRecepcion:'4388',empresa:'',peso:'',procedencia:'',gerencia:'',areaOcupabilidad:'',inicio:currentTime,fin:''};
-  document.getElementById('mov-tipo-movimiento').value=normalizeMovimientoMaterial(values.movimiento);
+  const values = m || {fecha:today,movimiento:'ingreso',subclase:'',clase:'',tipoResiduo:'',descripcion:'',vehiculo:'',placa:'',patioRecepcion:'',empresa:'',peso:'',procedencia:'',gerencia:'',inicio:currentTime,fin:''};
   document.getElementById('mov-fecha').value=values.fecha;
   document.getElementById('mov-subclase').value=values.subclase;
   document.getElementById('mov-clase').value=values.clase;
   document.getElementById('mov-residuo').value=values.tipoResiduo;
   document.getElementById('mov-descripcion').value=values.descripcion;
-  const vehiculosBase=['Plataforma','Grúa','Amarillo','Camión tolva'];
+  const vehiculosBase=['Plataforma','Grúa','Amarillo'];
   document.getElementById('mov-vehiculo').value=vehiculosBase.includes(values.vehiculo)?values.vehiculo:(values.vehiculo?'Otros':'');
   document.getElementById('mov-vehiculo-otro').value=vehiculosBase.includes(values.vehiculo)?'':(values.vehiculo||'');
   toggleOtroVehiculo();
@@ -3532,49 +3494,33 @@ function openMovimientoModal(id=null){
   document.getElementById('mov-patio').value=patiosBase.includes(values.patioRecepcion)?values.patioRecepcion:(values.patioRecepcion?'Otros':'');
   document.getElementById('mov-patio-otro').value=patiosBase.includes(values.patioRecepcion)?'':(values.patioRecepcion||'');
   toggleOtroPatio();
-  document.getElementById('mov-empresa').value=values.empresa||'';
-  document.getElementById('mov-peso').value=values.peso||'';
+  document.getElementById('mov-empresa').value=values.empresa;
+  document.getElementById('mov-peso').value=values.peso;
   document.getElementById('mov-procedencia').value=values.procedencia||'';
   const gerenciaNormalizada=normalizeGerenciaPatio(values.gerencia);
   document.getElementById('mov-gerencia').value=GERENCIAS_PATIO.includes(gerenciaNormalizada)?gerenciaNormalizada:'';
-  document.getElementById('mov-inicio').value=values.inicio||currentTime;
-  document.getElementById('mov-fin').value=values.fin||'';
-  const area=inferAreaOcupabilidad(values);
-  document.getElementById('mov-area-ocupabilidad').value=area?.id||'';
-  updateMovimientoModeUI();
+  document.getElementById('mov-inicio').value=values.inicio;
+  document.getElementById('mov-fin').value=values.fin;
   openModal('modal-movimiento');
 }
-function toggleOtroPatio(){const select=document.getElementById('mov-patio'),group=document.getElementById('mov-patio-otro-group');if(group)group.style.display=select?.value==='Otros'?'block':'none';}
-function toggleOtroVehiculo(){const select=document.getElementById('mov-vehiculo'),group=document.getElementById('mov-vehiculo-otro-group');if(group)group.style.display=select?.value==='Otros'?'block':'none';}
-function autoSelectOcupabilidadArea(force=false){
-  const select=document.getElementById('mov-area-ocupabilidad');if(!select)return;
-  if(select.value&&!force){updateMovimientoImpactPreview();return;}
-  const candidate=inferAreaOcupabilidad({descripcion:document.getElementById('mov-descripcion')?.value||'',tipoResiduo:document.getElementById('mov-residuo')?.value||'',subclase:document.getElementById('mov-subclase')?.value||''});
-  if(candidate)select.value=candidate.id;
-  updateMovimientoImpactPreview();
+
+function toggleOtroPatio(){
+  const select=document.getElementById('mov-patio');
+  const group=document.getElementById('mov-patio-otro-group');
+  if(group) group.style.display=select?.value==='Otros'?'block':'none';
 }
-function updateMovimientoModeUI(){
-  const tipo=normalizeMovimientoMaterial(document.getElementById('mov-tipo-movimiento')?.value),id=document.getElementById('mov-id')?.value;
-  const modalTitle=document.getElementById('mov-modal-title'),saveBtn=document.getElementById('btn-save-movimiento');
-  if(modalTitle)modalTitle.textContent=id?`Editar ${tipo==='ingreso'?'ingreso':'evacuación'} de material`:`Registrar ${tipo==='ingreso'?'ingreso':'evacuación'} de material`;
-  if(saveBtn)saveBtn.textContent=id?'Guardar cambios':tipo==='ingreso'?'Guardar ingreso':'Guardar evacuación';
-  updateMovimientoImpactPreview();
-}
-function updateMovimientoImpactPreview(){
-  const box=document.getElementById('mov-ocupabilidad-calc');if(!box)return;
-  const tipo=normalizeMovimientoMaterial(document.getElementById('mov-tipo-movimiento')?.value),area=getOccAreaById(document.getElementById('mov-area-ocupabilidad')?.value),tn=Number(document.getElementById('mov-peso')?.value||0);
-  box.classList.toggle('out',tipo==='evacuacion');
-  if(!area||!Number.isFinite(tn)||tn<=0){box.textContent='Selecciona el área e ingresa las toneladas para calcular el impacto.';return;}
-  const m2=tn/area.factor;
-  box.innerHTML=`La ${tipo==='ingreso'?'ocupación aumentará':'ocupación se reducirá'} aproximadamente <strong>${m2.toFixed(2)} m²</strong> en <strong>${escapeHtml(area.short)}</strong> (${area.factor.toFixed(2)} tn/m²).`;
+
+function toggleOtroVehiculo(){
+  const select=document.getElementById('mov-vehiculo');
+  const group=document.getElementById('mov-vehiculo-otro-group');
+  if(group) group.style.display=select?.value==='Otros'?'block':'none';
 }
 
 async function saveMovimiento(){
   if(!canEditPatios()) return;
   const m={
     fecha:document.getElementById('mov-fecha').value,
-    movimiento:normalizeMovimientoMaterial(document.getElementById('mov-tipo-movimiento').value),
-    areaOcupabilidad:document.getElementById('mov-area-ocupabilidad').value,
+    movimiento:'ingreso',
     subclase:document.getElementById('mov-subclase').value,
     clase:document.getElementById('mov-clase').value,
     tipoResiduo:document.getElementById('mov-residuo').value,
@@ -3590,112 +3536,207 @@ async function saveMovimiento(){
     fin:document.getElementById('mov-fin').value,
     registradoPor:APP.user.login
   };
-  if(!m.fecha||!m.areaOcupabilidad||!m.subclase||!m.clase||!m.tipoResiduo||!m.descripcion||!m.vehiculo||!m.placa||!m.patioRecepcion||!m.empresa||!m.peso||!m.procedencia||!m.gerencia||!m.inicio){showToast('Completa todos los campos obligatorios del movimiento','error');return;}
+  if(!m.fecha||!m.subclase||!m.clase||!m.tipoResiduo||!m.descripcion||!m.vehiculo||!m.placa||!m.patioRecepcion||!m.empresa||!m.peso||!m.procedencia||!m.gerencia||!m.inicio){showToast('Completa todos los campos obligatorios del ingreso','error');return;}
   if(m.peso<=0){showToast('El peso debe ser mayor que cero','error');return;}
   const id=document.getElementById('mov-id').value;
-  const runQuery=payload=>id?db.from('movimientos_material').update(payload).eq('id',id):db.from('movimientos_material').insert([payload]);
-  const row=appMovimientoToDb(m);
-  let {error}=await runQuery(row),fallback=false;
-  if(error&&/area_ocupabilidad|schema cache|column/i.test(error.message||'')){const legacy={...row};delete legacy.area_ocupabilidad;({error}=await runQuery(legacy));fallback=!error;}
+  const query=id?db.from('movimientos_material').update(appMovimientoToDb(m)).eq('id',id):db.from('movimientos_material').insert([appMovimientoToDb(m)]);
+  const {error}=await query;
   if(error){console.error(error);showToast('Error al guardar: '+(error.message||'revisa columnas y políticas de Supabase'),'error');return;}
-  closeModal('modal-movimiento');await loadAllData();
-  if(fallback)showToast('Movimiento guardado. Ejecuta el SQL v26 para almacenar el área seleccionada permanentemente.','warning');
-  else showToast(id?'Movimiento actualizado':m.movimiento==='ingreso'?'Ingreso registrado':'Evacuación registrada y ocupabilidad actualizada','success');
+  closeModal('modal-movimiento'); await loadAllData(); showToast(id?'Ingreso actualizado':'Ingreso registrado. Cuando el vehículo se retire, pulsa “Marcar salida”.','success'); syncMovimientosToDrive({silent:true});
 }
+
 async function marcarSalidaVehiculo(id){
   if(!canEditPatios()) return;
-  const m=APP.data.movimientos.find(x=>x.id===id);if(!m){showToast('No se encontró el movimiento seleccionado','error');return;}
+  const m=APP.data.movimientos.find(x=>x.id===id);
+  if(!m){showToast('No se encontró el ingreso seleccionado','error');return;}
   if(m.fin){showToast('Este vehículo ya tiene una hora de salida registrada','warning');return;}
   const hora=new Date().toTimeString().slice(0,5);
   if(!confirm(`¿Registrar la salida del vehículo ${m.vehiculo}, placa ${m.placa||'sin placa'}, a las ${hora}?`)) return;
   const {error}=await db.from('movimientos_material').update({hora_fin:hora}).eq('id',id);
   if(error){console.error(error);showToast('No se pudo registrar la salida','error');return;}
-  await loadAllData();showToast(`Salida del vehículo registrada a las ${hora}`,'success');
+  await loadAllData();
+  showToast(`Salida registrada a las ${hora}`,'success');
+  syncMovimientosToDrive({silent:true});
 }
+
 async function deleteMovimiento(id){
   if(APP.user?.role!=='admin'){showToast('Solo administración puede eliminar registros','warning');return;}
-  if(!confirm('¿Eliminar este movimiento? La ocupabilidad será recalculada.'))return;
+  if(!confirm('¿Eliminar este ingreso?'))return;
   const {error}=await db.from('movimientos_material').delete().eq('id',id);
-  if(error){console.error(error);showToast('Error al eliminar','error');return;}
-  await loadAllData();showToast('Movimiento eliminado y ocupabilidad recalculada','warning');
+  if(error){console.error(error);showToast('Error al eliminar','error');return;} await loadAllData(); showToast('Ingreso eliminado','warning'); syncMovimientosToDrive({silent:true});
 }
 function getPatioFilteredData(){
-  const d=document.getElementById('patio-desde')?.value||'',h=document.getElementById('patio-hasta')?.value||'',mov=document.getElementById('patio-movimiento-filtro')?.value||'',t=document.getElementById('patio-tipo-mov')?.value||'',s=document.getElementById('patio-subclase')?.value||'',g=document.getElementById('patio-gerencia')?.value||'',p=document.getElementById('patio-recepcion-filtro')?.value||'';
-  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!mov||normalizeMovimientoMaterial(m.movimiento)===mov)&&(!t||(t==='en_patio'?!m.fin:!!m.fin))&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
+  const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', t=document.getElementById('patio-tipo-mov')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'', p=document.getElementById('patio-recepcion-filtro')?.value||'';
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||(t==='en_patio'?!m.fin:!!m.fin))&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
 }
 function getPatioChartData(){
-  const d=document.getElementById('patio-desde')?.value||'',h=document.getElementById('patio-hasta')?.value||'',mov=document.getElementById('patio-movimiento-filtro')?.value||'',s=document.getElementById('patio-subclase')?.value||'',g=document.getElementById('patio-gerencia')?.value||'',p=document.getElementById('patio-recepcion-filtro')?.value||'';
-  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!mov||normalizeMovimientoMaterial(m.movimiento)===mov)&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
+  const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'', p=document.getElementById('patio-recepcion-filtro')?.value||'';
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
 }
 function renderPatios(){
-  const data=getPatioFilteredData(),editable=canEditPatios();
-  const btn=document.getElementById('btn-nuevo-movimiento');if(btn)btn.style.display=editable?'inline-flex':'none';
-  const note=document.getElementById('patio-readonly-note');if(note)note.style.display=editable?'none':'block';
-  const ingresos=data.filter(m=>normalizeMovimientoMaterial(m.movimiento)==='ingreso'),evacuaciones=data.filter(m=>normalizeMovimientoMaterial(m.movimiento)==='evacuacion'),enPatio=data.filter(m=>!m.fin);
-  document.getElementById('patio-kpi-ingresos').textContent=ingresos.length;
-  document.getElementById('patio-kpi-evacuaciones').textContent=evacuaciones.length;
-  document.getElementById('patio-kpi-tn-in').textContent=ingresos.reduce((a,m)=>a+m.peso,0).toFixed(2);
-  document.getElementById('patio-kpi-tn-out').textContent=evacuaciones.reduce((a,m)=>a+m.peso,0).toFixed(2);
+  const data=getPatioFilteredData(); const editable=canEditPatios();
+  const btn=document.getElementById('btn-nuevo-movimiento'); if(btn) btn.style.display=editable?'inline-flex':'none';
+  const note=document.getElementById('patio-readonly-note'); if(note) note.style.display=editable?'none':'block';
+  const salidas=data.filter(m=>!!m.fin), enPatio=data.filter(m=>!m.fin);
+  const tnIn=data.reduce((a,m)=>a+m.peso,0);
+  document.getElementById('patio-kpi-ingresos').textContent=data.length;
+  document.getElementById('patio-kpi-salidas').textContent=salidas.length;
+  document.getElementById('patio-kpi-tn-in').textContent=tnIn.toFixed(2);
   document.getElementById('patio-kpi-balance').textContent=enPatio.length;
   const tbody=document.getElementById('tbody-movimientos');
   tbody.innerHTML=data.length?data.map(m=>{
-    const tipo=normalizeMovimientoMaterial(m.movimiento),estado=m.fin?'<span class="badge badge-done">Salió</span>':'<span class="badge badge-pending">En patio</span>',movBadge=tipo==='ingreso'?'<span class="badge mov-ingreso">Ingreso</span>':'<span class="badge mov-salida">Evacuación</span>',area=inferAreaOcupabilidad(m),m2=getMovimientoImpactoM2(m),impact=`<strong style="color:${tipo==='ingreso'?'var(--success)':'var(--warning)'}">${tipo==='ingreso'?'+':'−'}${m2.toFixed(2)}</strong>`,salidaBtn=editable&&!m.fin?`<button class="btn btn-success btn-sm" onclick="marcarSalidaVehiculo(${m.id})">✓ Marcar salida</button>`:'';
-    return `<tr><td>${formatDate(m.fecha)}</td><td>${movBadge}</td><td>${estado}</td><td><strong>${escapeHtml(area?.short||'Sin clasificar')}</strong></td><td>${impact}</td><td><strong>${escapeHtml(m.patioRecepcion||'—')}</strong></td><td><strong>${escapeHtml(m.placa||'—')}</strong></td><td>${escapeHtml(m.subclase)}</td><td>${escapeHtml(m.clase)}</td><td>${escapeHtml(m.tipoResiduo)}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${escapeHtml(m.vehiculo)}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${escapeHtml(m.gerencia)}</td><td>${m.inicio||'—'}</td><td>${m.fin||'<span style="color:var(--warning);font-weight:700">Pendiente</span>'}</td><td>${escapeHtml(m.registradoPor||'—')}</td><td style="white-space:nowrap;display:flex;gap:6px;flex-wrap:wrap">${salidaBtn}${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?`<button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`;
-  }).join(''):`<tr><td colspan="20" style="text-align:center;padding:32px;color:var(--text-m)">No hay movimientos para los filtros seleccionados</td></tr>`;
+    const estado=m.fin?'<span class="badge badge-done">Salió</span>':'<span class="badge badge-pending">En patio</span>';
+    const salidaBtn=editable&&!m.fin?`<button class="btn btn-success btn-sm" onclick="marcarSalidaVehiculo(${m.id})">✓ Marcar salida</button>`:'';
+    return `<tr><td>${formatDate(m.fecha)}</td><td>${estado}</td><td><strong>${escapeHtml(m.patioRecepcion||'—')}</strong></td><td><strong>${escapeHtml(m.placa||'—')}</strong></td><td>${m.subclase}</td><td>${m.clase}</td><td>${m.tipoResiduo}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${m.vehiculo}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${m.gerencia}</td><td>${m.inicio||'—'}</td><td>${m.fin||'<span style="color:var(--warning);font-weight:700">Pendiente</span>'}</td><td>${m.registradoPor||'—'}</td><td style="white-space:nowrap;display:flex;gap:6px;flex-wrap:wrap">${salidaBtn}${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?`<button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`;
+  }).join(''):`<tr><td colspan="17" style="text-align:center;padding:32px;color:var(--text-m)">No hay vehículos para los filtros seleccionados</td></tr>`;
   renderPatioCharts(getPatioChartData());
 }
 function renderPatioCharts(data){
-  const ingresos=data.filter(m=>normalizeMovimientoMaterial(m.movimiento)==='ingreso'),evacuaciones=data.filter(m=>normalizeMovimientoMaterial(m.movimiento)==='evacuacion');
-  const byResiduo={Pesado:0,Liviano:0};ingresos.forEach(m=>byResiduo[m.tipoResiduo]=(byResiduo[m.tipoResiduo]||0)+m.peso);
+  const ingresos=data;
+  const byResiduo={Pesado:0,Liviano:0}; ingresos.forEach(m=>byResiduo[m.tipoResiduo]=(byResiduo[m.tipoResiduo]||0)+m.peso);
   if(patioPieChart)patioPieChart.destroy();
   patioPieChart=new Chart(document.getElementById('chart-patio-residuo'),{type:'doughnut',data:{labels:Object.keys(byResiduo),datasets:[{data:Object.values(byResiduo),backgroundColor:['#1a5c2a','#69f0ae'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>`${c.label}: ${Number(c.raw).toFixed(2)} tn`}}}}});
-  const days=[...new Set(data.map(m=>m.fecha))].sort(),inByDay={},outByDay={};ingresos.forEach(m=>inByDay[m.fecha]=(inByDay[m.fecha]||0)+m.peso);evacuaciones.forEach(m=>outByDay[m.fecha]=(outByDay[m.fecha]||0)+m.peso);
+  const byDay={}; ingresos.forEach(m=>byDay[m.fecha]=(byDay[m.fecha]||0)+m.peso); const days=Object.keys(byDay).sort();
   if(patioBarChart)patioBarChart.destroy();
-  patioBarChart=new Chart(document.getElementById('chart-patio-ingresos'),{type:'bar',data:{labels:days.map(formatDate),datasets:[{label:'Ingresos (tn)',data:days.map(d=>inByDay[d]||0),backgroundColor:'#2e7d32',borderRadius:5},{label:'Evacuaciones (tn)',data:days.map(d=>outByDay[d]||0),backgroundColor:'#f57f17',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'Toneladas'}}},plugins:{legend:{position:'bottom'}}}});
-  const byGer={};ingresos.forEach(m=>byGer[m.gerencia]=(byGer[m.gerencia]||0)+m.peso);const arr=Object.entries(byGer).sort((a,b)=>b[1]-a[1]),max=arr[0]?.[1]||1;
-  document.getElementById('chart-patio-gerencia').innerHTML=arr.length?arr.map(([g,v])=>`<div class="pyramid-row" style="width:${Math.max(30,(v/max)*96)}%" title="${v.toFixed(3)} tn">${escapeHtml(g)}: ${v.toFixed(2)} tn</div>`).join(''):'<div class="wa-empty">Sin datos para mostrar</div>';
+  patioBarChart=new Chart(document.getElementById('chart-patio-ingresos'),{type:'bar',data:{labels:days.map(formatDate),datasets:[{label:'Toneladas',data:days.map(d=>byDay[d]),backgroundColor:'#2e7d32',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,title:{display:true,text:'Toneladas'}}},plugins:{legend:{display:false}}}});
+  const byGer={}; ingresos.forEach(m=>byGer[m.gerencia]=(byGer[m.gerencia]||0)+m.peso); const arr=Object.entries(byGer).sort((a,b)=>b[1]-a[1]); const max=arr[0]?.[1]||1;
+  document.getElementById('chart-patio-gerencia').innerHTML=arr.length?arr.map(([g,v])=>`<div class="pyramid-row" style="width:${Math.max(30,(v/max)*96)}%" title="${v.toFixed(3)} tn">${g}: ${v.toFixed(2)} tn</div>`).join(''):'<div class="wa-empty">Sin datos para mostrar</div>';
 }
-function clearPatioFilters(){['patio-desde','patio-hasta','patio-movimiento-filtro','patio-tipo-mov','patio-subclase','patio-gerencia','patio-recepcion-filtro'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderPatios();}
+function clearPatioFilters(){['patio-desde','patio-hasta','patio-tipo-mov','patio-subclase','patio-gerencia','patio-recepcion-filtro'].forEach(id=>document.getElementById(id).value='');renderPatios();}
 function exportMovimientosCSV(){
-  const data=getPatioFilteredData();if(!data.length){showToast('No hay datos para exportar','warning');return;}
-  const headers=['Fecha','Movimiento','Estado vehículo','Área ocupabilidad','Impacto m²','Patio','Placa','Subclase','Clase','Tipo residuo','Descripción','Vehículo','Empresa','Peso tn','Procedencia','Gerencia','Hora inicio','Hora fin','Registrado por'];
-  const rows=data.map(m=>{const tipo=normalizeMovimientoMaterial(m.movimiento),area=inferAreaOcupabilidad(m),m2=getMovimientoImpactoM2(m);return[m.fecha,tipo==='ingreso'?'Ingreso':'Evacuación',m.fin?'Salió':'En patio',area?.short||'',(tipo==='ingreso'?m2:-m2).toFixed(2),m.patioRecepcion,m.placa,m.subclase,m.clase,m.tipoResiduo,m.descripcion,m.vehiculo,m.empresa,m.peso,m.procedencia,m.gerencia,m.inicio,m.fin||'',m.registradoPor];});
-  const csv='\ufeff'+[headers,...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='movimientos_patios_ocupabilidad.csv';a.click();URL.revokeObjectURL(a.href);
+  const data=getPatioFilteredData(); if(!data.length){showToast('No hay datos para exportar','warning');return;}
+  const headers=['Fecha','Estado','Patio recepción','Placa','Subclase','Clase','Tipo residuo','Descripción','Vehículo','Empresa','Peso tn','Procedencia','Gerencia','Hora inicio','Hora fin','Registrado por'];
+  const rows=data.map(m=>[m.fecha,m.fin?'Salió':'En patio',m.patioRecepcion,m.placa,m.subclase,m.clase,m.tipoResiduo,m.descripcion,m.vehiculo,m.empresa,m.peso,m.procedencia,m.gerencia,m.inicio,m.fin||'',m.registradoPor]);
+  const csv='\ufeff'+[headers,...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n'); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='movimientos_patios.csv';a.click();URL.revokeObjectURL(a.href);
 }
+function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
+/* ===== OCUPABILIDAD ===== */
+let OCC_SELECTED_AREA_ID='rrmm_livianos';
+const OCC_BASE_DATE='2026-07-25';
+const OCC_LIMIT=0.40;
+const OCC_AREAS=[
+  {id:'tuberias_hdpe',name:'TUBERIAS HDPE',short:'Tuberías HDPE',totalM2:567.55,baseM2:299.25,factor:0.20},
+  {id:'rrmm_varios_op',name:'RRMM Varios  OP',short:'RRMM Varios OP',totalM2:251.69,baseM2:93.15,factor:0.75},
+  {id:'fajas',name:'FAJAS',short:'Fajas',totalM2:601.58,baseM2:323.75,factor:0.50},
+  {id:'linners_tub_op',name:'Linners y Tub OP',short:'Linners y Tub OP',totalM2:195.87,baseM2:88.88,factor:1.00},
+  {id:'rrmm_livianos',name:'RRMM Varios - Livianos',short:'Chatarra liviana',totalM2:1659.14,baseM2:780.27,factor:0.20},
+  {id:'comp_chancado',name:'Comp-Chancado Primario',short:'Comp. Chancado',totalM2:382.28,baseM2:206.91,factor:0.60},
+  {id:'coproductos',name:'COPRODUCTOS',short:'Coproductos',totalM2:111.70,baseM2:36.12,factor:0.50},
+  {id:'linners_2_3',name:'Linners tipo 2 y tipo 3',short:'Linners tipo 2 y 3',totalM2:336.50,baseM2:122.08,factor:1.00},
+  {id:'almacen_hdpe',name:'Almacen de tuberia HDPE',short:'Almacén HDPE',totalM2:907.46,baseM2:505.44,factor:0.20},
+  {id:'acopio_hdpe',name:'Acopio temporal HDPE',short:'Acopio temporal HDPE',totalM2:144.00,baseM2:72.00,factor:0.20},
+  {id:'jebes',name:'Jebes',short:'Jebes',totalM2:149.50,baseM2:51.75,factor:0.30}
+];
+
+function canEditOcupabilidad(){return APP.user&&['admin','controlador'].includes(APP.user.role);}
+function occNormalizeText(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+function getOccAreaById(id){return OCC_AREAS.find(a=>a.id===id)||null;}
+function inferOccAreaFromIngreso(m){
+  const t=occNormalizeText(`${m?.descripcion||''} ${m?.tipoResiduo||''} ${m?.subclase||''}`);
+  if(/liner.*(tipo\s*2|tipo\s*3)|tipo\s*2.*liner|tipo\s*3.*liner/.test(t))return getOccAreaById('linners_2_3');
+  if(/liner|linner|revestimiento/.test(t))return getOccAreaById('linners_tub_op');
+  if(/acopio.*hdpe/.test(t))return getOccAreaById('acopio_hdpe');
+  if(/almacen.*hdpe/.test(t))return getOccAreaById('almacen_hdpe');
+  if(/hdpe|tuberia.*polietileno|tubo.*polietileno/.test(t))return getOccAreaById('tuberias_hdpe');
+  if(/faja|correa transportadora/.test(t))return getOccAreaById('fajas');
+  if(/jebe|caucho|manguera|cono ciclon/.test(t))return getOccAreaById('jebes');
+  if(/chancado|chancador|crusher/.test(t))return getOccAreaById('comp_chancado');
+  if(/coproduct/.test(t))return getOccAreaById('coproductos');
+  if(/livian|baranda|escalera|anaquel|malla|calamina|locker|cama|estante|bandeja|perno|clavo|lata|estructura pequena|rejilla/.test(t))return getOccAreaById('rrmm_livianos');
+  return getOccAreaById(String(m?.tipoResiduo||'').toLowerCase().includes('livian')?'rrmm_livianos':'rrmm_varios_op');
+}
+function getOccStatus(pct){
+  if(pct>OCC_LIMIT)return{key:'critical',label:'Sobre el límite'};
+  if(pct>=0.35)return{key:'alert',label:'Próximo al límite'};
+  return{key:'ok',label:'Dentro del límite'};
+}
 function calculateOcupabilidad(){
-  const result=OCC_AREAS.map(area=>({...area,occupiedM2:area.baseM2,tnIn:0,tnOut:0,m2In:0,m2Out:0,movements:[]})),byId=Object.fromEntries(result.map(x=>[x.id,x])),recordedEvacByDateArea={};
+  const result=OCC_AREAS.map(a=>({...a,occupiedM2:a.baseM2,tnIn:0,tnOut:0,m2In:0,m2Out:0,movements:[]})),byId=Object.fromEntries(result.map(a=>[a.id,a]));
   (APP.data.movimientos||[]).forEach(m=>{
     if(String(m.patioRecepcion||'')!=='4388'||!m.fecha||m.fecha<=OCC_BASE_DATE)return;
-    const area=inferAreaOcupabilidad(m);if(!area||!byId[area.id])return;
-    const type=normalizeMovimientoMaterial(m.movimiento),tn=Number(m.peso||0);if(!Number.isFinite(tn)||tn<=0)return;
+    if(String(m.movimiento||'ingreso').toLowerCase()!=='ingreso')return;
+    const area=inferOccAreaFromIngreso(m),tn=Number(m.peso||0);
+    if(!area||!Number.isFinite(tn)||tn<=0)return;
     const m2=tn/area.factor,item=byId[area.id];
-    if(type==='ingreso'){item.tnIn+=tn;item.m2In+=m2;item.occupiedM2+=m2;}
-    else{item.tnOut+=tn;item.m2Out+=m2;item.occupiedM2-=m2;const key=`${m.fecha}|${area.id}`;recordedEvacByDateArea[key]=(recordedEvacByDateArea[key]||0)+tn;}
-    item.movements.push({fecha:m.fecha,type,tn,m2,descripcion:m.descripcion||'',source:'Supabase'});
+    item.tnIn+=tn;item.m2In+=m2;item.occupiedM2+=m2;
+    item.movements.push({fecha:m.fecha,type:'ingreso',tn,m2,descripcion:m.descripcion||'Ingreso de Control de patios',source:'Control de patios'});
   });
-  OCC_HISTORICAL_EVACUATIONS.forEach(seed=>{
-    const item=byId[seed.areaId];if(!item)return;
-    const key=`${seed.fecha}|${seed.areaId}`,already=recordedEvacByDateArea[key]||0,pending=Math.max(0,seed.tn-already);if(pending<=0.001)return;
-    const m2=pending/item.factor;item.tnOut+=pending;item.m2Out+=m2;item.occupiedM2-=m2;item.movements.push({fecha:seed.fecha,type:'evacuacion',tn:pending,m2,descripcion:seed.descripcion,source:'Evacuación inicial'});
+  (APP.data.ocupabilidadEvacuaciones||[]).forEach(e=>{
+    if(!e.fecha||e.fecha<=OCC_BASE_DATE)return;
+    const item=byId[e.areaId],tn=Number(e.toneladas||0);
+    if(!item||!Number.isFinite(tn)||tn<=0)return;
+    const m2=tn/item.factor;
+    item.tnOut+=tn;item.m2Out+=m2;item.occupiedM2-=m2;
+    item.movements.push({fecha:e.fecha,type:'evacuacion',tn,m2,descripcion:e.descripcion||'Evacuación',source:'Ocupabilidad'});
   });
-  result.forEach(item=>{item.occupiedM2=Math.max(0,item.occupiedM2);item.pct=item.totalM2?item.occupiedM2/item.totalM2:0;item.netM2=item.occupiedM2-item.baseM2;item.availableM2=Math.max(0,item.totalM2-item.occupiedM2);item.limitM2=item.totalM2*OCC_LIMIT;item.marginToLimit=item.limitM2-item.occupiedM2;item.status=getOccStatus(item.pct);item.movements.sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));});
+  result.forEach(item=>{
+    item.occupiedM2=Math.max(0,item.occupiedM2);
+    item.pct=item.totalM2?item.occupiedM2/item.totalM2:0;
+    item.netM2=item.occupiedM2-item.baseM2;
+    item.limitM2=item.totalM2*OCC_LIMIT;
+    item.marginToLimit=item.limitM2-item.occupiedM2;
+    item.status=getOccStatus(item.pct);
+    item.movements.sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
+  });
   return result;
 }
 function renderOcupabilidad(){
-  const data=calculateOcupabilidad(),totalArea=data.reduce((a,x)=>a+x.totalM2,0),totalOccupied=data.reduce((a,x)=>a+x.occupiedM2,0),totalBase=data.reduce((a,x)=>a+x.baseM2,0),pct=totalArea?totalOccupied/totalArea:0,critical=data.filter(x=>x.pct>OCC_LIMIT).length,net=totalOccupied-totalBase,set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
-  set('occ-kpi-total',(pct*100).toFixed(1)+'%');set('occ-kpi-m2',totalOccupied.toFixed(1));set('occ-kpi-critical',critical);set('occ-kpi-net',(net>=0?'+':'')+net.toFixed(1));set('occ-last-update','Actualizado '+new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}));
-  const registerBtn=document.getElementById('btn-ocupabilidad-mov');if(registerBtn)registerBtn.style.display=canEditPatios()?'inline-flex':'none';
-  document.querySelectorAll('.occ-zone').forEach(zone=>{const item=data.find(x=>x.id===zone.dataset.areaId);if(!item)return;zone.classList.remove('status-ok','status-alert','status-critical','selected');zone.classList.add('status-'+item.status.key);if(item.id===OCC_SELECTED_AREA_ID)zone.classList.add('selected');zone.setAttribute('aria-label',`${item.short}: ${(item.pct*100).toFixed(1)}% de ocupabilidad`);const pctEl=document.getElementById('occ-map-pct-'+item.id);if(pctEl)pctEl.textContent=(item.pct*100).toFixed(1)+'%';});
-  const grid=document.getElementById('occ-area-grid');if(grid)grid.innerHTML=[...data].sort((a,b)=>b.pct-a.pct).map(item=>`<div class="occ-area-card ${item.id===OCC_SELECTED_AREA_ID?'active':''}" data-occ-card="${item.id}" onclick="selectOcupabilidadArea('${item.id}')"><div class="occ-area-top"><div class="occ-area-name">${escapeHtml(item.short)}</div><div class="occ-area-percent" style="color:${item.status.key==='critical'?'var(--danger)':item.status.key==='alert'?'var(--warning)':'var(--success)'}">${(item.pct*100).toFixed(1)}%</div></div><div class="occ-area-progress"><span style="width:${Math.min(100,item.pct*100)}%;background:${item.status.key==='critical'?'var(--danger)':item.status.key==='alert'?'var(--warning)':'var(--success)'}"></span></div><div class="occ-area-meta"><span>${item.occupiedM2.toFixed(1)} / ${item.totalM2.toFixed(1)} m²</span><span>${item.status.label}</span></div></div>`).join('');
-  renderOcupabilidadDetail(data);
+  const data=calculateOcupabilidad(),totalArea=data.reduce((s,a)=>s+a.totalM2,0),occupied=data.reduce((s,a)=>s+a.occupiedM2,0),base=data.reduce((s,a)=>s+a.baseM2,0),pct=totalArea?occupied/totalArea:0,critical=data.filter(a=>a.pct>OCC_LIMIT).length,net=occupied-base;
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  set('occ-kpi-total',(pct*100).toFixed(1)+'%');set('occ-kpi-m2',occupied.toFixed(1));set('occ-kpi-critical',critical);set('occ-kpi-net',(net>=0?'+':'')+net.toFixed(1));set('occ-last-update','Actualizado '+new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}));
+  const btn=document.getElementById('btn-nueva-evacuacion');if(btn)btn.style.display=canEditOcupabilidad()?'inline-flex':'none';
+  document.querySelectorAll('.occ-zone').forEach(zone=>{
+    const item=data.find(a=>a.id===zone.dataset.areaId);if(!item)return;
+    zone.classList.remove('status-ok','status-alert','status-critical','selected');zone.classList.add('status-'+item.status.key);if(item.id===OCC_SELECTED_AREA_ID)zone.classList.add('selected');
+    const pctEl=document.getElementById('occ-map-pct-'+item.id);if(pctEl)pctEl.textContent=(item.pct*100).toFixed(1)+'%';
+  });
+  const grid=document.getElementById('occ-area-grid');
+  if(grid)grid.innerHTML=[...data].sort((a,b)=>b.pct-a.pct).map(item=>`<div class="occ-area-card ${item.id===OCC_SELECTED_AREA_ID?'active':''}" onclick="selectOcupabilidadArea('${item.id}')"><div class="occ-area-top"><div class="occ-area-name">${escapeHtml(item.short)}</div><div class="occ-area-percent" style="color:${item.status.key==='critical'?'var(--danger)':item.status.key==='alert'?'var(--warning)':'var(--success)'}">${(item.pct*100).toFixed(1)}%</div></div><div class="occ-area-progress"><span style="width:${Math.min(100,item.pct*100)}%;background:${item.status.key==='critical'?'var(--danger)':item.status.key==='alert'?'var(--warning)':'var(--success)'}"></span></div><div class="occ-area-meta"><span>${item.occupiedM2.toFixed(1)} / ${item.totalM2.toFixed(1)} m²</span><span>${item.status.label}</span></div></div>`).join('');
+  renderOccDetail(data);
+  renderOcupabilidadEvacuaciones();
 }
 function selectOcupabilidadArea(id){if(!getOccAreaById(id))return;OCC_SELECTED_AREA_ID=id;renderOcupabilidad();}
-function renderOcupabilidadDetail(data){
-  const item=data.find(x=>x.id===OCC_SELECTED_AREA_ID)||data[0];if(!item)return;
-  const box=document.getElementById('occ-selected-detail');if(!box)return;
-  const marginLabel=item.marginToLimit>=0?'Margen hasta 40%':'Exceso sobre 40%',marginValue=Math.abs(item.marginToLimit),movementHtml=item.movements.length?item.movements.slice(0,8).map(m=>`<div class="occ-movement ${m.type}"><div>${formatDate(m.fecha)}</div><div><strong>${m.type==='ingreso'?'Ingreso':'Evacuación'} · ${m.tn.toFixed(2)} tn</strong><small>${escapeHtml(m.descripcion||m.source)}</small></div><div style="font-weight:900;color:${m.type==='ingreso'?'var(--success)':'var(--warning)'}">${m.type==='ingreso'?'+':'−'}${m.m2.toFixed(2)} m²</div></div>`).join(''):'<div class="wa-empty">Sin movimientos posteriores al área base.</div>';
-  box.innerHTML=`<div class="occ-detail-head"><div><div class="card-title">${escapeHtml(item.short)}</div><div class="card-subtitle">Factor: ${item.factor.toFixed(2)} tn/m²</div></div><span class="occ-status-pill ${item.status.key}">${item.status.label}</span></div><div style="font-size:34px;font-weight:900;color:var(--navy);margin-top:12px">${(item.pct*100).toFixed(1)}%</div><div class="occ-meter"><span class="${item.status.key}" style="width:${Math.min(100,item.pct*100)}%"></span></div><div class="occ-meter-labels"><span>0%</span><span>Límite 40%</span><span>100%</span></div><div class="occ-detail-grid"><div class="occ-detail-metric"><span>Área base</span><strong>${item.baseM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área actual</span><strong>${item.occupiedM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Ingresos</span><strong style="color:var(--success)">+${item.m2In.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Evacuaciones</span><strong style="color:var(--warning)">−${item.m2Out.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>${marginLabel}</span><strong style="color:${item.marginToLimit>=0?'var(--success)':'var(--danger)'}">${marginValue.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área total</span><strong>${item.totalM2.toFixed(2)} m²</strong></div></div><div class="card-title" style="font-size:12px;margin-top:16px">Últimos movimientos del área</div><div class="occ-movement-list">${movementHtml}</div>`;
+function renderOccDetail(data){
+  const item=data.find(a=>a.id===OCC_SELECTED_AREA_ID)||data[0],box=document.getElementById('occ-selected-detail');if(!item||!box)return;
+  const marginLabel=item.marginToLimit>=0?'Margen hasta 40%':'Exceso sobre 40%',margin=Math.abs(item.marginToLimit);
+  const movements=item.movements.length?item.movements.slice(0,10).map(m=>`<div class="occ-movement ${m.type}"><div>${formatDate(m.fecha)}</div><div><strong>${m.type==='ingreso'?'Ingreso':'Evacuación'} · ${m.tn.toFixed(2)} tn</strong><small>${escapeHtml(m.descripcion)} · ${escapeHtml(m.source)}</small></div><div style="font-weight:900;color:${m.type==='ingreso'?'var(--success)':'var(--warning)'}">${m.type==='ingreso'?'+':'−'}${m.m2.toFixed(2)} m²</div></div>`).join(''):'<div class="wa-empty">Sin movimientos posteriores al 25/07/2026.</div>';
+  box.innerHTML=`<div class="occ-detail-head"><div><div class="card-title">${escapeHtml(item.short)}</div><div class="card-subtitle">Factor: ${item.factor.toFixed(2)} tn/m²</div></div><span class="occ-status-pill ${item.status.key}">${item.status.label}</span></div><div style="font-size:34px;font-weight:900;color:var(--navy);margin-top:12px">${(item.pct*100).toFixed(1)}%</div><div class="occ-meter"><span class="${item.status.key}" style="width:${Math.min(100,item.pct*100)}%"></span></div><div class="occ-meter-labels"><span>0%</span><span>Límite 40%</span><span>100%</span></div><div class="occ-detail-grid"><div class="occ-detail-metric"><span>Área base</span><strong>${item.baseM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área actual</span><strong>${item.occupiedM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Ingresos</span><strong style="color:var(--success)">+${item.m2In.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Evacuaciones</span><strong style="color:var(--warning)">−${item.m2Out.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>${marginLabel}</span><strong style="color:${item.marginToLimit>=0?'var(--success)':'var(--danger)'}">${margin.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área total</span><strong>${item.totalM2.toFixed(2)} m²</strong></div></div><div class="card-title" style="font-size:12px;margin-top:16px">Movimientos considerados</div><div class="occ-movement-list">${movements}</div>`;
+}
+function openEvacuacionModal(id=null){
+  if(!canEditOcupabilidad()){showToast('Tu usuario tiene permiso solo de visualización','warning');return;}
+  const e=id?APP.data.ocupabilidadEvacuaciones.find(x=>x.id===id):null;
+  document.getElementById('occ-evac-id').value=id||'';
+  document.getElementById('occ-evac-modal-title').textContent=id?'Editar evacuación':'Registrar evacuación';
+  document.getElementById('occ-evac-fecha').value=e?.fecha||new Date().toISOString().split('T')[0];
+  document.getElementById('occ-evac-area').value=e?.areaId||OCC_SELECTED_AREA_ID||'';
+  document.getElementById('occ-evac-descripcion').value=e?.descripcion||'';
+  document.getElementById('occ-evac-toneladas').value=e?.toneladas||'';
+  document.getElementById('occ-evac-observacion').value=e?.observacion||'';
+  updateEvacuacionPreview();openModal('modal-ocupabilidad-evacuacion');
+}
+function updateEvacuacionPreview(){
+  const area=getOccAreaById(document.getElementById('occ-evac-area')?.value),tn=Number(document.getElementById('occ-evac-toneladas')?.value||0),box=document.getElementById('occ-evac-preview');if(!box)return;
+  if(!area||!Number.isFinite(tn)||tn<=0){box.textContent='Selecciona el área e ingresa las toneladas para calcular los m² liberados.';return;}
+  box.innerHTML=`La evacuación reducirá aproximadamente <strong>${(tn/area.factor).toFixed(2)} m²</strong> en <strong>${escapeHtml(area.short)}</strong>.`;
+}
+async function saveOcupabilidadEvacuacion(){
+  if(!canEditOcupabilidad())return;
+  const e={fecha:document.getElementById('occ-evac-fecha').value,areaId:document.getElementById('occ-evac-area').value,descripcion:document.getElementById('occ-evac-descripcion').value.trim(),toneladas:Number(document.getElementById('occ-evac-toneladas').value),observacion:document.getElementById('occ-evac-observacion').value.trim(),registradoPor:APP.user.login};
+  if(!e.fecha||!e.areaId||!e.descripcion||!e.toneladas||e.toneladas<=0){showToast('Completa fecha, área, descripción y toneladas','error');return;}
+  const id=document.getElementById('occ-evac-id').value;
+  const query=id?db.from('ocupabilidad_evacuaciones').update(appOcupabilidadEvacuacionToDb(e)).eq('id',id):db.from('ocupabilidad_evacuaciones').insert([appOcupabilidadEvacuacionToDb(e)]);
+  const {error}=await query;if(error){console.error(error);showToast('No se pudo guardar. Ejecuta el SQL de ocupabilidad en Supabase.','error');return;}
+  closeModal('modal-ocupabilidad-evacuacion');await loadAllData();showToast(id?'Evacuación actualizada':'Evacuación registrada y ocupabilidad actualizada','success');
+}
+async function deleteOcupabilidadEvacuacion(id){
+  if(!canEditOcupabilidad())return;if(!confirm('¿Eliminar esta evacuación? El área ocupada se recalculará.'))return;
+  const {error}=await db.from('ocupabilidad_evacuaciones').delete().eq('id',id);if(error){showToast('No se pudo eliminar','error');return;}await loadAllData();showToast('Evacuación eliminada','warning');
+}
+function renderOcupabilidadEvacuaciones(){
+  const tbody=document.getElementById('tbody-ocupabilidad-evacuaciones');if(!tbody)return;
+  const rows=[...(APP.data.ocupabilidadEvacuaciones||[])].sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))||Number(b.id)-Number(a.id));
+  tbody.innerHTML=rows.length?rows.map(e=>{const area=getOccAreaById(e.areaId),m2=area?e.toneladas/area.factor:0;return`<tr><td>${formatDate(e.fecha)}</td><td><strong>${escapeHtml(area?.short||e.areaId)}</strong></td><td>${escapeHtml(e.descripcion)}</td><td>${e.toneladas.toFixed(3)}</td><td><strong>${m2.toFixed(2)}</strong></td><td>${escapeHtml(e.registradoPor||'—')}</td><td style="white-space:nowrap">${canEditOcupabilidad()?`<button class="btn btn-outline btn-sm" onclick="openEvacuacionModal(${e.id})">Editar</button> <button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteOcupabilidadEvacuacion(${e.id})">×</button>`:'<span class="occ-table-badge">Solo lectura</span>'}</td></tr>`;}).join(''):`<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--text-m)">No hay evacuaciones registradas.</td></tr>`;
 }
 
 /* ===== RENDER USUARIOS ===== */
@@ -4695,7 +4736,7 @@ async function syncMovimientosToDrive(options={}){
   const payload={token:cfg.token,accion:'sincronizar',hoja:'Movimientos_material',actualizado_en:new Date().toISOString(),filas:rows.map(m=>({
     id:m.id,fecha:m.fecha,movimiento:m.movimiento,subclase:m.subclase,clase:m.clase,tipo_residuo:m.tipoResiduo,
     descripcion:m.descripcion,tipo_vehiculo:m.vehiculo,placa:m.placa,patio_recepcion:m.patioRecepcion,empresa:m.empresa,peso_tn:m.peso,procedencia:m.procedencia,
-    gerencia:m.gerencia,area_ocupabilidad:m.areaOcupabilidad||inferAreaOcupabilidad(m)?.id||'',hora_inicio:m.inicio,hora_fin:m.fin,registrado_por:m.registradoPor
+    gerencia:m.gerencia,hora_inicio:m.inicio,hora_fin:m.fin,registrado_por:m.registradoPor
   }))};
   try{
     await fetch(cfg.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
