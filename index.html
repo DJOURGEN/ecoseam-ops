@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- SEAMX BUILD v27: branding comercial, login visual, recordarme, edición de usuario y sincronización AppSheet/Google Sheets -->
+  <!-- SEAMX BUILD v29: interfaz depurada, sincronización vía Supabase y KPI HH limitado a 10 h por persona/día -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -907,7 +907,7 @@ img,canvas,svg,video{max-width:100%}
           <div class="stat-card accent">
             <div class="stat-label">Horas hombre del día</div>
             <div class="stat-value" id="kpi-hh">0</div>
-            <div class="stat-sub">Horas efectivas filtradas</div>
+            <div class="stat-sub">Máx. 10 h por persona/día</div>
           </div>
           <div class="stat-card success">
             <div class="stat-label">Cumplen meta de 10 h</div>
@@ -1164,7 +1164,7 @@ img,canvas,svg,video{max-width:100%}
             <div class="filters-spacer"></div>
             <button class="btn btn-outline btn-sm" onclick="clearPatioFilters()">Limpiar</button>
             <button class="btn btn-outline btn-sm" onclick="exportMovimientosCSV()">Exportar Excel</button>
-            <button class="btn btn-primary btn-sm" onclick="syncPatiosBidireccional()">Sincronizar Google Sheets</button>
+            <button class="btn btn-primary btn-sm" onclick="actualizarControlPatios()">↻ Actualizar datos</button>
           </div>
         </div>
 
@@ -1204,10 +1204,6 @@ img,canvas,svg,video{max-width:100%}
           </div>
         </div>
 
-        <div class="occ-source-note">
-          <div>ℹ️</div>
-          <div><strong>Control de patios no fue modificado.</strong> Esta pestaña lee los registros de ingreso existentes del Patio 4388, clasifica el material según su descripción y aplica las evacuaciones guardadas en el módulo de ocupabilidad.</div>
-        </div>
 
         <div class="occ-hero">
           <div>
@@ -1440,69 +1436,6 @@ img,canvas,svg,video{max-width:100%}
         </div>
       </div>
 
-      <!-- PAGE: REPORTES -->
-      <div id="view-reportes" style="display:none">
-        <div class="page-header">
-          <div>
-            <div class="page-title">Reportes y exportación</div>
-            <div class="page-subtitle">Integración Power BI y exportaciones</div>
-          </div>
-        </div>
-        <div class="grid-equal" style="margin-bottom:20px">
-          <div class="card">
-            <div class="card-header"><div class="card-title">🔗 Conexión Power BI</div></div>
-            <p style="font-size:14px;color:var(--text-s);margin-bottom:16px">Conecta este sistema con Microsoft Power BI usando el endpoint de datos:</p>
-            <div style="background:var(--surface-1);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:var(--navy);word-break:break-all;margin-bottom:16px">
-              GET /api/v1/ecoseam/actividades?format=json&desde=2024-01-01
-            </div>
-            <div class="alert alert-info">
-              <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M10 9v5M10 7h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              <div>En Power BI Desktop: <strong>Obtener datos → Web → JSON</strong> y pega la URL del endpoint.</div>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="showToast('Documentación de API copiada','success')">Copiar endpoint</button>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">📊 Exportar datos</div></div>
-            <p style="font-size:14px;color:var(--text-s);margin-bottom:16px">Descarga los datos en formato Excel para análisis externo:</p>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <button class="btn btn-outline" onclick="exportToCSV('actividades')">
-                📋 Exportar Actividades (CSV/Excel)
-              </button>
-              <button class="btn btn-outline" onclick="exportToCSV('restricciones')">
-                🚧 Exportar Restricciones (CSV/Excel)
-              </button>
-              <button class="btn btn-outline" onclick="exportToCSV('resumen')">
-                📈 Exportar Resumen Ejecutivo
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">🗄️ Arquitectura recomendada</div></div>
-          <div class="grid-3">
-            <div style="padding:16px;border-radius:10px;background:var(--surface-1);border:1.5px solid var(--border)">
-              <div style="font-size:20px;margin-bottom:8px">🥇</div>
-              <div style="font-weight:600;font-size:14px;margin-bottom:4px">PWA + Supabase</div>
-              <div style="font-size:13px;color:var(--text-s)">PostgreSQL gratis, API REST automática, Power BI connector nativo. <strong>Recomendado.</strong></div>
-              <div style="margin-top:8px"><span class="badge badge-done">✓ Costo bajo</span></div>
-            </div>
-            <div style="padding:16px;border-radius:10px;background:var(--surface-1);border:1.5px solid var(--border)">
-              <div style="font-size:20px;margin-bottom:8px">🥈</div>
-              <div style="font-weight:600;font-size:14px;margin-bottom:4px">Power Apps + SharePoint</div>
-              <div style="font-size:13px;color:var(--text-s)">Si ya tienen M365. Power BI integrado nativo. Sin código adicional.</div>
-              <div style="margin-top:8px"><span class="badge badge-observed">M365 requerido</span></div>
-            </div>
-            <div style="padding:16px;border-radius:10px;background:var(--surface-1);border:1.5px solid var(--border)">
-              <div style="font-size:20px;margin-bottom:8px">🥉</div>
-              <div style="font-weight:600;font-size:14px;margin-bottom:4px">PWA + SQL Server</div>
-              <div style="font-size:13px;color:var(--text-s)">Si ya tienen infraestructura SQL Server on-premise o en Azure.</div>
-              <div style="margin-top:8px"><span class="badge badge-pending">Infraestructura previa</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
       <!-- PAGE: PROGRAMACIÓN DIARIA -->
       <div id="view-programacion" style="display:none">
         <div class="page-header">
@@ -1601,7 +1534,7 @@ img,canvas,svg,video{max-width:100%}
         <div class="page-header">
           <div>
             <div class="page-title">Administración</div>
-            <div class="page-subtitle">Usuarios e integración de SEAMX</div>
+            <div class="page-subtitle">Gestión de usuarios</div>
           </div>
           <button class="btn btn-primary" onclick="openNewUsuarioModal()">+ Nuevo usuario</button>
         </div>
@@ -1616,42 +1549,6 @@ img,canvas,svg,video{max-width:100%}
           </div>
         </div>
 
-        <div class="card" style="margin-top:20px">
-          <div class="card-header" style="align-items:flex-start">
-            <div>
-              <div class="card-title">Google AppSheet / Google Sheets</div>
-              <div class="card-subtitle">Los registros creados en AppSheet pueden ingresar automáticamente a Control de patios de SEAMX.</div>
-            </div>
-            <span id="sheets-config-status" class="badge badge-process">Sin configurar</span>
-          </div>
-          <div class="form-group">
-            <label class="form-label">URL de la aplicación web de Apps Script</label>
-            <input class="form-control" id="sheets-sync-url" type="url" placeholder="https://script.google.com/macros/s/.../exec">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Token de conexión</label>
-              <input class="form-control" id="sheets-sync-token" type="password" placeholder="Token privado">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Hoja de Control de patios / AppSheet</label>
-              <input class="form-control" id="sheets-movements-sheet" type="text" value="Movimientos_material">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Hoja de Actividades (opcional)</label>
-            <input class="form-control" id="sheets-activities-sheet" type="text" value="Actividades">
-          </div>
-          <div class="alert alert-info" style="margin-bottom:14px">
-            <div>Una vez configurado, SEAMX revisará la hoja de Control de patios automáticamente cada 60 segundos y también al iniciar sesión. Para que la sincronización siga funcionando incluso con SEAMX cerrado, ejecuta una sola vez la función instalarSincronizacionAutomaticaSEAMX() dentro de Apps Script. Los registros se identifican con ID_EXTERNO para evitar duplicados.</div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-primary" onclick="saveGoogleSheetsSettings()">Guardar conexión</button>
-            <button class="btn btn-outline" onclick="syncMovimientosFromGoogleSheets()">↻ Probar importación de patios</button>
-            <button class="btn btn-outline" onclick="copyGoogleSheetsSql()">Copiar SQL de Supabase</button>
-            <button class="btn btn-outline" onclick="copyGoogleAppsScript()">Copiar Apps Script</button>
-          </div>
-        </div>
 </div>
 
     </div><!-- /content -->
@@ -2404,7 +2301,7 @@ function saveGoogleSheetsSettings(){
   if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(url)){showToast('Pega una URL válida de la aplicación web de Apps Script','error');return;}
   if(token.length<8){showToast('Usa un token de al menos 8 caracteres','error');return;}
   localStorage.setItem('ecoseam_sheets_url',url);localStorage.setItem('ecoseam_sheets_token',token);localStorage.setItem('ecoseam_sheets_activities_sheet',sheet);localStorage.setItem('seamx_sheets_movements_sheet',movementSheet);
-  loadGoogleSheetsSettingsUI();startGoogleSheetsAutoSync();showToast('Conexión con AppSheet / Google Sheets guardada','success');
+  loadGoogleSheetsSettingsUI();startGoogleSheetsAutoSync();startPatiosAutoRefresh();showToast('Conexión con AppSheet / Google Sheets guardada','success');
 }
 
 async function copySetupText(text,label){
@@ -3163,7 +3060,7 @@ async function doLogin() {
 
   await loadAllData();
   setupUI();
-  startGoogleSheetsAutoSync();
+  startPatiosAutoRefresh();
   navigateTo(APP.user.role === 'controlador' ? 'patios' : 'actividades');
 } 
 
@@ -3178,7 +3075,7 @@ function doLogout() {
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
   document.getElementById('login-error').style.display = 'none';
-  stopGoogleSheetsAutoSync();
+  stopGoogleSheetsAutoSync();stopPatiosAutoRefresh();
   loadRememberedCredentials();
 }
 
@@ -3213,7 +3110,7 @@ async function restoreSession(){
     document.getElementById('page-app').style.display='flex';
     await loadAllData();
     setupUI();
-    startGoogleSheetsAutoSync();
+    startPatiosAutoRefresh();
     const hashView=location.hash.replace(/^#/,'');
     const remembered=hashView||sessionStorage.getItem(SESSION_KEYS.view);
     const allowed=NAV_CONFIG[APP.user.role]||NAV_CONFIG.operador;
@@ -3237,15 +3134,14 @@ const NAV_CONFIG = {
     {id:'restricciones',label:'Restricciones',icon:'alert'},
     {id:'programacion',label:'Programación diaria',icon:'calendar'},
     {id:'seguridad',label:'Asistente seguridad',icon:'book'},
-    {id:'reportes',label:'Reportes',icon:'chart'},
     {id:'resumen',label:'Reporte de actividades',icon:'image'},
     {id:'admin',label:'Administración',icon:'user'},
   ],
   operador: ['actividades','ocupabilidad','seguridad'],
   controlador: ['actividades','patios','ocupabilidad','coproductos','seguridad'],
   supervisor: ['programacion','actividades','restricciones','patios','ocupabilidad','coproductos','seguridad','resumen'],
-  gerencia: ['actividades','restricciones','patios','ocupabilidad','coproductos','seguridad','reportes'],
-  admin: ['programacion','actividades','restricciones','patios','ocupabilidad','coproductos','seguridad','reportes','resumen','admin'],
+  gerencia: ['actividades','restricciones','patios','ocupabilidad','coproductos','seguridad'],
+  admin: ['programacion','actividades','restricciones','patios','ocupabilidad','coproductos','seguridad','resumen','admin'],
 };
 
 const ICONS = {
@@ -3270,7 +3166,6 @@ const VIEW_TITLES = {
   restricciones:'Restricciones operativas',
   programacion:'Programación diaria',
   seguridad:'Asistente de seguridad',
-  reportes:'Reportes y exportación',
   resumen:'Reporte de actividades',
   admin:'Administración',
 };
@@ -4293,13 +4188,14 @@ function updateDashboard() {
   toggleDashboardDateInputs();
   const { acts: todayActs, rests: todayRest, periodo, desde, hasta } = getDashboardFilteredData();
 
-  const hhTotal = todayActs.reduce((s,a)=>s+(a.calc.hh||0),0);
   const done = todayActs.filter(a=>a.estado==='finalizado').length;
   const pend = todayActs.filter(a=>a.estado==='pendiente').length;
   const horasLost = todayRest.reduce((s,r)=>s+(r.calc.horas_perdidas||0),0);
   const openRest = todayRest.filter(r=>r.estado==='abierto').length;
   const personal = new Set(todayActs.map(a => a.operadorLogin || a.operador).filter(Boolean)).size;
   const personHours=buildPersonHoursSummary(todayActs,periodo);
+  // HH acreditadas: máximo 10 h por persona y por día, aunque registre más horas.
+  const hhTotal=personHours.reduce((s,p)=>s+p.credited,0);
   const compliant=personHours.filter(p=>p.compliant).length;
   const nonEffective=personHours.reduce((s,p)=>s+p.nonEffective,0);
 
@@ -5163,6 +5059,40 @@ function startGoogleSheetsAutoSync(){
   SHEETS_AUTO_SYNC_TIMER=setInterval(runGoogleSheetsAutoSync,60000);
 }
 function stopGoogleSheetsAutoSync(){if(SHEETS_AUTO_SYNC_TIMER){clearInterval(SHEETS_AUTO_SYNC_TIMER);SHEETS_AUTO_SYNC_TIMER=null;}}
+
+async function actualizarControlPatios(options={}){
+  const silent=Boolean(options.silent);
+  try{
+    if(!silent)showToast('Actualizando Control de patios...','success');
+    const {data,error}=await db.from('movimientos_material').select('*').order('fecha',{ascending:false}).order('id',{ascending:false});
+    if(error)throw error;
+    APP.data.movimientos=(data||[]).map(dbMovimientoToApp);
+    if(APP.currentView==='patios')renderPatios();
+    if(APP.currentView==='ocupabilidad')renderOcupabilidad();
+    localStorage.setItem('seamx_patios_last_refresh',new Date().toISOString());
+    if(!silent)showToast(`Datos actualizados · ${APP.data.movimientos.length} registros`,'success');
+    return true;
+  }catch(err){
+    console.error('Error actualizando Control de patios:',err);
+    if(!silent)showToast('No se pudieron actualizar los datos','error');
+    return false;
+  }
+}
+
+let PATIOS_AUTO_REFRESH_TIMER=null;
+function startPatiosAutoRefresh(){
+  stopPatiosAutoRefresh();
+  if(!APP.user)return;
+  PATIOS_AUTO_REFRESH_TIMER=setInterval(()=>{
+    if(APP.user&&!document.hidden)actualizarControlPatios({silent:true});
+  },30000);
+}
+function stopPatiosAutoRefresh(){
+  if(PATIOS_AUTO_REFRESH_TIMER){clearInterval(PATIOS_AUTO_REFRESH_TIMER);PATIOS_AUTO_REFRESH_TIMER=null;}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&APP.user)actualizarControlPatios({silent:true});
+});
 
 async function syncPatiosBidireccional(){
   showToast('Sincronizando Control de patios con Google Sheets...','success');
