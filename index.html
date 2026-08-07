@@ -632,6 +632,42 @@ img,canvas,svg,video{max-width:100%}
   .logout-label{display:none}
 }
 
+
+/* ===== v33 · TOPBAR MÓVIL + VISOR DE PLANO ===== */
+@media(max-width:768px){
+  .topbar{height:62px;padding:0 10px;gap:7px;overflow:hidden}
+  .hamburger{padding:6px;flex:0 0 auto}
+  .topbar-title{font-size:16px;font-weight:750;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar-actions{gap:5px;flex:0 0 auto}
+  #topbar-date{display:none!important}
+  #btn-logout{padding:7px 9px!important;gap:4px!important;font-size:12px!important;background:#f5faf6!important}
+  #btn-logout .logout-label{display:inline!important}
+  .network-badge{padding:5px 7px!important;font-size:10px!important;white-space:nowrap}
+  .offline-queue-pill{display:none!important}
+}
+@media(max-width:430px){
+  .topbar-title{font-size:15px;max-width:126px}
+  #btn-logout{padding:7px!important}
+  #btn-logout svg{width:14px;height:14px}
+  .network-badge{font-size:9px!important;padding:5px 6px!important}
+}
+
+.occ-map-wrap:fullscreen{border-radius:0;border:0;background:#fff;padding:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+.occ-map-wrap:fullscreen .occ-real-plan-stage{width:100%;height:auto;aspect-ratio:1915/585}
+.occ-map-wrap:fullscreen .occ-plan-tools{left:16px;bottom:16px}
+
+@media(max-width:520px){
+  .occ-map-card{padding:10px}
+  .occ-map-head{flex-direction:column;gap:8px;margin-bottom:8px}
+  .occ-legend{gap:5px}.occ-legend span{padding:3px 5px;font-size:9px}
+  .occ-map-wrap{min-height:0!important;height:auto!important;aspect-ratio:1915/585;border-radius:10px}
+  .occ-real-plan-stage{width:100%;height:100%;aspect-ratio:auto!important}
+  .occ-plan-tools{left:5px;bottom:5px;gap:3px;flex-direction:row}
+  .occ-plan-tool{width:29px;height:29px;border-radius:7px;font-size:12px}
+  .occ-plan-note{font-size:9px;line-height:1.3;margin-top:6px}.occ-plan-badge{display:none}
+  .occ-layout{gap:12px}
+}
+
 /* ===== SEAMX LOGIN EXPERIENCE ===== */
 .login-page{
   min-height:100vh;
@@ -876,7 +912,7 @@ img,canvas,svg,video{max-width:100%}
       <div class="user-info">
         <div class="user-name" id="user-name-side">Operador</div>
         <div class="user-role" id="user-role-side">operador</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v32 · Comando inteligente</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px">v33 · Comando inteligente</div>
       </div>
       <button onclick="doLogout()" title="Cerrar sesión" style="color:rgba(255,255,255,.5);padding:6px;border-radius:8px" onmouseenter="this.style.color='#fff';this.style.background='rgba(198,40,40,.3)'" onmouseleave="this.style.color='rgba(255,255,255,.5)';this.style.background='none'">
         <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -894,7 +930,6 @@ img,canvas,svg,video{max-width:100%}
       <div class="topbar-title" id="topbar-title">Actividades</div>
       <div class="topbar-actions">
         <span id="seamx-network-badge" class="network-badge">En línea <span id="seamx-offline-count" class="offline-queue-pill">0</span></span>
-        <span class="badge badge-done" style="white-space:nowrap">Actualizado v32</span>
         <span id="topbar-date" style="font-size:13px;color:var(--text-s)"></span>
         <button onclick="doLogout()" id="btn-logout" title="Cerrar sesión" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:var(--surface-2);color:var(--text-s);font-size:13px;font-weight:600;border:1.5px solid var(--border);transition:all .2s" onmouseenter="this.style.background='var(--danger)';this.style.color='#fff';this.style.borderColor='var(--danger)'" onmouseleave="this.style.background='var(--surface-2)';this.style.color='var(--text-s)';this.style.borderColor='var(--border)'">
           <svg viewBox="0 0 20 20" fill="none" width="15" height="15"><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3M13 15l4-5-4-5M17 10H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1305,6 +1340,7 @@ img,canvas,svg,video{max-width:100%}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-outline" onclick="renderOcupabilidad()">↻ Actualizar</button>
+            <button class="btn btn-outline" onclick="compartirReporteOcupabilidad()">▣ Reporte WhatsApp</button>
             <button class="btn btn-primary" id="btn-nueva-evacuacion" onclick="openEvacuacionModal()">+ Registrar evacuación</button>
           </div>
         </div>
@@ -1351,12 +1387,13 @@ img,canvas,svg,video{max-width:100%}
               <div class="occ-map-tooltip" id="occ-map-tooltip"></div>
               <div class="occ-plan-tools" aria-label="Controles del plano">
                 <button class="occ-plan-tool hand" type="button" title="Mover plano: mantén presionado y arrastra" onclick="showToast('Mantén presionado sobre una zona libre del plano y arrastra para moverte','success')">✋</button>
+                <button class="occ-plan-tool" type="button" title="Ver plano a pantalla completa" onclick="toggleOcupabilidadFullscreen()">⛶</button>
                 <button class="occ-plan-tool" type="button" title="Acercar" onclick="zoomOcupabilidadPlano(0.15)">+</button>
                 <button class="occ-plan-tool" type="button" title="Alejar" onclick="zoomOcupabilidadPlano(-0.15)">−</button>
                 <button class="occ-plan-tool" type="button" title="Restablecer vista" onclick="resetOcupabilidadPlano()">↺</button>
               </div>
             </div>
-            <div class="occ-plan-note"><span>Arrastra el plano con la mano para desplazarte. Pasa el cursor sobre una zona para ver su nombre y ocupabilidad; haz clic para abrir el detalle.</span><span class="occ-plan-badge">10 zonas interactivas</span></div>
+            <div class="occ-plan-note"><span>Arrastra el plano con la mano. Usa la rueda del mouse para zoom; en celular usa dos dedos. Toca una zona para abrir el detalle.</span><span class="occ-plan-badge">10 zonas interactivas</span></div>
           </div>
           <div class="card occ-detail"><div id="occ-selected-detail"></div></div>
         </div>
@@ -4133,12 +4170,55 @@ function initOcupabilidadPlanoInteractions(){
   wrap.addEventListener('pointermove',e=>{if(!OCC_PLAN_DRAG||OCC_PLAN_DRAG.id!==e.pointerId)return;OCC_PLAN_PAN_X=OCC_PLAN_DRAG.panX+(e.clientX-OCC_PLAN_DRAG.startX);OCC_PLAN_PAN_Y=OCC_PLAN_DRAG.panY+(e.clientY-OCC_PLAN_DRAG.startY);applyOcupabilidadPlanoZoom();e.preventDefault();});
   const endDrag=e=>{if(!OCC_PLAN_DRAG||OCC_PLAN_DRAG.id!==e.pointerId)return;OCC_PLAN_DRAG=null;wrap.classList.remove('is-dragging');try{wrap.releasePointerCapture?.(e.pointerId);}catch(_){}};
   wrap.addEventListener('pointerup',endDrag);wrap.addEventListener('pointercancel',endDrag);wrap.addEventListener('pointerleave',e=>{if(!OCC_PLAN_DRAG)hideOcupabilidadMapTooltip();});
-  wrap.addEventListener('wheel',e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();zoomOcupabilidadPlano(e.deltaY<0?0.12:-0.12);},{passive:false});
+  wrap.addEventListener('wheel',e=>{e.preventDefault();zoomOcupabilidadPlano(e.deltaY<0?0.12:-0.12);},{passive:false});
   stage.querySelectorAll('.occ-zone').forEach(zone=>{const id=zone.dataset.areaId;zone.addEventListener('pointerenter',e=>showOcupabilidadMapTooltip(e,id));zone.addEventListener('pointermove',moveOcupabilidadMapTooltip);zone.addEventListener('pointerleave',hideOcupabilidadMapTooltip);});
   window.addEventListener('resize',()=>{clampOcupabilidadPlanoPan();applyOcupabilidadPlanoZoom();},{passive:true});
 }
+
+function toggleOcupabilidadFullscreen(){
+  const wrap=document.getElementById('occ-real-map-wrap');if(!wrap)return;
+  if(document.fullscreenElement===wrap){document.exitFullscreen?.();return;}
+  if(wrap.requestFullscreen)wrap.requestFullscreen().then(()=>{resetOcupabilidadPlano();}).catch(()=>{});
+  else showToast('La pantalla completa no está disponible en este navegador','warning');
+}
+
+let OCC_PINCH=null;
+function enableOcupabilidadPinch(){
+  const wrap=document.getElementById('occ-real-map-wrap');if(!wrap||wrap.dataset.pinchReady==='1')return;wrap.dataset.pinchReady='1';
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){OCC_PINCH={distance:dist(e.touches),zoom:OCC_PLAN_ZOOM};e.preventDefault();}},{passive:false});
+  wrap.addEventListener('touchmove',e=>{if(e.touches.length===2&&OCC_PINCH){const ratio=dist(e.touches)/Math.max(1,OCC_PINCH.distance);OCC_PLAN_ZOOM=Math.max(1,Math.min(3,OCC_PINCH.zoom*ratio));applyOcupabilidadPlanoZoom();e.preventDefault();}},{passive:false});
+  wrap.addEventListener('touchend',e=>{if(e.touches.length<2)OCC_PINCH=null;},{passive:true});
+}
+
+function buildOcupabilidadReportElement(){
+  const data=calculateOcupabilidad(),totalArea=data.reduce((s,a)=>s+a.totalM2,0),occupied=data.reduce((s,a)=>s+a.occupiedM2,0),base=data.reduce((s,a)=>s+a.baseM2,0),pct=totalArea?occupied/totalArea:0,critical=data.filter(a=>a.pct>OCC_LIMIT).sort((a,b)=>b.pct-a.pct),net=occupied-base;
+  const f=typeof computeEvacuationForecast==='function'?computeEvacuationForecast():null;
+  const status=(p)=>p>OCC_LIMIT?['CRÍTICO','#b42318','#fdecec']:p>=.35?['CERCA DEL LÍMITE','#9a6700','#fff5cc']:['CONTROLADO','#1b7a39','#eaf8ee'];
+  const rows=[...data].sort((a,b)=>b.pct-a.pct).map((a,i)=>{const st=status(a.pct);return `<div style="display:grid;grid-template-columns:42px 1.55fr .7fr .9fr;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid #e5eee7;font-size:18px"><b style="color:#78927f">${String(i+1).padStart(2,'0')}</b><div><b style="color:#123d20">${escapeHtml(a.short)}</b><div style="height:7px;background:#edf3ee;border-radius:20px;margin-top:8px;overflow:hidden"><span style="display:block;height:100%;width:${Math.min(100,a.pct*100)}%;background:${st[1]}"></span></div></div><b style="font-size:22px;color:${st[1]}">${(a.pct*100).toFixed(1)}%</b><span style="justify-self:end;padding:7px 10px;border-radius:999px;background:${st[2]};color:${st[1]};font-size:12px;font-weight:900">${st[0]}</span></div>`}).join('');
+  const priorities=critical.length?critical.slice(0,3).map((a,i)=>`<div style="padding:13px 15px;border-radius:12px;background:#fff6f4;border-left:5px solid #d64545"><b>${i+1}. ${escapeHtml(a.short)}</b><div style="margin-top:4px;color:#617568">${(a.pct*100).toFixed(1)}% de ocupabilidad · priorizar evacuación.</div></div>`).join(''):`<div style="padding:15px;border-radius:12px;background:#edf9f0;color:#1b6f36;font-weight:800">Todas las áreas se encuentran dentro del límite operacional de 40%.</div>`;
+  const report=document.createElement('div');report.id='occ-report-export';report.style.cssText='position:fixed;left:-12000px;top:0;width:1080px;background:#f5faf6;color:#14271a;font-family:Inter,Arial,sans-serif;padding:46px;z-index:-1';
+  report.innerHTML=`<div style="background:linear-gradient(135deg,#073b18,#17652c);border-radius:26px;padding:34px 38px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:18px;font-weight:900;letter-spacing:.12em;opacity:.8">SEAMX</div><div style="font-size:36px;font-weight:900;margin-top:6px">Reporte de Ocupabilidad</div><div style="font-size:18px;opacity:.82;margin-top:5px">Patio 4388 · Toda la operación en un solo lugar</div></div><div style="text-align:right"><div style="font-size:15px;opacity:.8">FECHA DE CORTE</div><div style="font-size:21px;font-weight:900;margin-top:4px">${new Date().toLocaleString('es-PE',{dateStyle:'medium',timeStyle:'short'})}</div></div></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0"><div style="background:white;border-radius:16px;padding:20px;border-left:5px solid #1a9c48"><small>OCUPABILIDAD TOTAL</small><div style="font-size:34px;font-weight:900;color:#16853d;margin-top:5px">${(pct*100).toFixed(1)}%</div></div><div style="background:white;border-radius:16px;padding:20px;border-left:5px solid #168b89"><small>ÁREA OCUPADA</small><div style="font-size:34px;font-weight:900;color:#126f70;margin-top:5px">${occupied.toFixed(1)}</div><div style="font-size:13px;color:#6b8170">m² estimados</div></div><div style="background:white;border-radius:16px;padding:20px;border-left:5px solid #e58b18"><small>ÁREAS &gt; 40%</small><div style="font-size:34px;font-weight:900;color:#cc7411;margin-top:5px">${critical.length}</div></div><div style="background:white;border-radius:16px;padding:20px;border-left:5px solid #3476b9"><small>VARIACIÓN DESDE 25/07</small><div style="font-size:34px;font-weight:900;color:#28679f;margin-top:5px">${net>=0?'+':''}${net.toFixed(1)}</div><div style="font-size:13px;color:#6b8170">m² netos</div></div></div>
+  <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 5px 22px rgba(22,71,34,.08)"><div style="padding:20px 22px;border-bottom:1px solid #e5eee7"><b style="font-size:22px;color:#103d1e">Estado por área</b><div style="font-size:14px;color:#708276;margin-top:3px">Límite operacional de referencia: 40%</div></div>${rows}</div>
+  <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:20px"><div style="background:#fff;border-radius:20px;padding:22px"><b style="font-size:22px;color:#103d1e">Prioridades operacionales</b><div style="display:grid;gap:10px;margin-top:14px">${priorities}</div></div><div style="background:#fff;border-radius:20px;padding:22px"><b style="font-size:22px;color:#103d1e">Forecast de evacuación</b>${f?`<div style="font-size:44px;font-weight:900;color:${f.status==='ok'?'#16853d':f.status==='warn'?'#b67800':'#b42318'};margin-top:14px">${f.projected.toFixed(0)} tn</div><div style="color:#708276">proyección a fin de mes</div><div style="margin-top:18px;font-size:16px;line-height:1.8"><b>${f.actual.toFixed(1)} tn</b> ejecutadas<br><b>${f.target.toFixed(0)} tn</b> meta mensual<br><b>${f.neededPerDay.toFixed(1)} tn/día</b> requeridas</div>`:'<div style="margin-top:16px;color:#708276">Sin datos suficientes.</div>'}</div></div>
+  <div style="margin-top:22px;padding:17px 20px;border-radius:14px;background:#eaf3ec;color:#4c6753;font-size:14px;display:flex;justify-content:space-between"><span>Generado automáticamente por SEAMX</span><b>Documento operativo · Uso interno</b></div>`;
+  document.body.appendChild(report);return report;
+}
+async function ocupabilidadReportBlob(){
+  if(!window.html2canvas)throw new Error('No se cargó el generador de imágenes');const el=buildOcupabilidadReportElement();
+  try{const canvas=await html2canvas(el,{scale:1.5,backgroundColor:'#f5faf6',useCORS:true,logging:false,width:1080,windowWidth:1200});return await new Promise(r=>canvas.toBlob(r,'image/png',.96));}finally{el.remove();}
+}
+async function compartirReporteOcupabilidad(){
+  try{showToast('Generando reporte profesional…','success');const blob=await ocupabilidadReportBlob();if(!blob)throw new Error('No se pudo crear el archivo');const filename=`SEAMX_Ocupabilidad_4388_${seamxToday()}.png`,file=new File([blob],filename,{type:'image/png'});
+    if(navigator.canShare&&navigator.share&&navigator.canShare({files:[file]})){await navigator.share({title:'SEAMX · Ocupabilidad Patio 4388',text:'Reporte de ocupabilidad generado por SEAMX.',files:[file]});showToast('Reporte listo para compartir','success');return;}
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);showToast('Reporte descargado. Puedes enviarlo por WhatsApp.','success');
+  }catch(err){if(err?.name==='AbortError')return;console.error(err);showToast('No se pudo generar el reporte de ocupabilidad','error');}
+}
+
 function renderOcupabilidad(){
   initOcupabilidadPlanoInteractions();
+  enableOcupabilidadPinch();
   const data=calculateOcupabilidad(),totalArea=data.reduce((s,a)=>s+a.totalM2,0),occupied=data.reduce((s,a)=>s+a.occupiedM2,0),base=data.reduce((s,a)=>s+a.baseM2,0),pct=totalArea?occupied/totalArea:0,critical=data.filter(a=>a.pct>OCC_LIMIT).length,net=occupied-base;
   const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
   set('occ-kpi-total',(pct*100).toFixed(1)+'%');set('occ-kpi-m2',occupied.toFixed(1));set('occ-kpi-critical',critical);set('occ-kpi-net',(net>=0?'+':'')+net.toFixed(1));set('occ-last-update','Actualizado '+new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}));
