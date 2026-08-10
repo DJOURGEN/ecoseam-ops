@@ -988,6 +988,25 @@ img,canvas,svg,video{max-width:100%}
   .handover-foot{flex-direction:column;align-items:flex-start}
 }
 
+
+/* ===== v38 · rango de fechas móvil + programación ===== */
+.filters .dash-date-field{align-items:center;gap:7px;padding:5px 8px 5px 10px;border:1.5px solid var(--border);border-radius:var(--radius-s);background:var(--surface);min-height:42px}
+.filters .dash-date-field>span{font-size:11px;font-weight:800;color:var(--text-s);white-space:nowrap}
+.filters .dash-date-field .filter-select{border:0!important;background-color:transparent!important;box-shadow:none!important;padding:4px 2px!important;min-width:132px;height:auto}
+@media(max-width:768px){
+  #view-dashboard .filters{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+  #view-dashboard .filters>.filter-select{width:100%;min-width:0}
+  #view-dashboard .filters .dash-date-field{width:100%;min-width:0;padding:5px 8px}
+  #view-dashboard .filters .dash-date-field .filter-select{width:100%;min-width:0;font-size:13px}
+  #filter-area-dash{grid-column:1/-1}
+}
+@media(max-width:430px){
+  #view-dashboard .filters{grid-template-columns:1fr 1fr}
+  #filter-periodo-dash,#filter-guardia-dash{min-width:0}
+  .filters .dash-date-field>span{font-size:10px}
+  .filters .dash-date-field .filter-select{font-size:12px!important}
+}
+
 </style>
 </head>
 <body>
@@ -1239,8 +1258,14 @@ img,canvas,svg,video{max-width:100%}
               <option value="mes">Este mes</option>
               <option value="rango">Rango específico</option>
             </select>
-            <input type="date" class="filter-select" id="filter-desde-dash" onchange="updateDashboard()" style="padding-right:12px;display:none">
-            <input type="date" class="filter-select" id="filter-hasta-dash" onchange="updateDashboard()" style="padding-right:12px;display:none">
+            <div class="dash-date-field" id="dash-desde-wrap" style="display:none">
+              <span>Desde</span>
+              <input type="date" class="filter-select" id="filter-desde-dash" aria-label="Fecha desde" onchange="updateDashboard()">
+            </div>
+            <div class="dash-date-field" id="dash-hasta-wrap" style="display:none">
+              <span>Hasta</span>
+              <input type="date" class="filter-select" id="filter-hasta-dash" aria-label="Fecha hasta" onchange="updateDashboard()">
+            </div>
             <select class="filter-select" id="filter-guardia-dash" onchange="updateDashboard()">
               <option value="">Todas las guardias</option>
               <option value="A">Guardia A</option>
@@ -2426,8 +2451,8 @@ const APP = {
 const SESSION_KEYS={user:'ecoseam_session',view:'ecoseam_current_view',scrollPrefix:'ecoseam_scroll_'};
 const REMEMBER_KEY='seamx_remembered_credentials';
 
-const SEAMX_CACHE_KEY='seamx_offline_cache_v32';
-const SEAMX_QUEUE_KEY='seamx_offline_queue_v32';
+const SEAMX_CACHE_KEY='seamx_offline_cache_v38';
+const SEAMX_QUEUE_KEY='seamx_offline_queue_v38';
 let SEAMX_OFFLINE_SYNCING=false;
 function getOfflineQueue(){try{return JSON.parse(localStorage.getItem(SEAMX_QUEUE_KEY)||'[]')}catch(_){return[]}}
 function setOfflineQueue(q){localStorage.setItem(SEAMX_QUEUE_KEY,JSON.stringify(q||[]));updateOfflineUI();}
@@ -4869,6 +4894,25 @@ async function receiveHandover(){
 }
 async function downloadHandoverImage(){const el=document.getElementById('handover-report');if(!el)return;try{const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff'}),a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`SEAMX_entrega_guardia_${document.getElementById('handover-date').value||seamxToday()}.png`;a.click()}catch(err){console.error(err);showToast('No se pudo generar la imagen','error')}}
 
+function toggleDashboardDateInputs(){
+  const periodo=document.getElementById('filter-periodo-dash')?.value||'hoy';
+  const show=periodo==='rango';
+  const desdeWrap=document.getElementById('dash-desde-wrap');
+  const hastaWrap=document.getElementById('dash-hasta-wrap');
+  const desde=document.getElementById('filter-desde-dash');
+  const hasta=document.getElementById('filter-hasta-dash');
+  if(desdeWrap)desdeWrap.style.display=show?'flex':'none';
+  if(hastaWrap)hastaWrap.style.display=show?'flex':'none';
+  // Compatibilidad por si el HTML se abre desde una versión anterior sin wrappers.
+  if(!desdeWrap&&desde)desde.style.display=show?'inline-flex':'none';
+  if(!hastaWrap&&hasta)hasta.style.display=show?'inline-flex':'none';
+  if(show){
+    const today=new Date().toISOString().split('T')[0];
+    if(desde&&!desde.value)desde.value=today;
+    if(hasta&&!hasta.value)hasta.value=today;
+  }
+}
+
 function getDashboardFilteredData() {
   const periodo = document.getElementById('filter-periodo-dash')?.value || 'hoy';
   const desde = document.getElementById('filter-desde-dash')?.value;
@@ -5105,7 +5149,9 @@ function renderActiveRestrictions(data) {
 /* ===== PROGRAMACIÓN DIARIA ===== */
 const PERSONAL_PROGRAMACION = [
   'Jorge Cerquin','Jose Villanueva','Carlos Barrera','Marlon Vega',
-  'Daniel Sigueñas','Christian Vega','Hitler Chavez','Lucio Valentin'
+  'Daniel Sigueñas','Christian Vega','Hitler Chavez','Lucio Valentin',
+  'Miflin Acevedo','Jonatan Carhuallanqui','Dargor Portilla','Yonel Saavedra',
+  'Roger Madalengoitia','Junior Zapata'
 ];
 
 function canEditProgramacion(){
