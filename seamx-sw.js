@@ -1,4 +1,4 @@
-const CACHE_NAME='seamx-shell-v37';
+const CACHE_NAME='seamx-shell-v38';
 const CORE_ASSETS=[
   './',
   './logo-ecoseam.png',
