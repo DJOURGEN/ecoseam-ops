@@ -1033,6 +1033,11 @@ img,canvas,svg,video{max-width:100%}
 .activity-group-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:13px}.activity-group-card{position:relative;border:1px solid var(--border);border-radius:15px;background:linear-gradient(180deg,#fff,#fbfefb);padding:15px;box-shadow:0 5px 18px rgba(26,92,42,.07);overflow:hidden;transition:.18s}.activity-group-card:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(26,92,42,.11)}.activity-group-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#a9c8ae}.activity-group-card.process:before{background:#0277bd}.activity-group-card.paused:before{background:#f57f17}.activity-group-card.done:before{background:#2e7d32}.activity-group-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.activity-group-area{display:inline-flex;padding:4px 8px;border-radius:999px;background:#edf7ef;color:#1a5c2a;font-size:9px;font-weight:900;text-transform:uppercase}.activity-group-title{font-size:15px;font-weight:850;color:var(--navy);line-height:1.25;margin-top:8px}.activity-group-meta{font-size:10px;color:var(--text-m);margin-top:5px}.activity-group-count{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#f0f6f1;color:#345b3c;font-size:10px;font-weight:850;white-space:nowrap}.activity-group-progress{height:7px;border-radius:999px;background:#e7f0e8;overflow:hidden;margin:12px 0 10px}.activity-group-progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#1a5c2a,#00c853)}.activity-group-people{display:grid;gap:6px}.activity-group-person{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:8px;padding:7px 8px;border:1px solid #e1ece3;border-radius:10px;background:#fff}.activity-group-person-avatar{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#e7f3e9;color:#15572a;font-size:9px;font-weight:900}.activity-group-person strong{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-group-person small{display:block;font-size:9px;color:var(--text-m);margin-top:1px}.activity-group-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #e8efe9;flex-wrap:wrap}.activity-review-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900}.activity-review-badge.pending{background:#f2f5f2;color:#718176}.activity-review-badge.aprobado{background:#eafaf1;color:#1e8449}.activity-review-badge.observado{background:#fff4e5;color:#a45100}.activity-shared-evidence{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:10px;background:#eff8f1;color:#2f6840;font-size:9px;font-weight:750;margin-top:9px}.activity-group-actions{display:flex;gap:6px;flex-wrap:wrap}.btn-review{padding:6px 10px;border-radius:8px;background:#0f766e;color:#fff;font-size:10px;font-weight:800}.btn-edit-mini{padding:6px 10px;border-radius:8px;background:#edf5ef;color:#1a5c2a;border:1px solid #cfe0d2;font-size:10px;font-weight:800}.activity-table-review{white-space:nowrap}
 @media(max-width:720px){.activity-group-grid{grid-template-columns:1fr}.activity-history-filter{width:100%;margin-left:0;align-items:flex-start;flex-direction:column}.activity-history-filter>div{width:100%}.activity-history-filter input{flex:1}.activity-group-card{padding:13px}.activity-group-person{grid-template-columns:28px minmax(0,1fr) auto}.activity-group-footer{align-items:flex-start;flex-direction:column}.activity-group-actions{width:100%}.activity-group-actions button{flex:1}.activity-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+
+/* ===== v41 · PERMISOS DE MANTENIMIENTO ===== */
+.role-maintenance-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:999px;background:#fff8e1;color:#8a5a00;font-size:9px;font-weight:900}
+
 </style>
 </head>
 <body>
@@ -2418,6 +2423,7 @@ img,canvas,svg,video{max-width:100%}
         <select class="form-control" id="usr-rol">
           <option value="operador">👷 Operador</option>
           <option value="controlador">🏗️ Controlador de patios</option>
+          <option value="mantenimiento">🔧 Mantenimiento</option>
           <option value="supervisor">🔍 Supervisor</option>
           <option value="gerencia">📊 Gerencia</option>
           <option value="admin">⚙️ Administrador</option>
@@ -3143,7 +3149,7 @@ function initSampleData() {
 /* ===== ASISTENTE DOCUMENTAL DE SEGURIDAD ===== */
 function normalizarRolSeguridad(rol){
   const r=String(rol||'').trim().toLowerCase();
-  const map={administrador:'admin',administracion:'admin',administrativo:'administrativo',supervision:'supervisor',supervisor:'supervisor',gerente:'gerencia',gerencia:'gerencia',operadores:'operador',operator:'operador'};
+  const map={administrador:'admin',administracion:'admin',administrativo:'admin',supervision:'supervisor',supervisor:'supervisor',gerente:'gerencia',gerencia:'gerencia',operadores:'operador',operator:'operador',maintenance:'mantenimiento',mantenedor:'mantenimiento',mantenimiento:'mantenimiento'};
   return map[r]||r;
 }
 function puedeGestionarSeguridad(){return Boolean(APP.user&&['supervisor','admin'].includes(normalizarRolSeguridad(APP.user.role)));}
@@ -3676,11 +3682,12 @@ const NAV_CONFIG = {
     {id:'resumen',label:'Reporte de actividades',icon:'image'},
     {id:'admin',label:'Administración',icon:'user'},
   ],
-  operador: ['actividades','ocupabilidad','mantenimiento'],
-  controlador: ['comando','actividades','patios','ocupabilidad','coproductos','entrega','mantenimiento'],
+  operador: ['actividades','ocupabilidad'],
+  controlador: ['comando','actividades','patios','ocupabilidad','coproductos','entrega'],
   supervisor: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento','resumen'],
   gerencia: ['comando','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento'],
   admin: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento','resumen','admin'],
+  mantenimiento: ['actividades','mantenimiento'],
 };
 
 const ICONS = {
@@ -3784,7 +3791,7 @@ function setupUI() {
   document.documentElement.style.setProperty('--mobile-content-bottom', (mobileRows === 1 ? 86 : 145) + 'px');
 
   // Nueva actividad solo dentro de la página Actividades
-  const puedeRegistrarActividad = ['operador','controlador','admin'].includes(u.role);
+  const puedeRegistrarActividad = ['operador','controlador','mantenimiento','admin'].includes(u.role);
   const btnNuevaPage = document.getElementById('btn-nueva-actividad-page');
   if(btnNuevaPage) btnNuevaPage.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
   const btnSyncSheets = document.getElementById('btn-sync-actividades-sheets');
@@ -3811,7 +3818,7 @@ function setupUI() {
   });
 
   // Prefill operator name
-  if(['operador','controlador'].includes(u.role)) {
+  if(['operador','controlador','mantenimiento'].includes(u.role)) {
     document.getElementById('act-operador').value = u.name;
     document.getElementById('act-operador').readOnly = true;
     document.getElementById('act-guardia').value = u.guardia === 'ambas' ? 'A' : u.guardia;
@@ -3875,6 +3882,7 @@ function getDefaultViewForRole(){
   if(!APP.user)return 'actividades';
   if(['admin','supervisor','gerencia'].includes(APP.user.role))return 'comando';
   if(APP.user.role==='controlador')return 'comando';
+  if(APP.user.role==='mantenimiento')return 'actividades';
   return 'actividades';
 }
 
@@ -3941,7 +3949,7 @@ function calcRestDuration() {
 /* ===== SAVE ACTIVIDAD ===== */
 async function saveActividad() {
   if(esGerenciaSoloLectura()){ showToast('Gerencia tiene acceso solo de visualización','warning'); return; }
-  const isPersonalOperativo = APP.user && ['operador','controlador'].includes(APP.user.role);
+  const isPersonalOperativo = APP.user && ['operador','controlador','mantenimiento'].includes(APP.user.role);
   const fields = {
     fecha: document.getElementById('act-fecha').value,
     guardia: isPersonalOperativo && APP.user.guardia !== 'ambas' ? APP.user.guardia : document.getElementById('act-guardia').value,
@@ -3995,7 +4003,7 @@ function resetActForm() {
   document.getElementById('act-calc-result').style.display='none';
   document.getElementById('modal-actividad-title').textContent='Registrar actividad';
   document.getElementById('act-fecha').value=new Date().toISOString().split('T')[0];
-  if(APP.user&&['operador','controlador'].includes(APP.user.role)) {
+  if(APP.user&&['operador','controlador','mantenimiento'].includes(APP.user.role)) {
     document.getElementById('act-operador').value=APP.user.name;
     document.getElementById('act-guardia').value=APP.user.guardia === 'ambas' ? 'A' : APP.user.guardia;
     document.getElementById('act-guardia').disabled = APP.user.guardia !== 'ambas';
@@ -4007,7 +4015,7 @@ function resetActForm() {
 function editActividad(id) {
   const a = APP.data.actividades.find(x=>x.id==id);
   if(!a) return;
-  if(APP.user && ['operador','controlador'].includes(APP.user.role) && a.operadorLogin && a.operadorLogin !== APP.user.login) {
+  if(APP.user && ['operador','controlador','mantenimiento'].includes(APP.user.role) && a.operadorLogin && a.operadorLogin !== APP.user.login) {
     showToast('No puedes editar actividades de otro operador','error');
     return;
   }
@@ -4163,7 +4171,7 @@ function renderActividades() {
   if(guardia) data = data.filter(a=>a.guardia===guardia);
   if(area) data = data.filter(a=>a.area===area);
   if(estado) data = data.filter(a=>a.estado===estado);
-  if(APP.user && ['operador','controlador'].includes(APP.user.role)) {
+  if(APP.user && ['operador','controlador','mantenimiento'].includes(APP.user.role)) {
     data = data.filter(a => (a.operadorLogin && a.operadorLogin === APP.user.login) || (!a.operadorLogin && a.operador === APP.user.name));
   }
 
@@ -4189,7 +4197,7 @@ function renderActividades() {
       <td>${a.revision?`<span class="badge badge-${a.revision}">${a.revision}</span>`:'<span style="color:var(--text-m);font-size:12px">Sin revisar</span>'}</td>
       <td style="white-space:nowrap">
         ${(role==='supervisor'||role==='admin')?`<button class="btn btn-sm" style="padding:4px 10px;background:var(--teal);color:#fff;font-size:12px" onclick="openRevision(${a.id})">Revisar</button> `:''}
-        ${(role==='admin'||role==='operador'||role==='controlador')?`<button class="btn btn-outline btn-sm" style="font-size:12px" onclick="editActividad(${a.id})">Editar</button>`:''}
+        ${(role==='admin'||role==='operador'||role==='controlador'||role==='mantenimiento')?`<button class="btn btn-outline btn-sm" style="font-size:12px" onclick="editActividad(${a.id})">Editar</button>`:''}
         ${(role==='admin')?` <button class="btn btn-sm" style="padding:4px 10px;background:var(--danger);color:#fff;font-size:12px" onclick="deleteActividad(${a.id})">×</button>`:''}
       </td>
     </tr>
@@ -4749,7 +4757,7 @@ async function saveUsuario() {
 
 function renderUsuarios() {
   const tbody=document.getElementById('tbody-usuarios');
-  const rolColors={operador:'background:#e3f0e5;color:#1a5c2a',supervisor:'background:#e3f2fd;color:#0d47a1',controlador:'background:#e8f5e9;color:#1b5e20',gerencia:'background:#f3e5f5;color:#6a1b9a',admin:'background:#fff3e0;color:#e65100'};
+  const rolColors={operador:'background:#e3f0e5;color:#1a5c2a',supervisor:'background:#e3f2fd;color:#0d47a1',controlador:'background:#e8f5e9;color:#1b5e20',mantenimiento:'background:#fff8e1;color:#8a5a00',gerencia:'background:#f3e5f5;color:#6a1b9a',admin:'background:#fff3e0;color:#e65100'};
   const thead=tbody.closest('table').querySelector('thead tr');
   if(thead)thead.innerHTML='<th>Usuario</th><th>Nombre completo</th><th>Contraseña</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th>';
   tbody.innerHTML=APP.data.usuarios.map(u=>`
@@ -5022,7 +5030,7 @@ function getDashboardFilteredData() {
     rests = rests.filter(r => r.area === area);
   }
 
-  if(APP.user && ['operador','controlador'].includes(APP.user.role)) {
+  if(APP.user && ['operador','controlador','mantenimiento'].includes(APP.user.role)) {
     acts = acts.filter(a => (a.operadorLogin && a.operadorLogin === APP.user.login) || (!a.operadorLogin && a.operador === APP.user.name));
   }
 
@@ -6128,7 +6136,7 @@ function activityToday(){return new Date().toISOString().slice(0,10);}
 function activityNowIso(){return new Date().toISOString();}
 function activityNowTime(){return new Date().toTimeString().slice(0,5);}
 function activityCanAssign(){return Boolean(APP.user&&['supervisor','admin'].includes(APP.user.role));}
-function activityIsFieldUser(){return Boolean(APP.user&&['operador','controlador'].includes(APP.user.role));}
+function activityIsFieldUser(){return Boolean(APP.user&&['operador','controlador','mantenimiento'].includes(APP.user.role));}
 function activityFullUserName(u){return `${u?.nombre||''} ${u?.apellido||''}`.trim();}
 function activityUserMatch(a){
   if(!APP.user)return false;
@@ -6144,7 +6152,7 @@ function activityStatusInfo(state){
 }
 function activityAssignmentPeople(){
   const staticNames=[...new Set([...PERSONAL_PROGRAMACION,'Stev Bolaños'])];
-  const users=(APP.data.usuarios||[]).filter(u=>u.activo!==false&&u.rol!=='gerencia').map(u=>({name:activityFullUserName(u)||u.login,login:u.login||'',role:u.rol||''}));
+  const users=(APP.data.usuarios||[]).filter(u=>u.activo!==false&&['operador','controlador','mantenimiento'].includes(normalizarRolSeguridad(u.rol))).map(u=>({name:activityFullUserName(u)||u.login,login:u.login||'',role:normalizarRolSeguridad(u.rol)||''}));
   const byName=new Map();users.forEach(x=>byName.set(activityNormalize(x.name),x));
   staticNames.forEach(name=>{const key=activityNormalize(name);if(!byName.has(key))byName.set(key,{name,login:'',role:'operador'});});
   return [...byName.values()].sort((a,b)=>a.name.localeCompare(b.name,'es'));
@@ -6263,7 +6271,7 @@ function activityCanEditRecord(){return Boolean(APP.user&&APP.user.role==='admin
 function activityIsGerencia(){return Boolean(APP.user&&APP.user.role==='gerencia');}
 function activityPersonDedupKey(name){const t=activityNormalize(name).split(/\s+/).filter(Boolean);return t.slice(0,2).join(' ')||activityNormalize(name);}
 function activityAssignmentPeople(){
-  const allowed=(APP.data.usuarios||[]).filter(u=>u.activo!==false&&['operador','controlador'].includes(String(u.rol||'').toLowerCase()));
+  const allowed=(APP.data.usuarios||[]).filter(u=>u.activo!==false&&['operador','controlador','mantenimiento'].includes(normalizarRolSeguridad(u.rol)));
   const byLogin=new Map(),byPerson=new Map();
   for(const u of allowed){
     const name=activityFullUserName(u)||u.login||'Usuario';const login=String(u.login||'').trim();const loginKey=login.toLowerCase();const personKey=activityPersonDedupKey(name);
@@ -6276,7 +6284,7 @@ function activityAssignmentPeople(){
 }
 function renderAssignmentPeople(selected=[]){
   const grid=document.getElementById('assign-people-grid');if(!grid)return;const people=activityAssignmentPeople(),selectedNorm=new Set(selected.map(activityNormalize));
-  grid.innerHTML=people.length?people.map(p=>`<label class="assign-person-chip"><input type="checkbox" value="${escapeHtml(p.name)}" data-login="${escapeHtml(p.login)}" ${selectedNorm.has(activityNormalize(p.name))?'checked':''} onchange="updateAssignmentPeopleCount()"><span class="assign-person-mark">${escapeHtml(activityInitials(p.name))}</span><span>${escapeHtml(p.name)}<small style="display:block;font-size:9px;color:var(--text-m);font-weight:600">${escapeHtml(p.role==='controlador'?'Controlador de patios':'Operador')}${p.login?' · '+escapeHtml(p.login):''}</small></span></label>`).join(''):`<div class="activity-empty" style="grid-column:1/-1"><strong>Sin usuarios disponibles</strong>Crea o activa usuarios con rol Operador o Controlador de patios.</div>`;
+  grid.innerHTML=people.length?people.map(p=>`<label class="assign-person-chip"><input type="checkbox" value="${escapeHtml(p.name)}" data-login="${escapeHtml(p.login)}" ${selectedNorm.has(activityNormalize(p.name))?'checked':''} onchange="updateAssignmentPeopleCount()"><span class="assign-person-mark">${escapeHtml(activityInitials(p.name))}</span><span>${escapeHtml(p.name)}<small style="display:block;font-size:9px;color:var(--text-m);font-weight:600">${escapeHtml(p.role==='controlador'?'Controlador de patios':p.role==='mantenimiento'?'Mantenimiento':'Operador')}${p.login?' · '+escapeHtml(p.login):''}</small></span></label>`).join(''):`<div class="activity-empty" style="grid-column:1/-1"><strong>Sin usuarios disponibles</strong>Crea o activa usuarios con rol Operador, Controlador de patios o Mantenimiento.</div>`;
   updateAssignmentPeopleCount();
 }
 function activityLogicalGroupKey(a){return [a.fecha||'',a.guardia||'',activityNormalize(a.area),activityNormalize(a.actividad)].join('|');}
