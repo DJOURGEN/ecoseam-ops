@@ -1,4 +1,4 @@
-const CACHE_NAME='seamx-shell-v41';
+const CACHE_NAME='seamx-shell-current';
 
 const CORE_ASSETS=[
   './',
@@ -21,29 +21,22 @@ self.addEventListener('install',event=>{
     await Promise.allSettled(
       CORE_ASSETS.map(async url=>{
         try{
-          const response=await fetch(
-            url,
-            {
-              mode:url.startsWith('http') ? 'cors' : 'same-origin',
-              cache:'no-cache'
-            }
-          );
+          const response=await fetch(url,{
+            mode:url.startsWith('http')?'cors':'same-origin',
+            cache:'no-cache'
+          });
 
-          if(response.ok || response.type==='opaque'){
-            await cache.put(
-              url,
-              response.clone()
-            );
+          if(response.ok||response.type==='opaque'){
+            await cache.put(url,response.clone());
           }
 
         }catch(_){
-          /* Recursos externos opcionales */
+          /* Recurso opcional */
         }
       })
     );
 
     await self.skipWaiting();
-
   })());
 });
 
@@ -55,13 +48,10 @@ self.addEventListener('activate',event=>{
     await Promise.all(
       keys
         .filter(
-          k=>
-            k.startsWith('seamx-shell-') &&
-            k!==CACHE_NAME
+          k=>k.startsWith('seamx-shell-') &&
+             k!==CACHE_NAME
         )
-        .map(
-          k=>caches.delete(k)
-        )
+        .map(k=>caches.delete(k))
     );
 
     await self.clients.claim();
@@ -71,16 +61,13 @@ self.addEventListener('activate',event=>{
 
 self.addEventListener('fetch',event=>{
 
-  if(event.request.method!=='GET'){
-    return;
-  }
+  if(event.request.method!=='GET')return;
 
-  // Supabase siempre trabaja con información actual.
-  if(
-    new URL(event.request.url)
-      .origin
-      .includes('supabase.co')
-  ){
+  const requestUrl=
+    new URL(event.request.url);
+
+  // Supabase siempre consulta información actual.
+  if(requestUrl.origin.includes('supabase.co')){
     return;
   }
 
@@ -92,11 +79,7 @@ self.addEventListener('fetch',event=>{
     const isNavigation=
       event.request.mode==='navigate';
 
-    /*
-     * Para la aplicación principal
-     * intentamos descargar primero
-     * la última versión.
-     */
+    // Para la aplicación principal se prioriza la versión online.
     if(isNavigation){
 
       try{
@@ -132,10 +115,7 @@ self.addEventListener('fetch',event=>{
 
     }
 
-    /*
-     * Recursos almacenados:
-     * imágenes, librerías, etc.
-     */
+    // Recursos estáticos.
     const cached=
       await cache.match(event.request);
 
@@ -169,10 +149,6 @@ self.addEventListener('fetch',event=>{
 
     }
 
-    /*
-     * Si todavía no existe
-     * en caché, descargar.
-     */
     try{
 
       const network=
