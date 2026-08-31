@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- SEAMX BUILD v34: interfaz depurada, sincronización vía Supabase y KPI HH limitado a 10 h por persona/día -->
+  <!-- SEAMX BUILD v39: interfaz depurada, sincronización vía Supabase y KPI HH limitado a 10 h por persona/día -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SEAMX">
 <meta name="description" content="SEAMX · Toda la operación en un solo lugar">
-<title>SEAMX v34 · Toda la operación en un solo lugar</title>
+<title>SEAMX v39 · Toda la operación en un solo lugar</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231a5c2a'/><text y='24' x='4' font-size='22' font-family='sans-serif' fill='%2300c853'>E</text></svg>">
 
@@ -1007,6 +1007,25 @@ img,canvas,svg,video{max-width:100%}
   .filters .dash-date-field .filter-select{font-size:12px!important}
 }
 
+
+
+/* ===== v39 · GESTIÓN DE ACTIVIDADES ASIGNADAS ===== */
+.activity-hero{background:linear-gradient(135deg,#083a18 0%,#17652c 64%,#2e7d32 100%);color:#fff;border-radius:18px;padding:22px 24px;margin-bottom:16px;box-shadow:0 12px 30px rgba(8,58,24,.15);position:relative;overflow:hidden}
+.activity-hero:after{content:"";position:absolute;width:190px;height:190px;border:35px solid rgba(255,255,255,.055);border-radius:50%;right:-78px;top:-92px}.activity-hero>*{position:relative;z-index:1}.activity-hero-kicker{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.72}.activity-hero-title{font-size:25px;font-weight:900;line-height:1.12;margin-top:5px}.activity-hero-sub{font-size:12px;opacity:.83;margin-top:6px;max-width:760px}
+.activity-kpis{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:11px;margin-bottom:16px}.activity-kpi{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 15px;box-shadow:var(--shadow);min-height:96px}.activity-kpi span{display:block;font-size:9px;text-transform:uppercase;color:var(--text-s);font-weight:900;letter-spacing:.04em}.activity-kpi strong{display:block;font-size:27px;color:var(--navy);line-height:1;margin-top:7px}.activity-kpi small{display:block;font-size:10px;color:var(--text-m);margin-top:6px;line-height:1.25}.activity-kpi.green strong{color:#178447}.activity-kpi.orange strong{color:#ef7d00}.activity-kpi.red strong{color:#c62828}.activity-kpi.blue strong{color:#0277bd}
+.activity-toolbar-card{padding:14px 16px;margin-bottom:16px}.activity-toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:end}.activity-date-pair{display:flex;gap:7px;align-items:end}.activity-date-field{display:flex;flex-direction:column;gap:3px}.activity-date-field label{font-size:9px;text-transform:uppercase;color:var(--text-m);font-weight:900}.activity-toolbar .filter-select{min-height:39px}
+.activity-section{margin-bottom:16px}.activity-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.activity-section-title{font-size:16px;font-weight:900;color:var(--navy)}.activity-section-sub{font-size:11px;color:var(--text-s);margin-top:2px}.activity-count-badge{padding:5px 10px;border-radius:999px;background:#eaf7ed;color:var(--navy);font-size:10px;font-weight:900;white-space:nowrap}
+.activity-task-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:12px}.activity-task-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:15px;box-shadow:0 6px 20px rgba(22,78,37,.07);position:relative;overflow:hidden}.activity-task-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#9bbba2}.activity-task-card.pending:before{background:#f5a623}.activity-task-card.process:before{background:#0277bd}.activity-task-card.paused:before{background:#ef6c00}.activity-task-card.done:before{background:#2e7d32}.activity-task-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.activity-task-area{display:inline-flex;padding:4px 8px;border-radius:999px;background:#edf7ef;color:#15572a;font-size:9px;font-weight:900;text-transform:uppercase}.activity-status{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900}.activity-status.pending{background:#fff8e1;color:#9a6700}.activity-status.process{background:#eaf4ff;color:#0769a5}.activity-status.paused{background:#fff0e6;color:#b55200}.activity-status.done{background:#eaf8ee;color:#1b7a39}.activity-task-name{font-size:15px;font-weight:900;color:#102d19;line-height:1.3;margin-top:11px}.activity-task-detail{font-size:11px;color:var(--text-s);line-height:1.45;margin-top:6px;min-height:32px}.activity-task-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.activity-meta-box{background:#f7fbf8;border:1px solid #e1ece3;border-radius:10px;padding:8px}.activity-meta-box span{display:block;font-size:8px;text-transform:uppercase;color:#728a77;font-weight:900}.activity-meta-box strong{display:block;font-size:11px;color:#214a2c;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-task-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.activity-task-actions .btn{padding:7px 11px;font-size:11px}.btn-start{background:#167a3a;color:#fff}.btn-pause{background:#f57f17;color:#fff}.btn-finish{background:#0d3d1a;color:#fff}.btn-resume{background:#0277bd;color:#fff}
+.activity-empty{padding:30px 20px;text-align:center;border:1px dashed #cbdccb;border-radius:15px;background:#fbfefb;color:#6a8370}.activity-empty strong{display:block;color:#315e3b;font-size:14px;margin-bottom:4px}
+.activity-team-board{display:grid;gap:8px}.activity-team-row{display:grid;grid-template-columns:minmax(140px,1.2fr) minmax(180px,2fr) 110px 90px;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff}.activity-person{display:flex;align-items:center;gap:9px;min-width:0}.activity-person-avatar{width:31px;height:31px;border-radius:10px;background:#e3f0e5;color:#1a5c2a;display:grid;place-items:center;font-size:10px;font-weight:900;flex:0 0 auto}.activity-person strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-team-task{font-size:11px;color:#294b31;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-team-time{font-size:10px;color:#68816d;text-align:center}.activity-team-state{text-align:right}
+.assign-people-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:310px;overflow:auto;padding:2px}.assign-person-chip{position:relative;display:flex;align-items:center;gap:8px;padding:9px;border:1.5px solid var(--border);border-radius:11px;background:#fff;cursor:pointer;color:var(--text-s);font-size:11px;font-weight:750}.assign-person-chip input{position:absolute;opacity:0;pointer-events:none}.assign-person-chip:has(input:checked){background:#eaf7ed;border-color:#2e7d32;color:#15572a;box-shadow:0 0 0 2px rgba(46,125,50,.06)}.assign-person-mark{width:27px;height:27px;border-radius:9px;background:#e5f0e7;display:grid;place-items:center;color:#1a5c2a;font-size:9px;font-weight:900;flex:0 0 auto}.assign-person-chip:has(input:checked) .assign-person-mark{background:#1a5c2a;color:#fff}
+.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.evidence-box{border:1.5px dashed var(--border);border-radius:13px;padding:10px;background:#f8fcf9}.evidence-box label{display:block;font-size:10px;font-weight:900;color:#315f3c;margin-bottom:7px;text-transform:uppercase}.evidence-box input{width:100%;font-size:10px}.evidence-preview{height:92px;border-radius:9px;background:#eaf2eb;display:grid;place-items:center;color:#78927f;font-size:10px;margin-top:7px;overflow:hidden}.evidence-preview img{width:100%;height:100%;object-fit:cover}
+.maintenance-empty{min-height:calc(100vh - 150px);display:flex;align-items:center;justify-content:center;padding:30px}.maintenance-card{width:min(680px,100%);background:linear-gradient(145deg,#fff,#f3faf4);border:1px solid #d5e6d8;border-radius:24px;padding:42px;text-align:center;box-shadow:0 18px 48px rgba(13,61,26,.10)}.maintenance-icon{width:76px;height:76px;border-radius:22px;background:linear-gradient(145deg,#0d3d1a,#2e7d32);color:#fff;display:grid;place-items:center;margin:0 auto 18px;font-size:34px;box-shadow:0 10px 24px rgba(26,92,42,.24)}.maintenance-card h2{font-size:25px;color:#123d20}.maintenance-card p{font-size:13px;color:#63806a;margin-top:7px}.maintenance-status{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:8px 13px;border-radius:999px;background:#fff4e5;color:#a55700;font-size:11px;font-weight:900}.maintenance-status:before{content:"";width:8px;height:8px;border-radius:50%;background:#f57f17;box-shadow:0 0 0 5px rgba(245,127,23,.11)}
+.badge-en-pausa{background:#fff0e6;color:#b55200}
+@media(max-width:1100px){.activity-kpis{grid-template-columns:repeat(3,1fr)}.activity-team-row{grid-template-columns:minmax(130px,1fr) minmax(150px,1.8fr) 90px}}
+@media(max-width:768px){.activity-hero{padding:18px}.activity-hero-title{font-size:21px}.activity-kpis{grid-template-columns:1fr 1fr}.activity-toolbar{display:grid;grid-template-columns:1fr 1fr}.activity-toolbar>*{min-width:0;width:100%}.activity-date-pair{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.activity-task-grid{grid-template-columns:1fr}.activity-team-row{grid-template-columns:1fr auto}.activity-team-task{grid-column:1/-1;white-space:normal}.activity-team-time{display:none}.assign-people-grid{grid-template-columns:1fr}.evidence-grid{grid-template-columns:1fr}.evidence-preview{height:140px}.maintenance-empty{min-height:65vh;padding:12px}.maintenance-card{padding:28px 20px}}
+@media(max-width:430px){.activity-kpis{gap:8px}.activity-kpi{min-height:88px;padding:12px}.activity-kpi strong{font-size:24px}.activity-toolbar{grid-template-columns:1fr}.activity-date-pair{grid-template-columns:1fr 1fr}.activity-task-meta{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -1382,74 +1401,67 @@ img,canvas,svg,video{max-width:100%}
 
       <!-- PAGE: ACTIVIDADES -->
       <div id="view-actividades" style="display:none">
-        <div id="actividades-dashboard-slot"></div>
+        <div id="actividades-dashboard-slot" style="display:none"></div>
         <div class="page-header">
           <div>
-            <div class="page-title">Registro de actividades</div>
-            <div class="page-subtitle">Control diario de operaciones</div>
+            <div class="page-title">Gestión y seguimiento de actividades</div>
+            <div class="page-subtitle" id="activities-page-subtitle">Asignación, ejecución y evidencias del trabajo diario</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-outline" id="btn-sync-actividades-sheets" style="display:none" onclick="syncActividadesFromGoogleSheets()">↻ Importar Google Sheets</button>
-            <button class="btn btn-primary" id="btn-nueva-actividad-page" onclick="openModal('modal-actividad')">
-              <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-              Registrar actividad
-            </button>
+            <button class="btn btn-primary" id="btn-asignar-actividad" style="display:none" onclick="openAssignActivityModal()">+ Asignar actividad</button>
+            <button class="btn btn-outline" onclick="exportToCSV('actividades')">↓ Exportar Excel</button>
           </div>
         </div>
 
-        <!-- Filters -->
-        <div class="filters">
-          <input type="date" class="filter-select" id="filter-fecha-act" style="padding-right:12px">
-          <select class="filter-select" id="filter-guardia-act">
-            <option value="">Todas las guardias</option>
-            <option value="A">Guardia A</option>
-            <option value="B">Guardia B</option>
-          </select>
-          <select class="filter-select" id="filter-area-act">
-            <option value="">Todas las áreas</option>
-            <option>4388</option><option>DEG</option>
-            <option>Plataforma de Armados</option><option>PPL</option>
-          </select>
-          <select class="filter-select" id="filter-estado-act">
-            <option value="">Todos los estados</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="en proceso">En proceso</option>
-            <option value="finalizado">Finalizado</option>
-          </select>
-          <div class="filters-spacer"></div>
-          <button class="btn btn-outline btn-sm" onclick="exportToCSV('actividades')">
-            <svg viewBox="0 0 20 20" fill="none" width="14" height="14"><path d="M3 16h14M10 4v9M7 10l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Exportar Excel
-          </button>
-          <button class="btn btn-secondary btn-sm" onclick="filterActividades()">Filtrar</button>
+        <div class="activity-hero">
+          <div class="activity-hero-kicker" id="activity-hero-kicker">SEAMX · Actividades</div>
+          <div class="activity-hero-title" id="activity-hero-title">Control de ejecución del día</div>
+          <div class="activity-hero-sub" id="activity-hero-sub">Cada actividad queda asignada a una persona, se sigue por estado y se cierra con evidencia de campo.</div>
         </div>
 
-        <div class="card" style="padding:0">
-          <div class="table-wrap">
-            <table id="tabla-actividades">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Guardia</th>
-                  <th>Operador</th>
-                  <th>Área</th>
-                  <th>Actividad</th>
-                  <th>Inicio</th>
-                  <th>Fin</th>
-                  <th>Duración</th>
-                  <th>HH Individual</th>
-                  <th>Origen</th>
-                  <th>Estado</th>
-                  <th>Revisión</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tbody-actividades">
-              </tbody>
-            </table>
+        <div class="activity-kpis">
+          <div class="activity-kpi"><span>Asignadas hoy</span><strong id="act-kpi-assigned">0</strong><small>actividades planificadas</small></div>
+          <div class="activity-kpi blue"><span>En ejecución</span><strong id="act-kpi-process">0</strong><small>trabajos iniciados</small></div>
+          <div class="activity-kpi orange"><span>En pausa</span><strong id="act-kpi-paused">0</strong><small>requieren continuidad</small></div>
+          <div class="activity-kpi green"><span>Finalizadas</span><strong id="act-kpi-done">0</strong><small>con cierre registrado</small></div>
+          <div class="activity-kpi"><span>Sin iniciar</span><strong id="act-kpi-pending">0</strong><small>pendientes de inicio</small></div>
+          <div class="activity-kpi green"><span>Cumplimiento</span><strong id="act-kpi-progress">0%</strong><small>finalizadas / asignadas</small></div>
+        </div>
+
+        <div class="card activity-toolbar-card">
+          <div class="activity-toolbar">
+            <select class="filter-select" id="filter-periodo-act" onchange="toggleActivityRange();renderActividades()">
+              <option value="hoy">Hoy</option><option value="rango">Rango específico</option><option value="todos">Todo el historial</option>
+            </select>
+            <div class="activity-date-pair" id="activity-range-fields" style="display:none">
+              <div class="activity-date-field"><label>Desde</label><input type="date" class="filter-select" id="filter-desde-act" onchange="renderActividades()"></div>
+              <div class="activity-date-field"><label>Hasta</label><input type="date" class="filter-select" id="filter-hasta-act" onchange="renderActividades()"></div>
+            </div>
+            <select class="filter-select" id="filter-guardia-act" onchange="renderActividades()"><option value="">Todas las guardias</option><option value="A">Guardia A</option><option value="B">Guardia B</option></select>
+            <select class="filter-select" id="filter-area-act" onchange="renderActividades()"><option value="">Todas las áreas</option><option>4388</option><option>DEG</option><option>Plataforma de Armados</option><option>PPL</option><option>Otros</option></select>
+            <select class="filter-select" id="filter-estado-act" onchange="renderActividades()"><option value="">Todos los estados</option><option value="pendiente">Sin iniciar</option><option value="en proceso">En ejecución</option><option value="en pausa">En pausa</option><option value="finalizado">Finalizado</option></select>
+            <button class="btn btn-secondary btn-sm" onclick="renderActividades()">Aplicar filtros</button>
           </div>
         </div>
 
+        <div id="activities-operator-section" class="activity-section" style="display:none">
+          <div class="card">
+            <div class="activity-section-head"><div><div class="activity-section-title">Mis actividades asignadas</div><div class="activity-section-sub">Solo ves las actividades que fueron asignadas a tu usuario.</div></div><span class="activity-count-badge" id="my-activity-count">0 actividades</span></div>
+            <div id="my-activity-board" class="activity-task-grid"></div>
+          </div>
+        </div>
+
+        <div id="activities-management-section" class="activity-section" style="display:none">
+          <div class="card">
+            <div class="activity-section-head"><div><div class="activity-section-title">Seguimiento del equipo</div><div class="activity-section-sub">Estado individual de las actividades asignadas al personal.</div></div><span class="activity-count-badge" id="team-activity-count">0 registros</span></div>
+            <div id="activity-team-board" class="activity-team-board"></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="card-header" style="padding:16px 18px 4px"><div><div class="card-title">Historial de actividades</div><div class="card-subtitle">Trazabilidad de asignación, ejecución y cierre</div></div></div>
+          <div class="table-wrap"><table id="tabla-actividades"><thead><tr><th>Fecha</th><th>Personal</th><th>Área</th><th>Actividad</th><th>Inicio</th><th>Fin</th><th>HH</th><th>Estado</th><th>Evidencias</th><th>Asignado por</th><th>Acciones</th></tr></thead><tbody id="tbody-actividades"></tbody></table></div>
+        </div>
       </div>
 
       <!-- PAGE: RESTRICCIONES -->
@@ -1701,6 +1713,12 @@ img,canvas,svg,video{max-width:100%}
         </div>
       </div>
 
+
+      <!-- PAGE: GESTIÓN DE MANTENIMIENTO -->
+      <div id="view-mantenimiento" style="display:none">
+        <div class="page-header"><div><div class="page-title">Gestión de mantenimiento</div><div class="page-subtitle">Módulo reservado para la gestión futura de equipos ECOSEAM</div></div></div>
+        <div class="maintenance-empty"><div class="maintenance-card"><div class="maintenance-icon">⚙</div><h2>Gestión de mantenimiento</h2><p>Este módulo se está preparando para integrar posteriormente la gestión de los equipos de ECOSEAM.</p><div class="maintenance-status">EN EJECUCIÓN</div></div></div>
+      </div>
 
       <!-- PAGE: ASISTENTE DE SEGURIDAD -->
       <div id="view-seguridad" style="display:none">
@@ -2019,6 +2037,34 @@ img,canvas,svg,video{max-width:100%}
       <button class="btn btn-secondary" onclick="closeModal('modal-actividad')">Cancelar</button>
       <button class="btn btn-primary" onclick="saveActividad()">Guardar actividad</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal: Asignar actividad -->
+<div class="modal-overlay" id="modal-asignar-actividad">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-header"><div class="modal-title">Asignar actividad al personal</div><button class="modal-close" onclick="closeModal('modal-asignar-actividad')">×</button></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Fecha *</label><input class="form-control" id="assign-fecha" type="date"></div><div class="form-group"><label class="form-label">Guardia *</label><select class="form-control" id="assign-guardia"><option value="A">Guardia A</option><option value="B">Guardia B</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Área / Patio *</label><select class="form-control" id="assign-area"><option value="">Seleccionar</option><option>4388</option><option>DEG</option><option>Plataforma de Armados</option><option>PPL</option><option>Otros</option></select></div><div class="form-group"><label class="form-label">Actividad *</label><input class="form-control" id="assign-actividad" type="text" placeholder="Ej.: Habilitado de liners tipo 2 y 3"></div></div>
+    <div class="form-group"><label class="form-label">Indicaciones / alcance</label><textarea class="form-control" id="assign-detalle" rows="3" placeholder="Indica qué debe realizarse, alcance, prioridad o condición relevante."></textarea></div>
+    <div class="form-group"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px"><label class="form-label" style="margin:0">Personal involucrado *</label><span class="prog-counter" id="assign-person-count">0 personas</span></div><div id="assign-people-grid" class="assign-people-grid"></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-asignar-actividad')">Cancelar</button><button class="btn btn-primary" id="btn-save-assignment" onclick="saveAssignedActivity()">Asignar actividad</button></div>
+  </div>
+</div>
+
+<!-- Modal: Cierre y evidencias -->
+<div class="modal-overlay" id="modal-actividad-evidencias">
+  <div class="modal" style="max-width:780px">
+    <div class="modal-header"><div><div class="modal-title">Finalizar actividad</div><div class="card-subtitle" id="evidence-activity-title">Registra el cierre y las evidencias</div></div><button class="modal-close" onclick="closeModal('modal-actividad-evidencias')">×</button></div>
+    <input type="hidden" id="evidence-activity-id">
+    <div class="form-group"><label class="form-label">Descripción de lo realizado *</label><textarea class="form-control" id="evidence-description" rows="4" placeholder="Describe brevemente el trabajo ejecutado, resultado, condición final o información relevante."></textarea></div>
+    <div class="evidence-grid">
+      <div class="evidence-box"><label>Foto antes</label><input id="evidence-before" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-before')"><div class="evidence-preview" id="evidence-preview-before">Sin imagen</div></div>
+      <div class="evidence-box"><label>Foto durante</label><input id="evidence-during" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-during')"><div class="evidence-preview" id="evidence-preview-during">Sin imagen</div></div>
+      <div class="evidence-box"><label>Foto después</label><input id="evidence-after" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-after')"><div class="evidence-preview" id="evidence-preview-after">Sin imagen</div></div>
+    </div>
+    <div class="form-hint" style="margin-top:10px">Las fotografías se comprimen antes de subir para optimizar el uso desde celular. Puedes adjuntar una, dos o las tres evidencias.</div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-actividad-evidencias')">Cancelar</button><button class="btn btn-primary" id="btn-save-evidence" onclick="saveActivityEvidence()">✓ Finalizar actividad</button></div>
   </div>
 </div>
 
@@ -2755,6 +2801,16 @@ function dbActividadToApp(row) {
     comentario_rev: row.comentario_rev || '',
     origen: row.origen || 'aplicativo',
     externalId: row.external_id || '',
+    asignacionId: row.asignacion_id || '',
+    asignadoPor: row.asignado_por || '',
+    asignadoNombre: row.asignado_nombre || '',
+    inicioReal: row.inicio_real || '',
+    finReal: row.fin_real || '',
+    pausas: Array.isArray(row.pausas_json) ? row.pausas_json : [],
+    descripcionCierre: row.descripcion_cierre || '',
+    fotoAntesUrl: row.foto_antes_url || '',
+    fotoDuranteUrl: row.foto_durante_url || '',
+    fotoDespuesUrl: row.foto_despues_url || '',
     calc: {
       duracion: Number(row.duracion || 0),
       hh: Number(row.hh || 0)
@@ -2777,9 +2833,20 @@ function appActividadToDb(a) {
     obs: a.obs || '',
     estado: a.estado || 'pendiente',
     revision: a.revision || null,
-    comentario_rev: a.comentario_rev || ''
+    comentario_rev: a.comentario_rev || '',
+    asignacion_id: a.asignacionId || null,
+    asignado_por: a.asignadoPor || '',
+    asignado_nombre: a.asignadoNombre || '',
+    inicio_real: a.inicioReal || null,
+    fin_real: a.finReal || null,
+    pausas_json: Array.isArray(a.pausas) ? a.pausas : [],
+    descripcion_cierre: a.descripcionCierre || '',
+    foto_antes_url: a.fotoAntesUrl || '',
+    foto_durante_url: a.fotoDuranteUrl || '',
+    foto_despues_url: a.fotoDespuesUrl || ''
   };
   if(a.externalId){row.origen=a.origen||'google_sheets';row.external_id=a.externalId;}
+  else if(a.origen){row.origen=a.origen;}
   return row;
 }
 
@@ -3004,7 +3071,7 @@ async function loadAllDataOnline() {
   if(APP.currentView === 'patios') renderPatios();
   if(APP.currentView === 'ocupabilidad') renderOcupabilidad();
   if(APP.currentView === 'coproductos') renderCoproductos();
-  if(APP.currentView === 'seguridad') renderSeguridad();
+  if(APP.currentView === 'mantenimiento') { /* módulo en ejecución */ }
   if(APP.currentView === 'programacion') renderProgramacion();
   if(APP.currentView === 'comando') renderCommandCenter();
   if(APP.currentView === 'entrega') renderHandover();
@@ -3595,15 +3662,15 @@ const NAV_CONFIG = {
     {id:'restricciones',label:'Restricciones',icon:'alert'},
     {id:'programacion',label:'Programación diaria',icon:'calendar'},
     {id:'entrega',label:'Entrega de guardia',icon:'transfer'},
-    {id:'seguridad',label:'Asistente seguridad',icon:'book'},
+    {id:'mantenimiento',label:'Gestión de mantenimiento',icon:'wrench'},
     {id:'resumen',label:'Reporte de actividades',icon:'image'},
     {id:'admin',label:'Administración',icon:'user'},
   ],
-  operador: ['actividades','ocupabilidad','seguridad'],
-  controlador: ['comando','actividades','patios','ocupabilidad','coproductos','entrega','seguridad'],
-  supervisor: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','seguridad','resumen'],
-  gerencia: ['comando','actividades','restricciones','patios','ocupabilidad','coproductos','seguridad'],
-  admin: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','seguridad','resumen','admin'],
+  operador: ['actividades','ocupabilidad','mantenimiento'],
+  controlador: ['comando','actividades','patios','ocupabilidad','coproductos','entrega','mantenimiento'],
+  supervisor: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento','resumen'],
+  gerencia: ['comando','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento'],
+  admin: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento','resumen','admin'],
 };
 
 const ICONS = {
@@ -3619,6 +3686,7 @@ const ICONS = {
   image: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M6 13l3-3 2 2 2-3 2 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>`,
   calendar: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><rect x="3" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M6 2.5v3M14 2.5v3M3 8h14M7 11h2M11 11h2M7 14h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   transfer: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M3 6h11M11 3l3 3-3 3M17 14H6M9 11l-3 3 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  wrench: `<svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M12.7 3.2a4.2 4.2 0 01-5.4 5.4L3 12.9a2 2 0 102.8 2.8l4.3-4.3a4.2 4.2 0 005.4-5.4l-2.6 2.6-2.2-.5-.5-2.2 2.5-2.7z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 };
 
 const VIEW_TITLES = {
@@ -3630,7 +3698,7 @@ const VIEW_TITLES = {
   coproductos:'Coproductos 3D',
   restricciones:'Restricciones operativas',
   programacion:'Programación diaria',
-  seguridad:'Asistente de seguridad',
+  mantenimiento:'Gestión de mantenimiento',
   resumen:'Reporte de actividades',
   admin:'Administración',
 };
@@ -3656,7 +3724,7 @@ function setupUI() {
   document.body.classList.toggle('seamx-operacion',u.role!=='gerencia');
   mergeDashboardIntoActividades();
   const dashboardSlot=document.getElementById('actividades-dashboard-slot');
-  if(dashboardSlot)dashboardSlot.style.display=puedeVerDashboardActividades()?'block':'none';
+  if(dashboardSlot)dashboardSlot.style.display='none';
   document.getElementById('user-avatar-side').textContent = u.initials;
   document.getElementById('user-name-side').textContent = u.name;
   document.getElementById('user-role-side').textContent = u.role;
@@ -3788,7 +3856,7 @@ function navigateTo(view) {
   if(view === 'ocupabilidad') renderOcupabilidad();
   if(view === 'coproductos') renderCoproductos();
   if(view === 'resumen') renderResumenWhatsapp();
-  if(view === 'seguridad') renderSeguridad();
+  if(view === 'mantenimiento') { /* contenido intencionalmente reservado */ }
   if(view === 'programacion') { renderProgramacionDraftList(); renderProgramacion(); }
   restoreCurrentViewPosition(view);
 }
@@ -4771,7 +4839,7 @@ function renderCommandCenter(){
   document.getElementById('command-pulse-score').textContent=pulse.score;document.getElementById('command-pulse-label').textContent=pulse.label;document.getElementById('command-pulse-note').textContent=`${commandAttentionItems().length} prioridades detectadas · actualizado ${new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'})}`;
   document.getElementById('cmd-hh').textContent=hh.toFixed(1);document.getElementById('cmd-activities').textContent=activeActs;document.getElementById('cmd-restrictions').textContent=open;document.getElementById('cmd-vehicles').textContent=live.length;document.getElementById('cmd-occupancy').textContent=(occPct*100).toFixed(1)+'%';document.getElementById('cmd-occupancy-sub').textContent=`${crit} áreas sobre el 40%`;
   const occSubEl=document.getElementById('cmd-occupancy-sub');if(occSubEl){occSubEl.style.display='block';occSubEl.style.width='100%';}document.getElementById('cmd-evac').textContent=f.actual.toFixed(0)+' tn';document.getElementById('cmd-evac-sub').textContent=`de ${f.target.toFixed(0)} tn`;
-  const actions=document.getElementById('command-quick-actions');if(actions)actions.innerHTML=ger?'':`<button class="btn btn-primary" onclick="navigateTo('actividades')">+ Registrar actividad</button>${['admin','controlador'].includes(APP.user?.role)?`<button class="btn btn-outline" onclick="navigateTo('patios')">🚛 Registrar ingreso</button>`:''}${['admin','supervisor'].includes(APP.user?.role)?`<button class="btn btn-outline" onclick="navigateTo('restricciones')">⛔ Registrar restricción</button>`:''}<button class="btn btn-outline" onclick="navigateTo('entrega')">🔄 Preparar entrega</button>`;
+  const actions=document.getElementById('command-quick-actions');if(actions)actions.innerHTML=ger?'':`<button class="btn btn-primary" onclick="navigateTo('actividades')">+ Gestionar actividades</button>${['admin','controlador'].includes(APP.user?.role)?`<button class="btn btn-outline" onclick="navigateTo('patios')">🚛 Registrar ingreso</button>`:''}${['admin','supervisor'].includes(APP.user?.role)?`<button class="btn btn-outline" onclick="navigateTo('restricciones')">⛔ Registrar restricción</button>`:''}<button class="btn btn-outline" onclick="navigateTo('entrega')">🔄 Preparar entrega</button>`;
   const exec=document.getElementById('command-executive-summary');if(exec){exec.style.display=ger?'block':'none';exec.innerHTML=`<strong>Resumen SEAMX:</strong> ${pulse.label}. La ocupabilidad consolidada del Patio 4388 es ${(occPct*100).toFixed(1)}% con ${crit} áreas sobre el límite. El forecast de evacuación proyecta ${f.projected.toFixed(0)} tn frente a una meta de ${f.target.toFixed(0)} tn. Actualmente hay ${open} restricciones abiertas y ${live.length} vehículos en patio.`;}
   renderAttention();renderForecast();renderLiveVehicles();renderOccupancyPredictions();renderHandoverPreview();updateOfflineUI();
 }
@@ -5151,7 +5219,7 @@ const PERSONAL_PROGRAMACION = [
   'Jorge Cerquin','Jose Villanueva','Carlos Barrera','Marlon Vega',
   'Daniel Sigueñas','Christian Vega','Hitler Chavez','Lucio Valentin',
   'Miflin Acevedo','Jonatan Carhuallanqui','Dargor Portilla','Yonel Saavedra',
-  'Roger Madalengoitia','Junior Zapata'
+  'Roger Madalengoitia','Junior Zapata','Stev Bolaños'
 ];
 
 function canEditProgramacion(){
@@ -5326,8 +5394,9 @@ async function saveProgramacion(){
   const {error}=await query;
   if(error){console.error(error);showToast('No se pudo guardar. Ejecuta el SQL de actualización V19.','error');return;}
   document.getElementById('prog-reporte-fecha').value=p.fecha;
+  await syncProgramacionAssignments(p);
   resetProgramacionForm(false);await loadAllData();
-  showToast(p.id?'Reporte diario actualizado':'Reporte diario guardado','success');
+  showToast(p.id?'Reporte diario actualizado y actividades sincronizadas':'Reporte diario guardado y actividades asignadas','success');
 }
 
 function editProgramacion(id){
@@ -6042,6 +6111,140 @@ function showToast(msg, type='success') {
   setTimeout(()=>toast.remove(), 3500);
 }
 
+
+/* ===== v39 · ACTIVIDADES ASIGNADAS Y EJECUCIÓN EN CAMPO ===== */
+function activityNormalize(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();}
+function activityToday(){return new Date().toISOString().slice(0,10);}
+function activityNowIso(){return new Date().toISOString();}
+function activityNowTime(){return new Date().toTimeString().slice(0,5);}
+function activityCanAssign(){return Boolean(APP.user&&['supervisor','admin'].includes(APP.user.role));}
+function activityIsFieldUser(){return Boolean(APP.user&&['operador','controlador'].includes(APP.user.role));}
+function activityFullUserName(u){return `${u?.nombre||''} ${u?.apellido||''}`.trim();}
+function activityUserMatch(a){
+  if(!APP.user)return false;
+  if(a.operadorLogin&&String(a.operadorLogin)===String(APP.user.login))return true;
+  return activityNormalize(a.operador)===activityNormalize(APP.user.name);
+}
+function activityStatusInfo(state){
+  const s=String(state||'pendiente');
+  if(s==='finalizado')return{key:'done',label:'Finalizado'};
+  if(s==='en proceso')return{key:'process',label:'En ejecución'};
+  if(s==='en pausa')return{key:'paused',label:'En pausa'};
+  return{key:'pending',label:'Sin iniciar'};
+}
+function activityAssignmentPeople(){
+  const staticNames=[...new Set([...PERSONAL_PROGRAMACION,'Stev Bolaños'])];
+  const users=(APP.data.usuarios||[]).filter(u=>u.activo!==false&&u.rol!=='gerencia').map(u=>({name:activityFullUserName(u)||u.login,login:u.login||'',role:u.rol||''}));
+  const byName=new Map();users.forEach(x=>byName.set(activityNormalize(x.name),x));
+  staticNames.forEach(name=>{const key=activityNormalize(name);if(!byName.has(key))byName.set(key,{name,login:'',role:'operador'});});
+  return [...byName.values()].sort((a,b)=>a.name.localeCompare(b.name,'es'));
+}
+function activityInitials(name){return String(name||'').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'OP';}
+function renderAssignmentPeople(selected=[]){
+  const grid=document.getElementById('assign-people-grid');if(!grid)return;
+  const selectedNorm=new Set(selected.map(activityNormalize));
+  grid.innerHTML=activityAssignmentPeople().map(p=>`<label class="assign-person-chip"><input type="checkbox" value="${escapeHtml(p.name)}" data-login="${escapeHtml(p.login)}" ${selectedNorm.has(activityNormalize(p.name))?'checked':''} onchange="updateAssignmentPeopleCount()"><span class="assign-person-mark">${escapeHtml(activityInitials(p.name))}</span><span>${escapeHtml(p.name)}${p.login?`<small style="display:block;font-size:9px;color:var(--text-m);font-weight:600">${escapeHtml(p.login)}</small>`:''}</span></label>`).join('');
+  updateAssignmentPeopleCount();
+}
+function updateAssignmentPeopleCount(){const n=document.querySelectorAll('#assign-people-grid input:checked').length,el=document.getElementById('assign-person-count');if(el)el.textContent=`${n} ${n===1?'persona':'personas'}`;}
+function openAssignActivityModal(){
+  if(!activityCanAssign()){showToast('Solo supervisión y administración pueden asignar actividades','warning');return;}
+  document.getElementById('assign-fecha').value=activityToday();
+  document.getElementById('assign-guardia').value=(APP.user?.guardia&&APP.user.guardia!=='ambas')?APP.user.guardia:'A';
+  document.getElementById('assign-area').value='';document.getElementById('assign-actividad').value='';document.getElementById('assign-detalle').value='';
+  renderAssignmentPeople();openModal('modal-asignar-actividad');
+}
+function simpleActivityHash(value){let h=2166136261;for(const ch of String(value)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return (h>>>0).toString(36);}
+function resolveActivityPerson(name){
+  const match=(APP.data.usuarios||[]).find(u=>activityNormalize(activityFullUserName(u))===activityNormalize(name));
+  return {name,login:match?.login||'',guardia:match?.guardia||''};
+}
+async function saveAssignedActivity(){
+  if(!activityCanAssign())return;
+  const fecha=document.getElementById('assign-fecha').value,guardia=document.getElementById('assign-guardia').value,area=document.getElementById('assign-area').value,actividad=document.getElementById('assign-actividad').value.trim(),detalle=document.getElementById('assign-detalle').value.trim();
+  const checks=[...document.querySelectorAll('#assign-people-grid input:checked')];
+  if(!fecha||!guardia||!area||!actividad||!checks.length){showToast('Completa fecha, guardia, área, actividad y personal','warning');return;}
+  const group=`MAN-${fecha}-${Date.now().toString(36)}`;
+  const rows=checks.map((c,i)=>{const p=resolveActivityPerson(c.value);return appActividadToDb({fecha,guardia,operador:p.name,operadorLogin:p.login,area,actividad,obs:detalle,inicio:'',fin:'',estado:'pendiente',revision:null,comentario_rev:'',origen:'asignacion',asignacionId:`${group}-${i+1}-${simpleActivityHash(p.name)}`,asignadoPor:APP.user.login||'',asignadoNombre:APP.user.name||'',inicioReal:'',finReal:'',pausas:[],descripcionCierre:'',fotoAntesUrl:'',fotoDuranteUrl:'',fotoDespuesUrl:'',calc:{duracion:0,hh:0}});});
+  const btn=document.getElementById('btn-save-assignment');if(btn){btn.disabled=true;btn.textContent='Asignando…';}
+  try{
+    if(!navigator.onLine){rows.forEach(r=>{APP.data.actividades.unshift(dbActividadToApp({...r,id:offlineTempId()}));queueOfflineMutation('actividades','insert',r,null,'Actividad asignada');});cacheAppData();closeModal('modal-asignar-actividad');renderActividades();return;}
+    const {error}=await db.from('actividades').insert(rows);if(error)throw error;
+    closeModal('modal-asignar-actividad');await loadAllData();showToast(`Actividad asignada a ${rows.length} persona${rows.length===1?'':'s'}`,'success');
+  }catch(err){console.error(err);showToast('No se pudo asignar. Ejecuta el SQL de actualización v39.','error');}
+  finally{if(btn){btn.disabled=false;btn.textContent='Asignar actividad';}}
+}
+async function syncProgramacionAssignments(p){
+  if(!p?.fecha||!Array.isArray(p.actividades)||!p.actividades.length||!navigator.onLine)return;
+  try{
+    const {data:existing,error:eErr}=await db.from('actividades').select('id,asignacion_id').eq('fecha',p.fecha);
+    if(eErr)throw eErr;const keys=new Set((existing||[]).map(x=>x.asignacion_id).filter(Boolean));const rows=[];
+    p.actividades.forEach((a,ai)=>(a.personal||[]).forEach(name=>{const person=resolveActivityPerson(name);const key=`PROG-${p.fecha}-${simpleActivityHash(`${a.area}|${a.descripcion}|${name}`)}`;if(keys.has(key))return;keys.add(key);rows.push(appActividadToDb({fecha:p.fecha,guardia:(person.guardia&&person.guardia!=='ambas')?person.guardia:(APP.user?.guardia&&APP.user.guardia!=='ambas'?APP.user.guardia:'A'),operador:name,operadorLogin:person.login,area:a.area,actividad:a.descripcion,obs:`Programación diaria · HSE: ${a.hse||'—'} · Supervisor: ${a.supervisor||'—'}`,inicio:'',fin:'',estado:'pendiente',revision:null,comentario_rev:'',origen:'programacion',asignacionId:key,asignadoPor:APP.user?.login||'',asignadoNombre:a.supervisor||APP.user?.name||'',inicioReal:'',finReal:'',pausas:[],descripcionCierre:'',fotoAntesUrl:'',fotoDuranteUrl:'',fotoDespuesUrl:'',calc:{duracion:0,hh:0}}));}));
+    if(rows.length){const {error}=await db.from('actividades').insert(rows);if(error)throw error;}
+  }catch(err){console.warn('No se pudieron sincronizar actividades desde Programación diaria:',err);showToast('Programación guardada; revisa SQL v39 para sincronizar actividades','warning');}
+}
+function activityPauseMinutes(a,finishIso=null){
+  let total=0;for(const p of (a.pausas||[])){if(!p?.inicio)continue;const start=new Date(p.inicio).getTime(),end=new Date(p.fin||finishIso||Date.now()).getTime();if(Number.isFinite(start)&&Number.isFinite(end)&&end>start)total+=(end-start)/60000;}return total;
+}
+function activityEffectiveHours(a,finishIso){if(!a.inicioReal)return 0;const start=new Date(a.inicioReal).getTime(),end=new Date(finishIso||a.finReal||Date.now()).getTime();if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return 0;return Math.max(0,Math.round((((end-start)/60000-activityPauseMinutes(a,finishIso))/60)*100)/100);}
+async function updateAssignedActivity(id,action){
+  const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;if(activityIsFieldUser()&&!activityUserMatch(a)){showToast('Esta actividad no está asignada a tu usuario','error');return;}
+  const now=activityNowIso(),patch={},local={...a,pausas:[...(a.pausas||[])]};
+  if(action==='start'){if(a.estado!=='pendiente')return;patch.estado='en proceso';patch.inicio_real=now;patch.inicio=activityNowTime();local.estado='en proceso';local.inicioReal=now;local.inicio=patch.inicio;}
+  if(action==='pause'){if(a.estado!=='en proceso')return;local.pausas.push({inicio:now,fin:null});patch.estado='en pausa';patch.pausas_json=local.pausas;local.estado='en pausa';}
+  if(action==='resume'){if(a.estado!=='en pausa')return;const last=[...local.pausas].reverse().find(x=>x&&!x.fin);if(last)last.fin=now;patch.estado='en proceso';patch.pausas_json=local.pausas;local.estado='en proceso';}
+  if(!Object.keys(patch).length)return;
+  try{
+    if(!navigator.onLine){queueOfflineMutation('actividades','update',patch,{key:'id',value:Number(id)},'Estado de actividad');Object.assign(a,local);cacheAppData();renderActividades();return;}
+    const {error}=await db.from('actividades').update(patch).eq('id',id);if(error)throw error;await loadAllData();showToast(action==='start'?'Actividad iniciada':action==='pause'?'Actividad en pausa':'Actividad reanudada','success');
+  }catch(err){console.error(err);showToast('No se pudo actualizar la actividad','error');}
+}
+function openActivityEvidence(id){
+  const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;if(activityIsFieldUser()&&!activityUserMatch(a)){showToast('Esta actividad no está asignada a tu usuario','error');return;}
+  document.getElementById('evidence-activity-id').value=id;document.getElementById('evidence-activity-title').textContent=`${a.actividad} · ${a.area}`;document.getElementById('evidence-description').value=a.descripcionCierre||'';
+  ['evidence-before','evidence-during','evidence-after'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});
+  [['evidence-preview-before',a.fotoAntesUrl],['evidence-preview-during',a.fotoDuranteUrl],['evidence-preview-after',a.fotoDespuesUrl]].forEach(([id,url])=>{const box=document.getElementById(id);if(box)box.innerHTML=url?`<img src="${escapeHtml(url)}" alt="Evidencia">`:'Sin imagen';});openModal('modal-actividad-evidencias');
+}
+function previewActivityEvidence(input,previewId){const box=document.getElementById(previewId),file=input.files?.[0];if(!box)return;if(!file){box.textContent='Sin imagen';return;}const url=URL.createObjectURL(file);box.innerHTML=`<img src="${url}" alt="Vista previa">`;}
+async function compressActivityPhoto(file){
+  if(!file)return null;if(!String(file.type||'').startsWith('image/'))throw new Error('Selecciona una imagen válida.');if(file.size>15*1024*1024)throw new Error('Cada imagen debe pesar menos de 15 MB.');
+  const bmp=await createImageBitmap(file),max=1600,scale=Math.min(1,max/Math.max(bmp.width,bmp.height)),w=Math.max(1,Math.round(bmp.width*scale)),h=Math.max(1,Math.round(bmp.height*scale));const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(bmp,0,0,w,h);bmp.close?.();return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('No se pudo procesar la fotografía')),'image/jpeg',.82));
+}
+async function uploadActivityEvidence(file,a,kind){if(!file)return'';const blob=await compressActivityPhoto(file),safe=activityNormalize(a.operador).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'usuario',path=`${a.fecha}/${safe}/${a.id}-${kind}-${Date.now()}.jpg`;const {error}=await db.storage.from('actividades-evidencias').upload(path,blob,{cacheControl:'3600',upsert:false,contentType:'image/jpeg'});if(error)throw error;return db.storage.from('actividades-evidencias').getPublicUrl(path).data.publicUrl;}
+async function saveActivityEvidence(){
+  const id=document.getElementById('evidence-activity-id').value,a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;const desc=document.getElementById('evidence-description').value.trim();if(!desc){showToast('Describe lo realizado antes de finalizar','warning');return;}if(!navigator.onLine){showToast('Para cerrar con fotografías necesitas conexión. Puedes continuar trabajando y finalizar cuando recuperes señal.','warning');return;}
+  const btn=document.getElementById('btn-save-evidence');btn.disabled=true;btn.textContent='Subiendo evidencias…';
+  try{const before=document.getElementById('evidence-before').files?.[0],during=document.getElementById('evidence-during').files?.[0],after=document.getElementById('evidence-after').files?.[0];const urls=await Promise.all([uploadActivityEvidence(before,a,'antes'),uploadActivityEvidence(during,a,'durante'),uploadActivityEvidence(after,a,'despues')]);const finish=activityNowIso(),pausas=[...(a.pausas||[])];const openPause=[...pausas].reverse().find(x=>x&&!x.fin);if(openPause)openPause.fin=finish;const hrs=activityEffectiveHours({...a,pausas},finish);const patch={estado:'finalizado',fin_real:finish,fin:activityNowTime(),pausas_json:pausas,descripcion_cierre:desc,foto_antes_url:urls[0]||a.fotoAntesUrl||'',foto_durante_url:urls[1]||a.fotoDuranteUrl||'',foto_despues_url:urls[2]||a.fotoDespuesUrl||'',duracion:hrs,hh:hrs,obs:a.obs||''};const {error}=await db.from('actividades').update(patch).eq('id',id);if(error)throw error;closeModal('modal-actividad-evidencias');await loadAllData();showToast('Actividad finalizada y evidencias registradas','success');}catch(err){console.error(err);showToast('No se pudo finalizar: '+(err.message||'verifica el SQL y el bucket'),'error');}finally{btn.disabled=false;btn.textContent='✓ Finalizar actividad';}
+}
+function viewActivityEvidence(id){const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;openActivityEvidence(id);const btn=document.getElementById('btn-save-evidence');if(btn)btn.style.display=activityIsFieldUser()?'inline-flex':'none';}
+function toggleActivityRange(){const mode=document.getElementById('filter-periodo-act')?.value||'hoy',box=document.getElementById('activity-range-fields');if(box)box.style.display=mode==='rango'?'flex':'none';if(mode==='rango'){const today=activityToday();if(!document.getElementById('filter-desde-act').value)document.getElementById('filter-desde-act').value=today;if(!document.getElementById('filter-hasta-act').value)document.getElementById('filter-hasta-act').value=today;}}
+function activityFilteredData(){
+  const mode=document.getElementById('filter-periodo-act')?.value||'hoy',guardia=document.getElementById('filter-guardia-act')?.value||'',area=document.getElementById('filter-area-act')?.value||'',estado=document.getElementById('filter-estado-act')?.value||'';let data=[...(APP.data.actividades||[])];
+  if(mode==='hoy')data=data.filter(a=>a.fecha===activityToday());if(mode==='rango'){const from=document.getElementById('filter-desde-act')?.value||'',to=document.getElementById('filter-hasta-act')?.value||'';if(from)data=data.filter(a=>a.fecha>=from);if(to)data=data.filter(a=>a.fecha<=to);}if(guardia)data=data.filter(a=>a.guardia===guardia);if(area)data=data.filter(a=>a.area===area);if(estado)data=data.filter(a=>a.estado===estado);if(activityIsFieldUser())data=data.filter(activityUserMatch);return data;
+}
+function activityEvidenceCount(a){return [a.fotoAntesUrl,a.fotoDuranteUrl,a.fotoDespuesUrl].filter(Boolean).length;}
+function activityTaskActions(a){
+  if(!activityIsFieldUser()||!activityUserMatch(a))return `<button class="btn btn-outline btn-sm" onclick="viewActivityEvidence(${a.id})">Ver detalle</button>`;
+  if(a.estado==='pendiente')return `<button class="btn btn-start" onclick="updateAssignedActivity(${a.id},'start')">▶ Iniciar</button>`;
+  if(a.estado==='en proceso')return `<button class="btn btn-pause" onclick="updateAssignedActivity(${a.id},'pause')">Ⅱ En pausa</button><button class="btn btn-finish" onclick="openActivityEvidence(${a.id})">✓ Terminar</button>`;
+  if(a.estado==='en pausa')return `<button class="btn btn-resume" onclick="updateAssignedActivity(${a.id},'resume')">▶ Reanudar</button><button class="btn btn-finish" onclick="openActivityEvidence(${a.id})">✓ Terminar</button>`;
+  return `<button class="btn btn-outline btn-sm" onclick="viewActivityEvidence(${a.id})">▣ Ver evidencias</button>`;
+}
+function activityTaskCard(a){const st=activityStatusInfo(a.estado),evid=activityEvidenceCount(a);return `<div class="activity-task-card ${st.key}"><div class="activity-task-top"><span class="activity-task-area">${escapeHtml(a.area||'General')}</span><span class="activity-status ${st.key}">${st.label}</span></div><div class="activity-task-name">${escapeHtml(a.actividad)}</div><div class="activity-task-detail">${escapeHtml(a.obs||'Sin indicaciones adicionales.')}</div><div class="activity-task-meta"><div class="activity-meta-box"><span>Fecha / Guardia</span><strong>${formatDate(a.fecha)} · ${escapeHtml(a.guardia||'—')}</strong></div><div class="activity-meta-box"><span>Asignado por</span><strong>${escapeHtml(a.asignadoNombre||a.asignadoPor||'SEAMX')}</strong></div><div class="activity-meta-box"><span>Inicio</span><strong>${escapeHtml(a.inicio||'Sin iniciar')}</strong></div><div class="activity-meta-box"><span>Evidencias</span><strong>${evid}/3 fotos</strong></div></div>${a.descripcionCierre?`<div style="margin-top:9px;padding:8px 9px;border-radius:9px;background:#f1f8f2;font-size:10px;color:#45664d"><b>Cierre:</b> ${escapeHtml(a.descripcionCierre)}</div>`:''}<div class="activity-task-actions">${activityTaskActions(a)}</div></div>`;}
+function renderActivitiesDashboard(data){
+  const today=(APP.data.actividades||[]).filter(a=>a.fecha===activityToday()).filter(a=>activityIsFieldUser()?activityUserMatch(a):true),total=today.length,process=today.filter(a=>a.estado==='en proceso').length,paused=today.filter(a=>a.estado==='en pausa').length,done=today.filter(a=>a.estado==='finalizado').length,pending=today.filter(a=>a.estado==='pendiente').length;const pct=total?Math.round(done/total*100):0;
+  const vals={assigned:total,process,paused,done,pending,progress:pct+'%'};Object.entries(vals).forEach(([k,v])=>{const el=document.getElementById('act-kpi-'+k);if(el)el.textContent=v;});
+  const operator=activityIsFieldUser();document.getElementById('activity-hero-title').textContent=operator?'Mis actividades de hoy':'Seguimiento operacional de actividades';document.getElementById('activity-hero-sub').textContent=operator?'Revisa lo que tienes asignado, inicia tu trabajo, registra pausas y cierra con evidencias.':'Asigna actividades al personal y monitorea en tiempo real el avance individual hasta el cierre con evidencias.';document.getElementById('activities-page-subtitle').textContent=operator?'Trabajo asignado y ejecución diaria':'Asignación, ejecución y evidencias del trabajo diario';
+}
+function renderActivitiesOperator(data){const section=document.getElementById('activities-operator-section'),box=document.getElementById('my-activity-board');if(!section||!box)return;section.style.display=activityIsFieldUser()?'block':'none';if(!activityIsFieldUser())return;const rows=[...data].sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))||String(a.id).localeCompare(String(b.id)));document.getElementById('my-activity-count').textContent=`${rows.length} ${rows.length===1?'actividad':'actividades'}`;box.innerHTML=rows.length?rows.map(activityTaskCard).join(''):`<div class="activity-empty" style="grid-column:1/-1"><strong>No tienes actividades asignadas</strong>No hay trabajos asignados a tu usuario para los filtros seleccionados.</div>`;}
+function renderActivitiesManagement(data){const section=document.getElementById('activities-management-section'),box=document.getElementById('activity-team-board');if(!section||!box)return;const show=!activityIsFieldUser();section.style.display=show?'block':'none';if(!show)return;document.getElementById('team-activity-count').textContent=`${data.length} ${data.length===1?'registro':'registros'}`;box.innerHTML=data.length?data.slice(0,60).map(a=>{const st=activityStatusInfo(a.estado);return `<div class="activity-team-row"><div class="activity-person"><div class="activity-person-avatar">${escapeHtml(activityInitials(a.operador))}</div><div style="min-width:0"><strong>${escapeHtml(a.operador)}</strong><div style="font-size:9px;color:var(--text-m)">${escapeHtml(a.area)} · ${formatDate(a.fecha)}</div></div></div><div class="activity-team-task" title="${escapeHtml(a.actividad)}">${escapeHtml(a.actividad)}</div><div class="activity-team-time">${a.inicio||'—'} → ${a.fin||'—'}</div><div class="activity-team-state"><span class="activity-status ${st.key}">${st.label}</span></div></div>`;}).join(''):`<div class="activity-empty"><strong>Sin actividades</strong>No existen actividades para los filtros seleccionados.</div>`;}
+function renderActividades(){
+  toggleActivityRange();const data=activityFilteredData();const btn=document.getElementById('btn-asignar-actividad');if(btn)btn.style.display=activityCanAssign()?'inline-flex':'none';renderActivitiesDashboard(data);renderActivitiesOperator(data);renderActivitiesManagement(data);
+  const tbody=document.getElementById('tbody-actividades');if(!tbody)return;if(!data.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--text-m)">Sin actividades para los filtros seleccionados</td></tr>';return;}
+  tbody.innerHTML=data.map(a=>{const st=activityStatusInfo(a.estado),e=activityEvidenceCount(a);return `<tr><td>${formatDate(a.fecha)}</td><td><strong>${escapeHtml(a.operador)}</strong></td><td>${escapeHtml(a.area)}</td><td style="max-width:260px"><strong style="font-size:12px">${escapeHtml(a.actividad)}</strong><div style="font-size:10px;color:var(--text-m);margin-top:2px">${escapeHtml(a.obs||'')}</div></td><td>${a.inicio||'—'}</td><td>${a.fin||'—'}</td><td>${Number(a.calc?.hh||0).toFixed(1)} h</td><td><span class="activity-status ${st.key}">${st.label}</span></td><td>${e}/3${a.descripcionCierre?' · cierre ✓':''}</td><td>${escapeHtml(a.asignadoNombre||a.asignadoPor||'—')}</td><td style="white-space:nowrap">${activityTaskActions(a)}${activityCanAssign()?` <button class="btn btn-sm" style="background:#fdedec;color:#b42318;padding:6px 9px" onclick="deleteActividad(${a.id})">×</button>`:''}</td></tr>`;}).join('');
+}
+function filterActividades(){renderActividades();}
+
 /* ===== PWA INSTALL ===== */
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
@@ -6074,19 +6277,15 @@ loadRememberedCredentials();
 restoreSession();
 </script>
 
-<!-- Limpieza del caché antiguo: las nuevas versiones deben cargarse desde la red -->
+<!-- SEAMX v39 · Service Worker para modo offline -->
 <script>
 window.addEventListener('load',async()=>{
   try{
     if('serviceWorker' in navigator){
-      const registrations=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(registration=>registration.unregister()));
+      const registration=await navigator.serviceWorker.register('./seamx-sw.js',{updateViaCache:'none'});
+      registration.update().catch(()=>{});
     }
-    if('caches' in window){
-      const keys=await caches.keys();
-      await Promise.all(keys.filter(key=>key.startsWith('ecoseam-')).map(key=>caches.delete(key)));
-    }
-  }catch(error){console.warn('No se pudo limpiar el caché anterior:',error);}
+  }catch(error){console.warn('No se pudo registrar el modo offline:',error);}
 });
 </script>
 </body>
