@@ -1,4 +1,4 @@
-const CACHE_NAME='seamx-shell-v40';
+const CACHE_NAME='seamx-shell-v41';
 
 const CORE_ASSETS=[
   './',
@@ -21,14 +21,21 @@ self.addEventListener('install',event=>{
     await Promise.allSettled(
       CORE_ASSETS.map(async url=>{
         try{
-          const response=await fetch(url,{
-            mode:url.startsWith('http') ? 'cors' : 'same-origin',
-            cache:'no-cache'
-          });
+          const response=await fetch(
+            url,
+            {
+              mode:url.startsWith('http') ? 'cors' : 'same-origin',
+              cache:'no-cache'
+            }
+          );
 
           if(response.ok || response.type==='opaque'){
-            await cache.put(url,response.clone());
+            await cache.put(
+              url,
+              response.clone()
+            );
           }
+
         }catch(_){
           /* Recursos externos opcionales */
         }
@@ -36,62 +43,79 @@ self.addEventListener('install',event=>{
     );
 
     await self.skipWaiting();
+
   })());
 });
 
 self.addEventListener('activate',event=>{
   event.waitUntil((async()=>{
+
     const keys=await caches.keys();
 
     await Promise.all(
       keys
         .filter(
-          k=>k.startsWith('seamx-shell-') && k!==CACHE_NAME
+          k=>
+            k.startsWith('seamx-shell-') &&
+            k!==CACHE_NAME
         )
-        .map(k=>caches.delete(k))
+        .map(
+          k=>caches.delete(k)
+        )
     );
 
     await self.clients.claim();
+
   })());
 });
 
 self.addEventListener('fetch',event=>{
 
-  if(event.request.method!=='GET') return;
+  if(event.request.method!=='GET'){
+    return;
+  }
 
-  // Las consultas de Supabase siempre deben utilizar información actual.
-  if(new URL(event.request.url).origin.includes('supabase.co')){
+  // Supabase siempre trabaja con información actual.
+  if(
+    new URL(event.request.url)
+      .origin
+      .includes('supabase.co')
+  ){
     return;
   }
 
   event.respondWith((async()=>{
 
-    const cache=await caches.open(CACHE_NAME);
+    const cache=
+      await caches.open(CACHE_NAME);
 
     const isNavigation=
       event.request.mode==='navigate';
 
     /*
-     * Para index.html:
-     * primero intenta obtener la última versión desde internet.
-     * Si no existe conexión, utiliza la versión almacenada.
+     * Para la aplicación principal
+     * intentamos descargar primero
+     * la última versión.
      */
     if(isNavigation){
 
       try{
 
-        const network=await fetch(
-          event.request,
-          {
-            cache:'no-cache'
-          }
-        );
+        const network=
+          await fetch(
+            event.request,
+            {
+              cache:'no-cache'
+            }
+          );
 
         if(network.ok){
+
           await cache.put(
             './index.html',
             network.clone()
           );
+
         }
 
         return network;
@@ -103,22 +127,20 @@ self.addEventListener('fetch',event=>{
           (await cache.match('./')) ||
           Response.error()
         );
+
       }
+
     }
 
     /*
-     * Recursos estáticos:
-     * CSS, librerías, imágenes, etc.
+     * Recursos almacenados:
+     * imágenes, librerías, etc.
      */
     const cached=
       await cache.match(event.request);
 
     if(cached){
 
-      /*
-       * Devuelve rápidamente la caché
-       * y actualiza el recurso en segundo plano.
-       */
       event.waitUntil(
 
         fetch(event.request)
@@ -144,11 +166,12 @@ self.addEventListener('fetch',event=>{
       );
 
       return cached;
+
     }
 
     /*
-     * Si el recurso todavía no existe
-     * en caché, intenta descargarlo.
+     * Si todavía no existe
+     * en caché, descargar.
      */
     try{
 
