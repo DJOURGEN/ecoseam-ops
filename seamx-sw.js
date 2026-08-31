@@ -1,4 +1,4 @@
-const CACHE_NAME='seamx-shell-current';
+const CACHE_NAME='seamx-shell-live-activity-review';
 
 const CORE_ASSETS=[
   './',
@@ -21,17 +21,23 @@ self.addEventListener('install',event=>{
     await Promise.allSettled(
       CORE_ASSETS.map(async url=>{
         try{
-          const response=await fetch(url,{
-            mode:url.startsWith('http')?'cors':'same-origin',
-            cache:'no-cache'
-          });
+          const response=await fetch(
+            url,
+            {
+              mode:url.startsWith('http') ? 'cors' : 'same-origin',
+              cache:'no-cache'
+            }
+          );
 
-          if(response.ok||response.type==='opaque'){
-            await cache.put(url,response.clone());
+          if(response.ok || response.type==='opaque'){
+            await cache.put(
+              url,
+              response.clone()
+            );
           }
 
         }catch(_){
-          /* Recurso opcional */
+          /* recurso opcional */
         }
       })
     );
@@ -48,10 +54,13 @@ self.addEventListener('activate',event=>{
     await Promise.all(
       keys
         .filter(
-          k=>k.startsWith('seamx-shell-') &&
-             k!==CACHE_NAME
+          k=>
+            k.startsWith('seamx-shell-') &&
+            k!==CACHE_NAME
         )
-        .map(k=>caches.delete(k))
+        .map(
+          k=>caches.delete(k)
+        )
     );
 
     await self.clients.claim();
@@ -61,13 +70,17 @@ self.addEventListener('activate',event=>{
 
 self.addEventListener('fetch',event=>{
 
-  if(event.request.method!=='GET')return;
+  if(event.request.method!=='GET'){
+    return;
+  }
 
   const requestUrl=
     new URL(event.request.url);
 
-  // Supabase siempre consulta información actual.
-  if(requestUrl.origin.includes('supabase.co')){
+  // Supabase siempre debe consultar información actual.
+  if(
+    requestUrl.origin.includes('supabase.co')
+  ){
     return;
   }
 
@@ -76,11 +89,8 @@ self.addEventListener('fetch',event=>{
     const cache=
       await caches.open(CACHE_NAME);
 
-    const isNavigation=
-      event.request.mode==='navigate';
-
-    // Para la aplicación principal se prioriza la versión online.
-    if(isNavigation){
+    // Navegación principal
+    if(event.request.mode==='navigate'){
 
       try{
 
@@ -115,7 +125,7 @@ self.addEventListener('fetch',event=>{
 
     }
 
-    // Recursos estáticos.
+    // Recursos estáticos
     const cached=
       await cache.match(event.request);
 
