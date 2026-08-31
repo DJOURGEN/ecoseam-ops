@@ -1047,6 +1047,17 @@ img,canvas,svg,video{max-width:100%}
 .activity-task-card.shared-process{border-color:#9dcae7}.activity-task-card.shared-paused{border-color:#f4c38f}.activity-task-card.shared-done{border-color:#a9d7af}
 @media(max-width:520px){.activity-team-members{display:grid;grid-template-columns:1fr}.activity-team-member{width:100%}}
 
+
+
+/* ===== AJUSTES DE ACTIVIDADES Y PERFIL LATERAL ===== */
+.activity-detail-review{margin-top:16px;padding:14px;border:1px solid #d6e5d9;border-radius:14px;background:linear-gradient(180deg,#f8fcf9,#f2f8f4)}
+.activity-detail-review-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.activity-detail-review-head strong{font-size:13px;color:var(--navy)}.activity-detail-review-head span{font-size:10px;color:var(--text-s)}
+.activity-detail-review-comment{width:100%;min-height:72px;margin:8px 0 10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text);resize:vertical}
+.activity-detail-review-actions{display:flex;gap:8px;flex-wrap:wrap}.activity-detail-review-actions .btn{flex:1;min-width:150px}.btn-observe-activity{background:#fff4e5;color:#9a4d00;border:1px solid #f3c38d}.btn-approve-activity{background:#1f7a39;color:#fff}
+.activity-review-current{display:inline-flex;padding:5px 8px;border-radius:999px;background:#eef4ef;color:#607266;font-size:9px;font-weight:900}.activity-review-current.aprobado{background:#eafaf1;color:#1e8449}.activity-review-current.observado{background:#fff4e5;color:#9a4d00}
+.sidebar-user{overflow:hidden!important;min-width:0!important}.sidebar-user-brand{min-width:0!important;width:100%!important}.sidebar-user-brand-copy{min-width:0!important;overflow:hidden!important}.sidebar-user-brand-copy strong,.sidebar-user-brand-copy span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sidebar-user-meta{min-width:0!important;width:100%!important}.sidebar-user .user-info{min-width:0!important;overflow:hidden!important}.sidebar-user .user-name{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.sidebar-user .user-role,.sidebar-user-caption{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.sidebar-logout-btn{flex:0 0 auto!important}.sidebar-user-logo-wrap{flex:0 0 62px!important;width:62px!important;height:42px!important}.sidebar-user-logo{width:54px!important;max-width:54px!important}
+@media(max-width:768px){.sidebar-user{padding:10px!important;gap:9px!important}.sidebar-user-brand-copy span{font-size:8.5px!important}.sidebar-user-logo-wrap{flex-basis:58px!important;width:58px!important;height:40px!important}.sidebar-user-logo{width:50px!important}.sidebar-user .user-name{font-size:12px!important}.sidebar-user-caption{font-size:9px!important}}
+
 </style>
 </head>
 <body>
@@ -2013,7 +2024,7 @@ img,canvas,svg,video{max-width:100%}
         </select>
       </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" id="act-operador-group">
       <label class="form-label">Nombre del operador</label>
       <input class="form-control" id="act-operador" type="text" placeholder="Nombre y apellido del operador">
     </div>
@@ -2049,7 +2060,7 @@ img,canvas,svg,video{max-width:100%}
       <label class="form-label">Observación</label>
       <textarea class="form-control" id="act-obs" rows="2" placeholder="Observación breve..." style="resize:vertical"></textarea>
     </div>
-    <div class="form-group">
+    <div class="form-group" id="act-estado-group">
       <label class="form-label">Estado</label>
       <select class="form-control" id="act-estado">
         <option value="pendiente">Pendiente</option>
@@ -2087,8 +2098,9 @@ img,canvas,svg,video{max-width:100%}
       <div class="evidence-box"><label>Foto durante</label><input id="evidence-during" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-during')"><div class="evidence-preview" id="evidence-preview-during">Sin imagen</div></div>
       <div class="evidence-box"><label>Foto después</label><input id="evidence-after" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-after')"><div class="evidence-preview" id="evidence-preview-after">Sin imagen</div></div>
     </div>
-    <div class="form-hint" style="margin-top:10px">Las fotografías se comprimen antes de subir para optimizar el uso desde celular. Puedes adjuntar una, dos o las tres evidencias.</div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-actividad-evidencias')">Cancelar</button><button class="btn btn-primary" id="btn-save-evidence" onclick="saveActivityEvidence()">✓ Finalizar actividad</button></div>
+    <div class="form-hint" id="evidence-upload-hint" style="margin-top:10px">Las fotografías se comprimen antes de subir para optimizar el uso desde celular. Puedes adjuntar una, dos o las tres evidencias.</div>
+    <div id="activity-detail-review" class="activity-detail-review" style="display:none"></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-actividad-evidencias')">Cerrar</button><button class="btn btn-primary" id="btn-save-evidence" onclick="saveActivityEvidence()">✓ Finalizar actividad</button></div>
   </div>
 </div>
 
@@ -3691,7 +3703,7 @@ const NAV_CONFIG = {
     {id:'resumen',label:'Reporte de actividades',icon:'image'},
     {id:'admin',label:'Administración',icon:'user'},
   ],
-  operador: ['actividades','ocupabilidad'],
+  operador: ['actividades'],
   controlador: ['comando','actividades','patios','ocupabilidad','coproductos','entrega'],
   supervisor: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento','resumen'],
   gerencia: ['comando','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento'],
@@ -4005,6 +4017,7 @@ async function saveActividad() {
 } 
 
 function resetActForm() {
+  resetActivityEditFieldVisibility();
   ['act-edit-id','act-operador','act-area','act-actividad','act-inicio','act-fin','act-obs'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -4021,6 +4034,11 @@ function resetActForm() {
   }
 }
 
+function resetActivityEditFieldVisibility(){
+  const operatorGroup=document.getElementById('act-operador-group'),stateGroup=document.getElementById('act-estado-group'),operator=document.getElementById('act-operador'),state=document.getElementById('act-estado');
+  if(operatorGroup)operatorGroup.style.display='';if(stateGroup)stateGroup.style.display='';if(operator)operator.disabled=false;if(state)state.disabled=false;
+}
+
 function editActividad(id) {
   const a = APP.data.actividades.find(x=>x.id==id);
   if(!a) return;
@@ -4032,6 +4050,9 @@ function editActividad(id) {
   document.getElementById('act-fecha').value=a.fecha;
   document.getElementById('act-guardia').value=a.guardia;
   document.getElementById('act-operador').value=a.operador;
+  const operatorGroup=document.getElementById('act-operador-group');if(operatorGroup)operatorGroup.style.display='none';
+  const stateGroup=document.getElementById('act-estado-group');if(stateGroup)stateGroup.style.display='none';
+  document.getElementById('act-operador').disabled=true;document.getElementById('act-estado').disabled=true;
   document.getElementById('act-area').value=a.area;
   document.getElementById('act-actividad').value=a.actividad;
   document.getElementById('act-inicio').value=a.inicio;
@@ -6229,6 +6250,11 @@ async function updateAssignedActivity(id,action){
   }catch(err){console.error(err);showToast('No se pudo actualizar la actividad del equipo','error');}
 }
 function openActivityEvidence(id){
+  const detailTitle=document.querySelector('#modal-actividad-evidencias .modal-title');if(detailTitle)detailTitle.textContent='Finalizar actividad';
+  const descField=document.getElementById('evidence-description');if(descField)descField.readOnly=false;
+  ['evidence-before','evidence-during','evidence-after'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='';});
+  const reviewBox=document.getElementById('activity-detail-review');if(reviewBox){reviewBox.style.display='none';reviewBox.innerHTML='';}
+  const hint=document.getElementById('evidence-upload-hint');if(hint)hint.textContent='Las fotografías se comprimen antes de subir para optimizar el uso desde celular. Puedes adjuntar una, dos o las tres evidencias.';
   const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;if(activityIsFieldUser()&&!activityUserMatch(a)){showToast('Esta actividad no está asignada a tu usuario','error');return;}
   const members=activityGroupMembers(a),shared=activityGroupEvidence(members)||a;
   document.getElementById('evidence-activity-id').value=id;document.getElementById('evidence-activity-title').textContent=`${a.actividad} · ${a.area} · ${members.length} integrante${members.length===1?'':'s'}`;document.getElementById('evidence-description').value=shared.descripcionCierre||'';
@@ -6250,7 +6276,27 @@ async function saveActivityEvidence(){
     const patch={estado:'finalizado',inicio_real:sharedStart,inicio:sharedInicio,fin_real:finish,fin:activityNowTime(),pausas_json:pausas,descripcion_cierre:desc,foto_antes_url:urls[0]||sharedExisting?.fotoAntesUrl||a.fotoAntesUrl||'',foto_durante_url:urls[1]||sharedExisting?.fotoDuranteUrl||a.fotoDuranteUrl||'',foto_despues_url:urls[2]||sharedExisting?.fotoDespuesUrl||a.fotoDespuesUrl||'',duracion:hrs,hh:hrs};const ids=members.map(m=>m.id).filter(v=>v!==undefined&&v!==null);const {error}=await db.from('actividades').update(patch).in('id',ids);if(error)throw error;closeModal('modal-actividad-evidencias');await loadAllData();showToast(`Actividad finalizada · ${members.length} integrante${members.length===1?'':'s'} sincronizados`,'success');
   }catch(err){console.error(err);showToast('No se pudo finalizar: '+(err.message||'verifica la conexión'),'error');}finally{btn.disabled=false;btn.textContent='✓ Finalizar actividad';}
 }
-function viewActivityEvidence(id){const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;openActivityEvidence(id);const btn=document.getElementById('btn-save-evidence');if(btn)btn.style.display=activityIsFieldUser()?'inline-flex':'none';}
+function activityDetailReviewHtml(a,members){
+  if(!activityCanReview())return'';
+  const revision=activityGroupRevision(members),label=activityReviewLabel(revision),comment=members.find(x=>x.comentario_rev)?.comentario_rev||'';
+  return `<div class="activity-detail-review-head"><div><strong>Revisión de la actividad</strong><span>Supervisor y Administrador pueden aprobar u observar el cierre grupal.</span></div><span class="activity-review-current ${revision}">${escapeHtml(label)}</span></div><textarea id="activity-detail-review-comment" class="activity-detail-review-comment" placeholder="Comentario de revisión (opcional)">${escapeHtml(comment)}</textarea><div class="activity-detail-review-actions"><button class="btn btn-observe-activity" type="button" onclick="reviewActivityFromDetail('observado')">⚠ Observar actividad</button><button class="btn btn-approve-activity" type="button" onclick="reviewActivityFromDetail('aprobado')">✓ Aprobar actividad</button></div>`;
+}
+async function reviewActivityFromDetail(decision){
+  if(!activityCanReview()){showToast('Solo supervisión y administración pueden revisar actividades','warning');return;}
+  const id=document.getElementById('evidence-activity-id')?.value,a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;const members=activityGroupMembers(a),ids=members.map(x=>x.id),comment=document.getElementById('activity-detail-review-comment')?.value.trim()||'';
+  try{const {error}=await db.from('actividades').update({revision:decision,comentario_rev:comment}).in('id',ids);if(error)throw error;await loadAllData();closeModal('modal-actividad-evidencias');showToast(decision==='aprobado'?'Actividad aprobada':'Actividad observada','success');}catch(err){console.error(err);showToast('No se pudo guardar la revisión','error');}
+}
+function viewActivityEvidence(id){
+  const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;openActivityEvidence(id);
+  const members=activityGroupMembers(a),shared=activityGroupEvidence(members)||a,field=activityIsFieldUser();
+  const btn=document.getElementById('btn-save-evidence'),review=document.getElementById('activity-detail-review'),desc=document.getElementById('evidence-description'),hint=document.getElementById('evidence-upload-hint');
+  if(btn)btn.style.display='none';
+  if(desc)desc.readOnly=true;
+  ['evidence-before','evidence-during','evidence-after'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});
+  if(hint)hint.textContent=shared.descripcionCierre?'Evidencias registradas para esta actividad.':'La actividad aún no cuenta con evidencias de cierre.';
+  if(review){review.style.display=activityCanReview()?'block':'none';review.innerHTML=activityDetailReviewHtml(a,members);}
+  const title=document.querySelector('#modal-actividad-evidencias .modal-title');if(title)title.textContent='Detalle de actividad';
+}
 function toggleActivityRange(){const mode=document.getElementById('filter-periodo-act')?.value||'hoy',box=document.getElementById('activity-range-fields');if(box)box.style.display=mode==='rango'?'flex':'none';if(mode==='rango'){const today=activityToday();if(!document.getElementById('filter-desde-act').value)document.getElementById('filter-desde-act').value=today;if(!document.getElementById('filter-hasta-act').value)document.getElementById('filter-hasta-act').value=today;}}
 function activityFilteredData(){
   const mode=document.getElementById('filter-periodo-act')?.value||'hoy',guardia=document.getElementById('filter-guardia-act')?.value||'',area=document.getElementById('filter-area-act')?.value||'',estado=document.getElementById('filter-estado-act')?.value||'';let data=[...(APP.data.actividades||[])];
