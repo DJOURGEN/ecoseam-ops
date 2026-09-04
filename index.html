@@ -1186,6 +1186,47 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 @media(max-width:980px){.maint-summary-grid{grid-template-columns:repeat(2,1fr)}.maint-layout{grid-template-columns:1fr}}
 @media(max-width:700px){.maint-summary-grid{grid-template-columns:1fr}.maint-meter-grid{grid-template-columns:1fr}.maint-mini-chart{grid-template-columns:repeat(3,1fr)}}
 
+
+/* ===== Acciones de actividad ===== */
+.activity-group-card{position:relative}
+.activity-delete-x{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:1px solid #f2caca;background:#fff5f5;color:#c62828;display:grid;place-items:center;font-size:16px;font-weight:900;cursor:pointer;z-index:3;transition:.18s}
+.activity-delete-x:hover{background:#c62828;color:#fff;transform:scale(1.05)}
+.activity-group-card .activity-group-top{padding-right:30px}
+
+/* ===== Control de patios · distribución por gerencia ===== */
+.patio-gerencia-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:520px;overflow:auto;padding-right:4px}
+.patio-gerencia-item{border:1px solid var(--border);border-radius:14px;padding:12px;background:linear-gradient(145deg,#fff,#f8fcf9);display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center}
+.patio-gerencia-rank{width:34px;height:34px;border-radius:11px;background:#eaf5ed;color:#1a5c2a;display:grid;place-items:center;font-size:11px;font-weight:900}
+.patio-gerencia-name{min-width:0}
+.patio-gerencia-name strong{display:block;font-size:12px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.patio-gerencia-name span{display:block;font-size:9px;color:var(--text-m);margin-top:2px}
+.patio-gerencia-value{text-align:right;white-space:nowrap}.patio-gerencia-value strong{display:block;font-size:15px;color:var(--navy)}.patio-gerencia-value span{font-size:9px;color:var(--text-m)}
+.patio-gerencia-bar{grid-column:2/4;height:7px;border-radius:999px;background:#e7f1e8;overflow:hidden}.patio-gerencia-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#0d3d1a,#35a553)}
+.patio-gerencia-mix{grid-column:2/4;display:flex;gap:6px;flex-wrap:wrap}.patio-gerencia-mix span{padding:4px 7px;border-radius:999px;background:#f1f7f2;border:1px solid #e0eae2;font-size:9px;color:#486452;font-weight:800}
+@media(max-width:850px){.patio-gerencia-board{grid-template-columns:1fr;max-height:none}}
+
+/* ===== Gestión de mantenimiento estilo SAP ===== */
+.sap-maint-toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.sap-kpis{display:grid;grid-template-columns:repeat(5,minmax(135px,1fr));gap:12px;margin-bottom:18px}
+.sap-layout{display:grid;grid-template-columns:minmax(270px,.72fr) minmax(0,1.65fr);gap:16px;align-items:start}
+.sap-equipment-list{display:grid;gap:8px;max-height:760px;overflow:auto;padding-right:4px}
+.sap-eq-item{border:1px solid var(--border);border-radius:13px;padding:11px;background:#fff;display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:9px;align-items:center;cursor:pointer;transition:.18s}
+.sap-eq-item:hover,.sap-eq-item.active{border-color:#6fb37b;background:#f2faf4;box-shadow:0 6px 16px rgba(13,61,26,.07)}
+.sap-eq-icon{width:42px;height:42px;border-radius:12px;background:#e9f4eb;display:grid;place-items:center;font-size:23px}
+.sap-eq-main{min-width:0}.sap-eq-main strong{display:block;font-size:13px;color:var(--navy)}.sap-eq-main span{display:block;font-size:9px;color:var(--text-m);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sap-eq-health{min-width:64px;text-align:right}.sap-eq-health b{display:block;font-size:15px;color:var(--navy)}.sap-eq-health span{font-size:9px;font-weight:900}
+.sap-status-ok{color:#218443}.sap-status-warn{color:#b06900}.sap-status-crit{color:#c62828}
+.sap-eq-photo{height:210px;border-radius:16px;background:linear-gradient(145deg,#eff7f0,#e5f0e7);overflow:hidden;display:grid;place-items:center;margin-bottom:14px}
+.sap-eq-photo img{width:100%;height:100%;object-fit:cover}.sap-eq-photo .placeholder{text-align:center;color:#67816d;font-size:12px;padding:20px}.sap-eq-photo .placeholder b{display:block;font-size:52px;margin-bottom:8px}
+.sap-detail-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}.sap-detail-head h2{font-size:25px;color:var(--navy)}.sap-detail-head p{font-size:11px;color:var(--text-m);margin-top:3px}
+.sap-master-data{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}.sap-master-box{padding:9px 10px;border-radius:11px;background:#f8fbf9;border:1px solid #e4eee6}.sap-master-box span{display:block;font-size:8px;color:var(--text-s);font-weight:900;text-transform:uppercase}.sap-master-box strong{display:block;font-size:12px;color:var(--navy);margin-top:3px}
+.sap-component-summary{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.sap-component-summary span{padding:6px 9px;border-radius:999px;font-size:9px;font-weight:900;background:#f2f6f3}.sap-component-summary .ok{background:#eaf8ee;color:#237840}.sap-component-summary .warn{background:#fff6e2;color:#a36500}.sap-component-summary .crit{background:#fdecec;color:#bb2929}
+.sap-component-table-wrap{overflow:auto;border:1px solid var(--border);border-radius:14px}.sap-component-table{width:100%;border-collapse:collapse;min-width:760px}.sap-component-table th{background:#f0f6f1;color:#315d39;font-size:9px;text-transform:uppercase;letter-spacing:.03em;padding:9px;text-align:left}.sap-component-table td{padding:9px;border-top:1px solid #e4eee6;font-size:10px;color:#35543d;vertical-align:middle}.sap-component-table td strong{color:var(--navy);font-size:11px}.sap-comp-status{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900;white-space:nowrap}.sap-comp-status.ok{background:#eaf8ee;color:#237840}.sap-comp-status.warn{background:#fff6e2;color:#a36500}.sap-comp-status.crit{background:#fdecec;color:#bb2929}.sap-comp-status.monitor{background:#edf4ff;color:#1260a8}
+.sap-healthbar{width:95px;height:7px;border-radius:999px;background:#e8f0e9;overflow:hidden}.sap-healthbar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#2e7d32,#66bb6a)}
+.sap-maint-alerts{display:grid;gap:8px;margin-top:14px}.sap-maint-alert{border:1px solid #eadfc2;border-left:4px solid #f0a000;border-radius:11px;padding:10px;background:#fffaf0}.sap-maint-alert.crit{border-color:#f1cccc;border-left-color:#c62828;background:#fff5f5}.sap-maint-alert strong{display:block;font-size:11px;color:var(--navy)}.sap-maint-alert span{display:block;font-size:9px;color:var(--text-m);margin-top:3px}
+@media(max-width:1100px){.sap-kpis{grid-template-columns:repeat(3,1fr)}.sap-layout{grid-template-columns:1fr}.sap-equipment-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:none}}
+@media(max-width:700px){.sap-kpis{grid-template-columns:1fr 1fr}.sap-equipment-list{grid-template-columns:1fr}.sap-master-data{grid-template-columns:1fr 1fr}.sap-eq-photo{height:180px}}
+
 </style>
 </head>
 <body>
@@ -1706,7 +1747,6 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
             <div class="page-title">Control de ingreso y salida de vehículos</div>
             <div class="page-subtitle">Registra el ingreso una sola vez y marca la salida del mismo vehículo sin volver a escribir sus datos</div>
           </div>
-          <button class="btn btn-primary" id="btn-nuevo-movimiento" onclick="openMovimientoModal()">+ Registrar ingreso</button>
         </div>
 
         <div id="patio-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
@@ -1737,8 +1777,8 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
         <div class="patio-advanced-grid">
           <div class="card">
-            <div class="card-header"><div><div class="card-title">Procedencia operacional</div><div class="card-subtitle">Consolidado dinámico por procedencia, toneladas, ingresos y mezcla de material</div></div></div>
-            <div id="patio-procedencia-board" class="patio-origin-board"></div>
+            <div class="card-header"><div><div class="card-title">Distribución por gerencia</div><div class="card-subtitle">Consolidado de toneladas y registros por gerencia, ordenado de mayor a menor</div></div></div>
+            <div id="patio-gerencia-board" class="patio-gerencia-board"></div>
           </div>
           <div class="card patio-feed-card">
             <div class="card-header"><div><div class="card-title">Últimos movimientos</div><div class="card-subtitle">Secuencia operacional de ingresos y salidas registradas</div></div></div>
@@ -1899,38 +1939,33 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
         <div class="page-header">
           <div>
             <div class="page-title">Gestión de mantenimiento</div>
-            <div class="page-subtitle">Seguimiento predictivo y correctivo de flota y equipos ECOSEAM</div>
+            <div class="page-subtitle">Maestro de equipos, componentes, condición y planificación de mantenimiento</div>
           </div>
-          <div style="display:flex;gap:9px;flex-wrap:wrap">
-            <button class="btn btn-outline" onclick="renderMantenimiento()">↻ Actualizar vista</button>
-            <button class="btn btn-primary" onclick="openMaintenanceEventModal()">+ Registrar evento</button>
+          <div class="sap-maint-toolbar">
+            <button class="btn btn-outline" onclick="renderMantenimiento()">↻ Actualizar</button>
+            <button class="btn btn-primary" onclick="openMaintenanceEventModal()">+ Registrar mantenimiento / falla</button>
           </div>
         </div>
-        <div class="maint-note">Se configuró la pestaña con los equipos indicados: excavadoras Liebherr R922 con accesorio garra, minibus Hyundai H350 y camionetas Toyota Hilux. Cada unidad muestra lectura operacional, próximo mantenimiento estimado, estado predictivo, evidencias fotográficas y registro de fallas o componentes cambiados. La <b>ECM-809</b> corresponde a la excavadora completa con su garra Potenza y el pesómetro <b>Steelyard</b> instalado.</div>
-        <div class="maint-summary-grid">
-          <div class="stat-card success"><div class="stat-label">Equipos controlados</div><div class="stat-value" id="maint-kpi-total">0</div><div class="stat-sub">unidades en seguimiento</div></div>
-          <div class="stat-card amber"><div class="stat-label">Próximos a intervenir</div><div class="stat-value" id="maint-kpi-upcoming">0</div><div class="stat-sub">programar pronto</div></div>
-          <div class="stat-card danger"><div class="stat-label">Alertas críticas</div><div class="stat-value" id="maint-kpi-critical">0</div><div class="stat-sub">requieren atención</div></div>
-          <div class="stat-card info"><div class="stat-label">Disponibilidad estimada</div><div class="stat-value" id="maint-kpi-availability">0%</div><div class="stat-sub">flota operativa</div></div>
+        <div class="maint-note">Vista estructurada tipo SAP: primero se controla el <b>equipo</b>, luego sus <b>componentes y planes</b>. Las alertas se generan por componente según intervalo de mantenimiento, lectura actual y último evento registrado. En la ECM-809, excavadora, garra Potenza y pesómetro Steelyard forman una sola unidad.</div>
+        <div class="sap-kpis">
+          <div class="stat-card success"><div class="stat-label">Disponibilidad</div><div class="stat-value" id="maint-kpi-availability">0%</div><div class="stat-sub">equipos sin condición crítica</div></div>
+          <div class="stat-card teal"><div class="stat-label">Componentes OK</div><div class="stat-value" id="maint-kpi-ok">0</div><div class="stat-sub">dentro de intervalo</div></div>
+          <div class="stat-card amber"><div class="stat-label">Por programar</div><div class="stat-value" id="maint-kpi-upcoming">0</div><div class="stat-sub">próximos a mantenimiento</div></div>
+          <div class="stat-card danger"><div class="stat-label">Vencidos / falla</div><div class="stat-value" id="maint-kpi-critical">0</div><div class="stat-sub">requieren atención</div></div>
+          <div class="stat-card info"><div class="stat-label">Backlog mantenimiento</div><div class="stat-value" id="maint-kpi-backlog">0</div><div class="stat-sub">componentes pendientes</div></div>
         </div>
-        <div class="maint-layout">
+        <div class="sap-layout">
           <div class="card">
-            <div class="card-header"><div><div class="card-title">Flota y equipos</div><div class="card-subtitle">Vista predictiva por activo, con mini gráfico de avance hacia el próximo mantenimiento</div></div></div>
-            <div id="maintenance-assets-grid" class="maint-assets-grid"></div>
+            <div class="card-header"><div><div class="card-title">Maestro de equipos</div><div class="card-subtitle">Selecciona una unidad para revisar su estructura de mantenimiento</div></div></div>
+            <div id="maintenance-equipment-list" class="sap-equipment-list"></div>
           </div>
-          <div class="card maint-attention-card">
-            <div class="card-header"><div><div class="card-title">Fallas y observaciones</div><div class="card-subtitle">Hallazgos abiertos, monitoreos y últimas intervenciones</div></div></div>
-            <div id="maintenance-attention-list"></div>
+          <div class="card">
+            <div id="maintenance-equipment-detail"></div>
           </div>
         </div>
-        <div class="card maint-history-table" style="padding:0">
-          <div class="card-header" style="padding:18px 20px 0"><div><div class="card-title">Historial de mantenimiento</div><div class="card-subtitle">Registro cronológico de preventivos, correctivos e inspecciones con evidencia fotográfica</div></div></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Fecha</th><th>Equipo</th><th>Tipo</th><th>Estado</th><th>Lectura</th><th>Componente / Hallazgo</th><th>Acción</th><th>Evidencias</th><th>Registrado por</th></tr></thead>
-              <tbody id="maintenance-history-body"></tbody>
-            </table>
-          </div>
+        <div class="card maint-history-table" style="padding:0;margin-top:18px">
+          <div class="card-header" style="padding:18px 20px 0"><div><div class="card-title">Historial de órdenes / intervenciones</div><div class="card-subtitle">Trazabilidad de preventivos, fallas, inspecciones y cambios de componente</div></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Equipo</th><th>Tipo</th><th>Estado</th><th>Lectura</th><th>Componente</th><th>Hallazgo</th><th>Acción</th><th>Evidencias</th><th>Registrado por</th></tr></thead><tbody id="maintenance-history-body"></tbody></table></div>
         </div>
       </div>
 
@@ -2698,7 +2733,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
       <div class="form-group"><label class="form-label">Tipo de evento *</label><select class="form-control" id="maint-event-type"><option value="preventivo">Preventivo</option><option value="correctivo">Correctivo</option><option value="inspeccion">Inspección</option><option value="falla">Falla detectada</option><option value="cambio">Cambio de componente</option></select></div>
       <div class="form-group"><label class="form-label">Estado *</label><select class="form-control" id="maint-event-status"><option value="operativo">Operativo</option><option value="monitoreo">En monitoreo</option><option value="pendiente">Pendiente de intervención</option><option value="critico">Crítico / fuera de servicio</option></select></div>
       <div class="form-group"><label class="form-label">Lectura operacional</label><input class="form-control" id="maint-event-meter" type="number" min="0" step="1" placeholder="Horómetro o kilometraje"></div>
-      <div class="form-group"><label class="form-label">Componente / sistema</label><input class="form-control" id="maint-event-component" type="text" placeholder="Ej.: garra, sistema hidráulico, filtro, pesómetro"></div>
+      <div class="form-group"><label class="form-label">Componente / sistema *</label><select class="form-control" id="maint-event-component"></select></div>
     </div>
     <div class="form-group"><label class="form-label">Hallazgo / falla</label><textarea class="form-control" id="maint-event-issue" rows="3" placeholder="Describe la falla detectada, condición encontrada o motivo de la intervención."></textarea></div>
     <div class="form-group"><label class="form-label">Acción realizada / requerida</label><textarea class="form-control" id="maint-event-action" rows="3" placeholder="Ej.: cambio de componente, ajuste, lubricación, seguimiento programado, derivación a taller."></textarea></div>
@@ -3262,7 +3297,7 @@ function dbSeguridadIntentoToApp(row){
 }
 
 async function loadAllDataOnline() {
-  const [actRes, restRes, userRes, movRes, occEvacRes, coproRes, coproMovRes, segDocRes, segFragRes, segQRes, segTryRes, progRes, handPendRes, handHeadRes, handRecvRes] = await Promise.all([
+  const [actRes, restRes, userRes, movRes, occEvacRes, coproRes, coproMovRes, segDocRes, segFragRes, segQRes, segTryRes, progRes, handPendRes, handHeadRes, handRecvRes, maintRes] = await Promise.all([
     db.from('actividades').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('restricciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('usuarios').select('*').order('id', { ascending: true }),
@@ -3277,7 +3312,8 @@ async function loadAllDataOnline() {
     db.from('programaciones_diarias').select('*').order('fecha',{ascending:false}).order('id',{ascending:false}),
     db.from('entrega_guardia_pendientes').select('*').order('created_at',{ascending:false}),
     db.from('entrega_guardia_cabeceras').select('*').order('entregado_at',{ascending:false}),
-    db.from('entrega_guardia_recepciones').select('*').order('recibido_at',{ascending:false})
+    db.from('entrega_guardia_recepciones').select('*').order('recibido_at',{ascending:false}),
+    db.from('mantenimiento_registros').select('*').order('fecha',{ascending:false}).order('id',{ascending:false})
   ]);
 
   if(actRes.error) console.error('Error cargando actividades:', actRes.error);
@@ -3311,6 +3347,7 @@ async function loadAllDataOnline() {
   APP.data.handoverPendings = handPendRes.data || [];
   APP.data.handoverHeaders = handHeadRes.data || [];
   APP.data.handoverReceipts = handRecvRes.data || [];
+  APP.data.mantenimientoRegistros = maintRes.data || APP.data.mantenimientoRegistros || [];
 
   if(APP.currentView === 'actividades') {
     if(puedeVerDashboardActividades()) updateDashboard();
@@ -6647,9 +6684,18 @@ function activityGroupCard(group){
   const people=m.map(a=>{const ps=activityStatusInfo(a.estado);return `<div class="activity-group-person"><div class="activity-group-person-avatar">${escapeHtml(activityInitials(a.operador))}</div><div><strong>${escapeHtml(a.operador)}</strong><small>${a.inicio?`Inicio ${escapeHtml(a.inicio)}`:'Aún no inicia'}${a.fin?` · Fin ${escapeHtml(a.fin)}`:''}</small></div><span class="activity-status ${ps.key}">${ps.label}</span></div>`;}).join('');
   const reviewButton=activityCanReview()&&ev?`<button class="btn-review" onclick="openActivityGroupReview('${encodeURIComponent(group.key)}')">${rev==='pending'?'Revisar':'Actualizar revisión'}</button>`:'';
   const editButton=activityCanEditRecord()?`<button class="btn-edit-mini" onclick="editActividad(${first.id})">Editar</button>`:'';
-  return `<div class="activity-group-card ${st.key}"><div class="activity-group-top"><div><span class="activity-group-area">${escapeHtml(first.area||'General')}</span><div class="activity-group-title">${escapeHtml(first.actividad)}</div><div class="activity-group-meta">${formatDate(first.fecha)} · Guardia ${escapeHtml(first.guardia||'—')} · Asignado por ${escapeHtml(first.asignadoNombre||first.asignadoPor||'SEAMX')}</div></div><span class="activity-group-count">👥 ${m.length} ${m.length===1?'persona':'personas'}</span></div><div class="activity-group-progress"><span style="width:${pct}%"></span></div><div class="activity-group-people">${people}</div>${ev?`<div class="activity-shared-evidence">▣ Evidencia grupal registrada · ${activityEvidenceCount(ev)}/3 fotos · el cierre aplica a todo el equipo</div>`:''}<div class="activity-group-footer"><span class="activity-review-badge ${rev}">${activityReviewLabel(rev)}</span><div class="activity-group-actions">${reviewButton}${editButton}<button class="btn btn-outline btn-sm" onclick="viewActivityEvidence(${ev?.id||first.id})">Ver detalle</button></div></div></div>`;
+  const deleteButton=(APP.user&&['admin','supervisor'].includes(APP.user.role))?`<button class="activity-delete-x" title="Eliminar actividad" onclick="event.stopPropagation();deleteActivityGroup('${encodeURIComponent(group.key)}')">×</button>`:'';
+  return `<div class="activity-group-card ${st.key}">${deleteButton}<div class="activity-group-top"><div><span class="activity-group-area">${escapeHtml(first.area||'General')}</span><div class="activity-group-title">${escapeHtml(first.actividad)}</div><div class="activity-group-meta">${formatDate(first.fecha)} · Guardia ${escapeHtml(first.guardia||'—')} · Asignado por ${escapeHtml(first.asignadoNombre||first.asignadoPor||'SEAMX')}</div></div><span class="activity-group-count">👥 ${m.length} ${m.length===1?'persona':'personas'}</span></div><div class="activity-group-progress"><span style="width:${pct}%"></span></div><div class="activity-group-people">${people}</div>${ev?`<div class="activity-shared-evidence">▣ Evidencia grupal registrada · ${activityEvidenceCount(ev)}/3 fotos · el cierre aplica a todo el equipo</div>`:''}<div class="activity-group-footer"><span class="activity-review-badge ${rev}">${activityReviewLabel(rev)}</span><div class="activity-group-actions">${reviewButton}${editButton}<button class="btn btn-outline btn-sm" onclick="viewActivityEvidence(${ev?.id||first.id})">Ver detalle</button></div></div></div>`;
 }
 function renderActivitiesManagement(data){const section=document.getElementById('activities-management-section'),box=document.getElementById('activity-team-board');if(!section||!box)return;const show=!activityIsFieldUser();section.style.display=show?'block':'none';if(!show)return;const groups=activityGroups(data);document.getElementById('team-activity-count').textContent=`${groups.length} ${groups.length===1?'actividad':'actividades'}`;box.className='activity-group-grid';box.innerHTML=groups.length?groups.map(activityGroupCard).join(''):`<div class="activity-empty"><strong>Sin actividades</strong>No existen actividades para los filtros seleccionados.</div>`;}
+async function deleteActivityGroup(encodedKey){
+  if(!APP.user||!['admin','supervisor'].includes(APP.user.role)){showToast('Solo Supervisor o Administrador pueden eliminar actividades','warning');return;}
+  const key=decodeURIComponent(encodedKey),members=activityGroupMembers(key);if(!members.length)return;
+  const sample=members[0];
+  if(!confirm(`¿Eliminar la actividad "${sample.actividad}" para ${members.length} integrante${members.length===1?'':'s'}? Esta acción eliminará toda la asignación.`))return;
+  if(!navigator.onLine){showToast('Necesitas conexión para eliminar una actividad asignada','warning');return;}
+  try{const ids=members.map(a=>a.id).filter(Boolean);const {error}=await db.from('actividades').delete().in('id',ids);if(error)throw error;await loadAllData();showToast('Actividad eliminada para todo el equipo','success');}catch(err){console.error(err);showToast('No se pudo eliminar la actividad','error');}
+}
 function openActivityGroupReview(encodedKey){
   if(!activityCanReview()){showToast('Solo supervisión y administración pueden revisar actividades','warning');return;}const key=decodeURIComponent(encodedKey),members=activityGroupMembers(key),ev=activityGroupEvidence(members);if(!members.length)return;ACTIVITY_REVIEW_GROUP_IDS=members.map(a=>a.id);const a=ev||members[0];document.getElementById('rev-act-id').value=a.id;document.getElementById('rev-detail').innerHTML=`<strong>${escapeHtml(a.actividad)}</strong><br><span style="color:var(--text-s)">${escapeHtml(a.area)} · ${formatDate(a.fecha)} · ${members.length} involucrado${members.length===1?'':'s'}</span>${ev?.descripcionCierre?`<div style="margin-top:10px;padding:9px;border-radius:8px;background:#f1f8f2"><b>Cierre:</b> ${escapeHtml(ev.descripcionCierre)}<br><small>${activityEvidenceCount(ev)}/3 fotografías registradas</small></div>`:''}`;document.getElementById('rev-decision').value=activityGroupRevision(members)==='observado'?'observado':'aprobado';document.getElementById('rev-comment').value=members.find(x=>x.comentario_rev)?.comentario_rev||'';openModal('modal-revisar');
 }
@@ -6699,173 +6745,67 @@ function patioVehicleElapsedMinutes(m){
   if(!m?.fecha||!m?.inicio)return 0;const t=new Date(`${m.fecha}T${m.inicio}:00`);if(Number.isNaN(t.getTime()))return 0;return Math.max(0,Math.round((Date.now()-t.getTime())/60000));
 }
 function renderPatioOperationalView(data){
-  const procBox=document.getElementById('patio-procedencia-board'),mixBox=document.getElementById('patio-mix-board'),feed=document.getElementById('patio-movement-feed');
-  if(!procBox||!mixBox||!feed)return;
+  const gerBox=document.getElementById('patio-gerencia-board'),mixBox=document.getElementById('patio-mix-board'),feed=document.getElementById('patio-movement-feed');
+  if(!gerBox||!mixBox||!feed)return;
   const rows=[...(data||[])];
-  const maxTn=Math.max(1,...rows.map(m=>Number(m.peso||0)));
-  const byProc={};
+  const byGer={};
   for(const m of rows){
-    const key=(m.procedencia||'Sin procedencia').trim()||'Sin procedencia';
-    if(!byProc[key])byProc[key]={tn:0,ing:0,sal:0,veh:0,pesado:0,liviano:0};
-    const item=byProc[key];
-    const peso=Number(m.peso||0);
-    item.tn+=peso; item.veh+=1; item.ing+=1; if(m.fin)item.sal+=1;
-    if(String(m.tipoResiduo||'').toLowerCase().includes('livian'))item.liviano+=peso;else item.pesado+=peso;
+    const key=(m.gerencia||'Sin gerencia').trim()||'Sin gerencia';
+    if(!byGer[key])byGer[key]={tn:0,reg:0,sal:0,pesado:0,liviano:0};
+    const v=byGer[key],peso=Number(m.peso||0);v.tn+=peso;v.reg++;if(m.fin)v.sal++;
+    if(String(m.tipoResiduo||'').toLowerCase().includes('livian'))v.liviano+=peso;else v.pesado+=peso;
   }
-  const procEntries=Object.entries(byProc).sort((a,b)=>b[1].tn-a[1].tn);
-  const maxProc=Math.max(1,...procEntries.map(([,v])=>v.tn));
-  procBox.innerHTML=procEntries.length?procEntries.map(([name,v],idx)=>{const pesadoPct=v.tn?((v.pesado/v.tn)*100):0;const livianoPct=v.tn?((v.liviano/v.tn)*100):0;return `<div class="patio-origin-item"><div class="patio-origin-top"><div style="display:flex;gap:10px;min-width:0;flex:1"><div class="patio-origin-rank">${idx+1}</div><div class="patio-origin-main"><strong>${escapeHtml(name)}</strong><span>${v.veh} registro${v.veh===1?'':'s'} · ${v.ing} ingreso${v.ing===1?'':'s'}${v.sal?` · ${v.sal} salida${v.sal===1?'':'s'}`:''}</span></div></div><div class="patio-origin-tn"><strong>${v.tn.toFixed(2)}</strong><span>tn acumuladas</span></div></div><div class="patio-origin-bar"><span style="width:${Math.max(10,(v.tn/maxProc)*100)}%"></span></div><div class="patio-origin-meta"><div class="patio-origin-pill"><span>Pesado</span><strong>${v.pesado.toFixed(2)} tn</strong></div><div class="patio-origin-pill"><span>Liviano</span><strong>${v.liviano.toFixed(2)} tn</strong></div><div class="patio-origin-pill"><span>% Pesado</span><strong>${pesadoPct.toFixed(0)}%</strong></div><div class="patio-origin-pill"><span>% Liviano</span><strong>${livianoPct.toFixed(0)}%</strong></div></div></div>`;}).join(''):'<div class="patio-empty-state">No hay movimientos para consolidar por procedencia con los filtros actuales.</div>';
-
-  const classify=(label)=>{const items=rows.filter(m=>String(m.tipoResiduo||'').toLowerCase().includes(label==='Liviano'?'livian':'pesad'));const tn=items.reduce((a,m)=>a+Number(m.peso||0),0);const sal=items.filter(m=>m.fin).length;const open=items.filter(m=>!m.fin).length;const byP={};items.forEach(m=>{const p=(m.procedencia||'Sin procedencia').trim()||'Sin procedencia';byP[p]=(byP[p]||0)+Number(m.peso||0)});const lead=Object.entries(byP).sort((a,b)=>b[1]-a[1])[0];return {items,tn,sal,open,lead};};
-  const pesado=classify('Pesado'),liviano=classify('Liviano');
-  const totalMix=Math.max(1,pesado.tn+liviano.tn);
-  const renderClass=(title,obj,cls)=>`<div class="patio-class-card ${cls}"><span class="patio-class-badge"><i></i>${title}</span><div class="patio-class-title"><div><h4>${title}</h4><div class="patio-class-sub">Tonelaje filtrado según registros de control de patios</div></div><strong>${obj.tn.toFixed(2)} tn</strong></div><div class="patio-class-lane"><span style="width:${Math.max(8,(obj.tn/totalMix)*100)}%"></span></div><div class="patio-class-meta"><div class="mini"><span>Registros</span><strong>${obj.items.length}</strong></div><div class="mini"><span>Con salida</span><strong>${obj.sal}</strong></div><div class="mini"><span>Sin salida</span><strong>${obj.open}</strong></div></div><div class="patio-class-leading">${obj.lead?`Procedencia líder: <b>${escapeHtml(obj.lead[0])}</b> con <b>${obj.lead[1].toFixed(2)} tn</b>.`: 'Sin procedencia predominante para este grupo.'}</div></div>`;
-  mixBox.innerHTML=renderClass('Pesado',pesado,'heavy')+renderClass('Liviano',liviano,'light');
-
-  const events=[];for(const m of rows){events.push({date:m.fecha,time:m.inicio||'',type:'in',m});if(m.fin)events.push({date:m.fecha,time:m.fin||'',type:'out',m});}
-  events.sort((a,b)=>`${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
-  feed.innerHTML=events.length?events.slice(0,14).map(e=>`<div class="patio-feed-item"><div class="patio-feed-icon">${e.type==='in'?'↘':'↗'}</div><div class="patio-feed-main"><strong>${e.type==='in'?'Ingreso':'Salida'} · ${escapeHtml(e.m.placa||e.m.vehiculo||'Vehículo')}</strong><span>${escapeHtml(e.m.procedencia||'Sin procedencia')} · ${escapeHtml(e.m.tipoResiduo||'Sin tipo')} · ${Number(e.m.peso||0).toFixed(2)} tn</span></div><div class="patio-feed-time">${formatDate(e.date)}<br>${escapeHtml(e.time||'—')}</div></div>`).join(''):'<div class="patio-empty-state">Sin movimientos para los filtros seleccionados.</div>';
+  const gerEntries=Object.entries(byGer).sort((a,b)=>b[1].tn-a[1].tn),maxGer=Math.max(1,...gerEntries.map(([,v])=>v.tn));
+  gerBox.innerHTML=gerEntries.length?gerEntries.map(([name,v],idx)=>`<div class="patio-gerencia-item"><div class="patio-gerencia-rank">${idx+1}</div><div class="patio-gerencia-name"><strong>${escapeHtml(name)}</strong><span>${v.reg} registro${v.reg===1?'':'s'} · ${v.sal} salida${v.sal===1?'':'s'}</span></div><div class="patio-gerencia-value"><strong>${v.tn.toFixed(2)} tn</strong><span>${((v.tn/(rows.reduce((s,m)=>s+Number(m.peso||0),0)||1))*100).toFixed(1)}%</span></div><div class="patio-gerencia-bar"><span style="width:${Math.max(6,v.tn/maxGer*100)}%"></span></div><div class="patio-gerencia-mix"><span>Pesado ${v.pesado.toFixed(2)} tn</span><span>Liviano ${v.liviano.toFixed(2)} tn</span></div></div>`).join(''):'<div class="patio-empty-state">No hay datos por gerencia para los filtros seleccionados.</div>';
+  const classify=(light)=>{const items=rows.filter(m=>String(m.tipoResiduo||'').toLowerCase().includes(light?'livian':'pesad'));const tn=items.reduce((a,m)=>a+Number(m.peso||0),0);const byGer2={};items.forEach(m=>{const g=(m.gerencia||'Sin gerencia').trim()||'Sin gerencia';byGer2[g]=(byGer2[g]||0)+Number(m.peso||0)});return{items,tn,sal:items.filter(m=>m.fin).length,open:items.filter(m=>!m.fin).length,lead:Object.entries(byGer2).sort((a,b)=>b[1]-a[1])[0]};};
+  const pesado=classify(false),liviano=classify(true),total=Math.max(1,pesado.tn+liviano.tn);
+  const cls=(name,o,type)=>`<div class="patio-class-card ${type}"><span class="patio-class-badge"><i></i>${name}</span><div class="patio-class-title"><div><h4>${name}</h4><div class="patio-class-sub">Clasificación operacional filtrada</div></div><strong>${o.tn.toFixed(2)} tn</strong></div><div class="patio-class-lane"><span style="width:${Math.max(8,o.tn/total*100)}%"></span></div><div class="patio-class-meta"><div class="mini"><span>Registros</span><strong>${o.items.length}</strong></div><div class="mini"><span>Con salida</span><strong>${o.sal}</strong></div><div class="mini"><span>Sin salida</span><strong>${o.open}</strong></div></div><div class="patio-class-leading">${o.lead?`Mayor aporte: <b>${escapeHtml(o.lead[0])}</b> · <b>${o.lead[1].toFixed(2)} tn</b>`:'Sin gerencia predominante.'}</div></div>`;
+  mixBox.innerHTML=cls('Pesado',pesado,'heavy')+cls('Liviano',liviano,'light');
+  const events=[];for(const m of rows){events.push({date:m.fecha,time:m.inicio||'',type:'in',m});if(m.fin)events.push({date:m.fecha,time:m.fin||'',type:'out',m});}events.sort((a,b)=>`${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+  feed.innerHTML=events.length?events.slice(0,14).map(e=>`<div class="patio-feed-item"><div class="patio-feed-icon">${e.type==='in'?'↘':'↗'}</div><div class="patio-feed-main"><strong>${e.type==='in'?'Ingreso':'Salida'} · ${escapeHtml(e.m.placa||e.m.vehiculo||'Vehículo')}</strong><span>${escapeHtml(e.m.gerencia||'Sin gerencia')} · ${escapeHtml(e.m.tipoResiduo||'Sin tipo')} · ${Number(e.m.peso||0).toFixed(2)} tn</span></div><div class="patio-feed-time">${formatDate(e.date)}<br>${escapeHtml(e.time||'—')}</div></div>`).join(''):'<div class="patio-empty-state">Sin movimientos para los filtros seleccionados.</div>';
 }
 
-/* ===== MANTENIMIENTO AVANZADO ===== */
-const MAINTENANCE_LOCAL_KEY='seamx_mantenimiento_records_v1';
+/* ===== MANTENIMIENTO · LÓGICA TIPO SAP ===== */
+let MAINT_SELECTED_TAG='ECM-801';
 const MAINTENANCE_ASSETS=[
-  {tag:'ECM-801',type:'Excavadora con garra',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:3860,location:'Operaciones Mina',intervalBase:250,accessories:['Garra Potenza GS1254 · Cap. 2,000 kg'],notes:['Serie excavadora: WLHZ1442AZD054030']},
-  {tag:'ECM-809',type:'Excavadora con garra + pesómetro',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:3420,location:'Operaciones Mina',intervalBase:250,accessories:['Garra Potenza GS1254 · Serie 206678 · Cap. 2,000 kg','Pesómetro Steelyard instalado']},
-  {tag:'ECM-802',type:'Excavadora con garra',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:3715,location:'Operaciones Mina',intervalBase:250,accessories:['Garra Potenza GS1254 · Cap. 2,000 kg']},
-  {tag:'ECM-503',type:'Minibus',icon:'🚌',brand:'Hyundai',model:'H350',plate:'M6Y-967',meterType:'Kilometraje',baseMeter:32800,location:'Transporte personal',intervalBase:5000,accessories:['Servicio de transporte de personal']},
-  {tag:'ECM-508',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'BSX-732',meterType:'Kilometraje',baseMeter:41200,location:'Operaciones Mina',intervalBase:5000,accessories:['Unidad de apoyo operativo']},
-  {tag:'ECM-505',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'M6L-868',meterType:'Kilometraje',baseMeter:45600,location:'Operaciones Mina',intervalBase:5000,accessories:['Unidad de apoyo operativo']},
-  {tag:'ECM-507',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'BUF-773',meterType:'Kilometraje',baseMeter:39800,location:'Operaciones Mina',intervalBase:5000,accessories:['Unidad de apoyo operativo']}
+ {tag:'ECM-801',type:'Excavadora con garra',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:0,location:'Operaciones Mina',extra:'Garra Potenza GS1254 · Cap. 2,000 kg'},
+ {tag:'ECM-809',type:'Excavadora con garra + pesómetro',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:0,location:'Operaciones Mina',extra:'Garra Potenza GS1254 · Serie 206678 · Cap. 2,000 kg · Pesómetro Steelyard'},
+ {tag:'ECM-802',type:'Excavadora con garra',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:0,location:'Operaciones Mina',extra:'Garra Potenza GS1254 · Cap. 2,000 kg'},
+ {tag:'ECM-503',type:'Minibus',icon:'🚌',brand:'Hyundai',model:'H350',plate:'M6Y-967',meterType:'Kilometraje',baseMeter:0,location:'Transporte personal',extra:'Unidad de transporte de personal'},
+ {tag:'ECM-508',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'BSX-732',meterType:'Kilometraje',baseMeter:0,location:'Operaciones Mina',extra:'Unidad de apoyo operativo'},
+ {tag:'ECM-505',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'M6L-868',meterType:'Kilometraje',baseMeter:0,location:'Operaciones Mina',extra:'Unidad de apoyo operativo'},
+ {tag:'ECM-507',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'BUF-773',meterType:'Kilometraje',baseMeter:0,location:'Operaciones Mina',extra:'Unidad de apoyo operativo'}
 ];
-const MAINT_PLAN_LIBRARY={
-  excavadora:{250:['Filtro de motor','Filtro de petróleo','Filtro separador','Aceite de motor'],500:['Filtros de aire primario y secundario'],1000:['Filtro de pilotaje','Filtro hidráulico','Filtro de tanque hidráulico','Filtro A/C'],2000:['Aceite de transmisión (cubos)','Refrigerante'],4000:['Aceite hidráulico'],5000:['Polea de motor y revisión mayor']},
-  pickup:{5000:['Aceite de motor','Filtro de aceite','Engrase general'],10000:['Filtro de combustible','Líquido de inyectores'],15000:['Filtro de aire'],20000:['Aceite de transmisión y diferenciales','Limpieza de frenos'],25000:['Filtro de aire cabina','Inspección sistema eléctrico'],30000:['Revisión mayor de lubricantes y suspensión']},
-  minibus:{5000:['Cambio de aceite de motor','Cambio de filtro de aceite','Revisión de batería'],10000:['Filtro de aire acondicionado','Sistema eléctrico'],15000:['Filtro de aire y combustible'],20000:['Aceite transmisión y corona','Refrigerante','Limpieza de frenos'],25000:['Inspección integral'],30000:['Revisión mayor'],35000:['Revisión integral de tren motriz']}
+const MAINT_COMPONENTS={
+ excavadora:[
+  {key:'filtro_motor',name:'Filtro de motor 11691297',interval:250,action:'Reemplazo'},{key:'filtro_petroleo',name:'Filtro de petróleo 11691298',interval:250,action:'Reemplazo'},{key:'filtro_separador',name:'Filtro separador 11823470',interval:250,action:'Reemplazo'},{key:'aceite_motor',name:'Aceite de motor 15W40',interval:250,action:'Cambio'},{key:'filtro_aire_g',name:'Filtro de aire G11822826',interval:500,action:'Reemplazo'},{key:'filtro_aire_p',name:'Filtro de aire P11822827',interval:500,action:'Reemplazo'},{key:'filtro_pilotaje',name:'Filtro elemento pilotaje 11342118',interval:1000,action:'Reemplazo'},{key:'filtro_hidraulico',name:'Filtro hidráulico 10115197',interval:1000,action:'Reemplazo'},{key:'filtro_tanque_hid',name:'Filtro de tanque hidráulico 11492271',interval:1000,action:'Reemplazo'},{key:'filtro_ac',name:'Filtro aire acondicionado H14-006-447',interval:1000,action:'Reemplazo'},{key:'aceite_transmision',name:'Aceite de transmisión (cubos)',interval:2000,action:'Cambio'},{key:'refrigerante',name:'Refrigerante',interval:2000,action:'Cambio'},{key:'aceite_hidraulico',name:'Aceite hidráulico',interval:4000,action:'Cambio'},{key:'polea_motor',name:'Polea de motor 11832856',interval:5000,action:'Inspección / cambio'},{key:'garra_potenza',name:'Garra Potenza GS1254',interval:250,action:'Inspección estructural, lubricación y holguras'}
+ ],
+ hilux:[
+  {key:'aceite_motor',name:'Aceite de motor 15W40',interval:5000,action:'Cambio'},{key:'filtro_aceite',name:'Filtro de aceite de motor',interval:5000,action:'Reemplazo'},{key:'engrase',name:'Engrase de vehículo',interval:5000,action:'Servicio'},{key:'filtro_combustible',name:'Filtro de combustible',interval:10000,action:'Reemplazo'},{key:'inyectores',name:'Líquido / sistema de inyectores',interval:10000,action:'Servicio'},{key:'aceite_diferencial',name:'Aceite de diferenciales (corona)',interval:20000,action:'Inspección / cambio'},{key:'aceite_transmision',name:'Aceite de transmisión',interval:20000,action:'Inspección / cambio'},{key:'filtro_aire',name:'Filtro de aire',interval:25000,action:'Reemplazo / inspección'},{key:'freno',name:'Sistema de frenos',interval:5000,action:'Inspección'},{key:'neumaticos',name:'Neumáticos',interval:5000,action:'Inspección'},{key:'bateria',name:'Batería y sistema eléctrico',interval:5000,action:'Inspección'}
+ ],
+ minibus:[
+  {key:'aceite_motor',name:'Aceite de motor',interval:5000,action:'Cambio'},{key:'filtro_aceite',name:'Filtro de aceite',interval:5000,action:'Reemplazo'},{key:'bateria',name:'Batería y bornes',interval:5000,action:'Inspección'},{key:'niveles',name:'Niveles de fluidos',interval:5000,action:'Inspección'},{key:'filtro_aire',name:'Filtro de aire',interval:10000,action:'Reemplazo'},{key:'filtro_combustible',name:'Filtro de combustible',interval:10000,action:'Reemplazo'},{key:'filtro_ac',name:'Filtro aire acondicionado',interval:10000,action:'Inspección / cambio'},{key:'aceite_transmision',name:'Aceite de transmisión',interval:20000,action:'Cambio'},{key:'aceite_corona',name:'Aceite de corona',interval:20000,action:'Cambio'},{key:'refrigerante',name:'Refrigerante',interval:20000,action:'Cambio'},{key:'frenos',name:'Frenos',interval:20000,action:'Limpieza / inspección'},{key:'neumaticos',name:'Neumáticos',interval:5000,action:'Inspección'}
+ ]
 };
-function ensureMaintenanceData(){
-  if(!Array.isArray(APP.data.mantenimientoRegistros))APP.data.mantenimientoRegistros=[];
-  if(!APP.data.mantenimientoRegistros.length){
-    try{const saved=JSON.parse(localStorage.getItem(MAINTENANCE_LOCAL_KEY)||'[]');if(Array.isArray(saved)&&saved.length)APP.data.mantenimientoRegistros=saved;}catch(_){ }
-  }
-  if(!APP.data.mantenimientoRegistros.length){
-    const today=new Date();
-    const fmt=d=>new Date(d).toISOString().split('T')[0];
-    APP.data.mantenimientoRegistros=[
-      {id:'m1',assetTag:'ECM-801',date:fmt(today.getTime()-9*86400000),type:'preventivo',status:'operativo',meter:3750,component:'Servicio 3,750 h',issue:'Cambio programado de filtros y lubricación.',action:'Mantenimiento preventivo ejecutado y unidad liberada.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'},
-      {id:'m2',assetTag:'ECM-809',date:fmt(today.getTime()-3*86400000),type:'inspeccion',status:'monitoreo',meter:3420,component:'Pesómetro Steelyard',issue:'Se detectó desvío menor en lectura del pesómetro.',action:'Mantener seguimiento y recalibrar en la próxima parada.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'},
-      {id:'m3',assetTag:'ECM-508',date:fmt(today.getTime()-1*86400000),type:'correctivo',status:'pendiente',meter:41200,component:'Neumático posterior',issue:'Desgaste irregular y pérdida gradual de presión.',action:'Programar cambio en la próxima guardia.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'},
-      {id:'m4',assetTag:'ECM-503',date:fmt(today.getTime()-6*86400000),type:'preventivo',status:'operativo',meter:30000,component:'Servicio 30,000 km',issue:'Mantenimiento programado ejecutado.',action:'Cambio de aceite, filtro y revisión general.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'}
-    ];
-    persistMaintenanceData();
-  }
-}
-function persistMaintenanceData(){
-  try{localStorage.setItem(MAINTENANCE_LOCAL_KEY,JSON.stringify(APP.data.mantenimientoRegistros||[]));}catch(_){ }
-  try{cacheAppData();}catch(_){ }
-}
-function maintenanceAssetByTag(tag){return MAINTENANCE_ASSETS.find(a=>a.tag===tag)||null;}
-function maintenanceRecordsForTag(tag){return (APP.data.mantenimientoRegistros||[]).filter(r=>r.assetTag===tag).sort((a,b)=>`${b.date} ${b.createdAt||''}`.localeCompare(`${a.date} ${a.createdAt||''}`));}
-function maintenanceFormatMeter(asset,val){if(!Number.isFinite(Number(val)))return '—';const num=Number(val);return asset.meterType==='Horómetro'?`${num.toLocaleString('es-PE')} h`:`${num.toLocaleString('es-PE')} km`;}
-function maintenancePlanKey(asset){if(asset.type.toLowerCase().includes('minibus'))return 'minibus';if(asset.type.toLowerCase().includes('camioneta'))return 'pickup';return 'excavadora';}
-function maintenanceNextWindow(asset,current){const step=Number(asset.intervalBase||250);const next=Math.ceil(Math.max(1,current)/step)*step;const prev=Math.max(0,next-step);return {prev,next,step};}
-function maintenanceState(asset){
-  const recs=maintenanceRecordsForTag(asset.tag);
-  const latest=recs[0]||null;
-  const current=Number(latest?.meter||asset.baseMeter||0);
-  const wnd=maintenanceNextWindow(asset,current);
-  const total=Math.max(1,wnd.next-wnd.prev);
-  const advanced=Math.max(0,current-wnd.prev);
-  const pct=Math.max(4,Math.min(100,(advanced/total)*100));
-  const gap=Math.max(0,wnd.next-current);
-  const thresholdWarn=asset.meterType==='Horómetro'?80:1200;
-  const thresholdCrit=asset.meterType==='Horómetro'?30:300;
-  const latestStatus=String(latest?.status||'operativo');
-  let healthKey='ok', healthLabel='Operativo';
-  if(latestStatus==='critico'){healthKey='crit';healthLabel='Crítico';}
-  else if(latestStatus==='pendiente'){healthKey='warn';healthLabel='Pendiente';}
-  else if(gap<=thresholdCrit){healthKey='crit';healthLabel='Vence pronto';}
-  else if(gap<=thresholdWarn||latestStatus==='monitoreo'){healthKey='warn';healthLabel='En monitoreo';}
-  const photo=latest?.photoUnitUrl||recs.find(r=>r.photoUnitUrl)?.photoUnitUrl||'';
-  const openIssues=recs.filter(r=>['pendiente','critico','monitoreo'].includes(String(r.status||'')));
-  const planLib=MAINT_PLAN_LIBRARY[maintenancePlanKey(asset)]||{};
-  const planTasks=planLib[wnd.next]||planLib[asset.intervalBase]||Object.values(planLib)[0]||[];
-  return {asset,recs,latest,current,wnd,pct,gap,healthKey,healthLabel,photo,openIssues,planTasks};
-}
-function renderMantenimiento(){
-  ensureMaintenanceData();
-  const assets=MAINTENANCE_ASSETS.map(maintenanceState);
-  const total=assets.length;
-  const upcoming=assets.filter(a=>a.healthKey==='warn').length;
-  const critical=assets.filter(a=>a.healthKey==='crit').length;
-  const available=assets.filter(a=>a.healthKey!=='crit').length;
-  const totalEl=document.getElementById('maint-kpi-total');if(totalEl)totalEl.textContent=String(total);
-  const upEl=document.getElementById('maint-kpi-upcoming');if(upEl)upEl.textContent=String(upcoming);
-  const critEl=document.getElementById('maint-kpi-critical');if(critEl)critEl.textContent=String(critical);
-  const avaEl=document.getElementById('maint-kpi-availability');if(avaEl)avaEl.textContent=`${Math.round((available/Math.max(1,total))*100)}%`;
-  const grid=document.getElementById('maintenance-assets-grid');
-  if(grid)grid.innerHTML=assets.map(s=>{const asset=s.asset;const tags=[asset.plate&&asset.plate!=='—'?`Placa ${asset.plate}`:null,asset.location,...(asset.accessories||[])].filter(Boolean);const mini=[0.18,0.35,0.52,0.68,0.84,1].map((p,idx)=>{const filled=Math.max(8,Math.min(100,Math.round(Math.min(1,s.pct/100 + (idx-2)*0.02)*100)));return `<div class="maint-mini-seg"><span style="height:${filled}%"></span><b>${idx===5?s.wnd.next:(s.wnd.prev+Math.round((idx+1)*(s.wnd.step/6)))}</b></div>`;}).join('');const healthClass=s.healthKey==='crit'?'crit':s.healthKey==='warn'?'warn':'ok';return `<article class="maint-asset-card" id="maint-${asset.tag}"><div class="maint-asset-photo">${s.photo?`<img src="${escapeHtml(s.photo)}" alt="${escapeHtml(asset.tag)}">`:`<div class="placeholder"><div><strong>${asset.icon}</strong>${escapeHtml(asset.type)}<br><small>Adjunta una foto en el registro para mostrar la unidad aquí.</small></div></div>`}</div><div class="maint-asset-body"><div class="maint-chip-row"><span class="maint-type-chip">${escapeHtml(asset.type)}</span><span class="maint-health ${healthClass}">${escapeHtml(s.healthLabel)}</span></div><div><div class="maint-name">${escapeHtml(asset.tag)}</div><div class="maint-meta">${escapeHtml(asset.brand)} ${escapeHtml(asset.model)}${asset.plate&&asset.plate!=='—'?` · Placa ${escapeHtml(asset.plate)}`:''}<br>${escapeHtml(asset.meterType)} · ${escapeHtml(asset.location)}</div></div><div class="maint-meter-grid"><div class="maint-meter-box"><span>Lectura actual</span><strong>${maintenanceFormatMeter(asset,s.current)}</strong></div><div class="maint-meter-box"><span>Próximo MP</span><strong>${maintenanceFormatMeter(asset,s.wnd.next)}</strong></div><div class="maint-meter-box"><span>Brecha</span><strong>${maintenanceFormatMeter(asset,s.gap)}</strong></div></div><div class="maint-progress"><span style="width:${s.pct}%"></span></div><div class="maint-progress-caption"><span>${maintenanceFormatMeter(asset,s.wnd.prev)} desde el último tramo</span><span>${maintenanceFormatMeter(asset,s.wnd.next)} meta siguiente</span></div><div class="maint-mini-chart">${mini}</div><div class="maint-tags">${tags.map(t=>`<span class="maint-tag">${escapeHtml(t)}</span>`).join('')}</div><div class="maint-plan-box"><b>Próxima intervención sugerida:</b> ${escapeHtml(s.planTasks.join(', ')||'Inspección general.')} ${s.latest?.component?`<br><b>Último componente/hallazgo:</b> ${escapeHtml(s.latest.component)}`:''}</div><div class="maint-actions"><button class="btn btn-primary btn-sm" onclick="openMaintenanceEventModal('${asset.tag}')">Registrar evento</button><button class="btn btn-outline btn-sm" onclick="scrollToMaintenanceHistory('${asset.tag}')">Ver historial</button></div></div></article>`;}).join('');
-  const att=document.getElementById('maintenance-attention-list');
-  if(att){
-    const issues=assets.flatMap(s=>s.openIssues.slice(0,3).map(r=>({asset:s.asset,record:r})) ).sort((a,b)=>`${b.record.date}`.localeCompare(`${a.record.date}`));
-    att.innerHTML=issues.length?issues.slice(0,12).map(({asset,record})=>`<div class="maint-attention-item"><strong>${escapeHtml(asset.tag)} · ${escapeHtml(asset.type)}</strong><span><b>${escapeHtml(record.component||record.type||'Evento')}</b><br>${escapeHtml(record.issue||'Sin detalle registrado.')}</span><div class="maint-attention-meta"><span>${formatDate(record.date)} · ${escapeHtml(record.status||'operativo')}</span><span>${maintenanceFormatMeter(asset,record.meter)}</span></div>${(record.photoFailureUrl||record.photoComponentUrl)?`<div class="maint-thumb-row">${record.photoFailureUrl?`<img src="${escapeHtml(record.photoFailureUrl)}" alt="Falla">`:''}${record.photoComponentUrl?`<img src="${escapeHtml(record.photoComponentUrl)}" alt="Componente">`:''}</div>`:''}</div>`).join(''):'<div class="maint-empty">No hay fallas ni observaciones activas. La flota se encuentra en condición controlada.</div>';
-  }
-  const tbody=document.getElementById('maintenance-history-body');
-  if(tbody){
-    const all=[...(APP.data.mantenimientoRegistros||[])].sort((a,b)=>`${b.date} ${b.createdAt||''}`.localeCompare(`${a.date} ${a.createdAt||''}`));
-    tbody.innerHTML=all.length?all.map(r=>{const asset=maintenanceAssetByTag(r.assetTag)||{tag:r.assetTag,type:'Equipo',meterType:'Horómetro'};const thumbs=[r.photoUnitUrl,r.photoFailureUrl,r.photoComponentUrl].filter(Boolean);return `<tr data-maint-asset="${escapeHtml(r.assetTag)}"><td>${formatDate(r.date)}</td><td><strong>${escapeHtml(r.assetTag)}</strong><br><small>${escapeHtml(asset.type||'')}</small></td><td>${escapeHtml(String(r.type||'evento').replace(/^./,c=>c.toUpperCase()))}</td><td><span class="badge ${r.status==='critico'?'badge-open':r.status==='pendiente'?'badge-pause':'badge-done'}">${escapeHtml(r.status||'operativo')}</span></td><td>${maintenanceFormatMeter(asset,Number(r.meter||0))}</td><td><b>${escapeHtml(r.component||'—')}</b><br><small>${escapeHtml(r.issue||'Sin hallazgo registrado.')}</small></td><td>${escapeHtml(r.action||'—')}</td><td>${thumbs.length?thumbs.map(u=>`<img src="${escapeHtml(u)}" alt="Evidencia">`).join(' '):'—'}</td><td>${escapeHtml(r.registeredBy||'—')}</td></tr>`;}).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-s);padding:30px">Aún no se registran eventos de mantenimiento.</td></tr>';
-  }
-  populateMaintenanceAssetOptions();
-}
-function populateMaintenanceAssetOptions(selected=''){
-  const sel=document.getElementById('maint-event-asset');if(!sel)return;
-  sel.innerHTML=MAINTENANCE_ASSETS.map(a=>`<option value="${escapeHtml(a.tag)}" ${a.tag===selected?'selected':''}>${escapeHtml(a.tag)} · ${escapeHtml(a.type)}</option>`).join('');
-}
-function resetMaintenanceModal(){
-  document.getElementById('maint-event-id').value='';
-  document.getElementById('maint-event-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('maint-event-type').value='preventivo';
-  document.getElementById('maint-event-status').value='operativo';
-  document.getElementById('maint-event-meter').value='';
-  document.getElementById('maint-event-component').value='';
-  document.getElementById('maint-event-issue').value='';
-  document.getElementById('maint-event-action').value='';
-  ['unit','failure','component'].forEach(k=>{['','-camera'].forEach(s=>{const el=document.getElementById(`maint-photo-${k}${s}`);if(el)el.value='';});const prev=document.getElementById(`maint-preview-${k==='unit'?'unit':k}`);if(prev)prev.innerHTML='Sin imagen';});
-}
-function openMaintenanceEventModal(tag=''){
-  ensureMaintenanceData();
-  resetMaintenanceModal();
-  populateMaintenanceAssetOptions(tag||MAINTENANCE_ASSETS[0]?.tag||'');
-  const asset=maintenanceAssetByTag(tag||MAINTENANCE_ASSETS[0]?.tag||'');
-  if(asset)document.getElementById('maint-event-meter').placeholder=asset.meterType==='Horómetro'?'Horómetro actual':'Kilometraje actual';
-  const sel=document.getElementById('maint-event-asset');if(sel)sel.onchange=()=>{const a=maintenanceAssetByTag(sel.value);document.getElementById('maint-event-meter').placeholder=a?.meterType==='Horómetro'?'Horómetro actual':'Kilometraje actual';};
-  openModal('modal-maintenance-event');
-}
-function previewMaintenanceFile(input,previewId,siblingId){if(siblingId){const sib=document.getElementById(siblingId);if(sib)sib.value='';}const file=input?.files?.[0];const box=document.getElementById(previewId);if(!box)return;if(!file){box.innerHTML='Sin imagen';return;}const reader=new FileReader();reader.onload=()=>{box.innerHTML=`<img src="${reader.result}" alt="Evidencia">`;};reader.readAsDataURL(file);}
+function maintenanceComponentSet(asset){const base=asset.type.toLowerCase().includes('minibus')?'minibus':asset.type.toLowerCase().includes('camioneta')?'hilux':'excavadora';const rows=MAINT_COMPONENTS[base].map(x=>({...x}));if(asset.tag==='ECM-809')rows.push({key:'pesometro_steelyard',name:'Pesómetro Steelyard',interval:null,action:'Inspección / calibración por desviación',conditionBased:true});return rows;}
+function maintenanceRecords(){return Array.isArray(APP.data.mantenimientoRegistros)?APP.data.mantenimientoRegistros:[];}
+function maintenanceRecordsForTag(tag){return maintenanceRecords().filter(r=>String(r.equipo_tag||r.assetTag||'')===tag).sort((a,b)=>`${b.fecha||b.date||''} ${b.created_at||b.createdAt||''}`.localeCompare(`${a.fecha||a.date||''} ${a.created_at||a.createdAt||''}`));}
+function maintenanceCurrentMeter(asset){const rec=maintenanceRecordsForTag(asset.tag).find(r=>Number(r.lectura??r.meter)>0);return Number((rec?.lectura??rec?.meter??asset.baseMeter) || 0);}
+function maintenanceFmt(asset,val){const n=Number(val||0);return asset.meterType==='Horómetro'?`${n.toLocaleString('es-PE')} h`:`${n.toLocaleString('es-PE')} km`;}
+function maintenanceComponentStatus(asset,comp){const current=maintenanceCurrentMeter(asset),records=maintenanceRecordsForTag(asset.tag).filter(r=>String(r.componente_key||'')===comp.key);const latest=records[0];if(current<=0&&!records.length)return{key:'monitor',label:'Sin lectura',current:0,last:0,next:null,remaining:null,pct:0,source:'sin lectura'};const fault=records.find(r=>['critico','pendiente','monitoreo'].includes(String(r.estado||r.status||'')));if(fault){const s=String(fault.estado||fault.status);return{key:s==='critico'?'crit':s==='pendiente'?'crit':'monitor',label:s==='critico'?'Falla crítica':s==='pendiente'?'Pendiente':'Monitoreo',current,last:Number((latest?.lectura??latest?.meter) || 0),next:null,remaining:null,pct:100,source:'evento'};}if(comp.conditionBased)return{key:'ok',label:'OK / condición',current,last:Number((latest?.lectura??latest?.meter) || 0),next:null,remaining:null,pct:15,source:'condición'};const interval=Number(comp.interval||0);const lastService=Number((records.find(r=>['preventivo','cambio','correctivo'].includes(String(r.tipo||r.type||''))&&String(r.estado||r.status||'operativo')==='operativo')?.lectura ?? records.find(r=>['preventivo','cambio','correctivo'].includes(String(r.tipo||r.type||'')))?.meter) || 0);const effectiveLast=lastService>0?lastService:Math.floor(current/interval)*interval;let next=effectiveLast+interval;if(next<=current&&lastService===0)next=(Math.floor(current/interval)+1)*interval;const remaining=next-current;const warn=asset.meterType==='Horómetro'?Math.max(50,interval*.2):Math.max(1000,interval*.2);const crit=asset.meterType==='Horómetro'?Math.max(15,interval*.06):Math.max(300,interval*.06);let key='ok',label='OK';if(remaining<=0){key='crit';label='Vencido';}else if(remaining<=crit){key='crit';label='Vence pronto';}else if(remaining<=warn){key='warn';label='Programar';}const pct=Math.max(2,Math.min(100,((current-effectiveLast)/interval)*100));return{key,label,current,last:effectiveLast,next,remaining,pct,source:lastService?'registro':'plan'};}
+function maintenanceAssetStatus(asset){const comps=maintenanceComponentSet(asset).map(c=>({comp:c,status:maintenanceComponentStatus(asset,c)}));const crit=comps.filter(x=>x.status.key==='crit').length,warn=comps.filter(x=>x.status.key==='warn'||x.status.key==='monitor').length,ok=comps.length-crit-warn;const health=Math.max(0,Math.round((ok+warn*.5)/Math.max(1,comps.length)*100));return{asset,comps,crit,warn,ok,health,current:maintenanceCurrentMeter(asset),photo:maintenanceRecordsForTag(asset.tag).find(r=>r.foto_unidad_url||r.photoUnitUrl)?.foto_unidad_url||maintenanceRecordsForTag(asset.tag).find(r=>r.photoUnitUrl)?.photoUnitUrl||''};}
+function renderMantenimiento(){const states=MAINTENANCE_ASSETS.map(maintenanceAssetStatus);if(!states.find(s=>s.asset.tag===MAINT_SELECTED_TAG))MAINT_SELECTED_TAG=states[0]?.asset.tag||'';const all=states.flatMap(s=>s.comps);const ok=all.filter(x=>x.status.key==='ok').length,up=all.filter(x=>x.status.key==='warn'||x.status.key==='monitor').length,crit=all.filter(x=>x.status.key==='crit').length,available=states.filter(s=>s.crit===0).length;const vals={'maint-kpi-availability':`${Math.round(available/Math.max(1,states.length)*100)}%`,'maint-kpi-ok':ok,'maint-kpi-upcoming':up,'maint-kpi-critical':crit,'maint-kpi-backlog':up+crit};Object.entries(vals).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});const list=document.getElementById('maintenance-equipment-list');if(list)list.innerHTML=states.map(s=>`<button class="sap-eq-item ${s.asset.tag===MAINT_SELECTED_TAG?'active':''}" onclick="selectMaintenanceEquipment('${s.asset.tag}')"><div class="sap-eq-icon">${s.asset.icon}</div><div class="sap-eq-main"><strong>${escapeHtml(s.asset.tag)} · ${escapeHtml(s.asset.brand)} ${escapeHtml(s.asset.model)}</strong><span>${escapeHtml(s.asset.type)}${s.asset.plate!=='—'?` · ${escapeHtml(s.asset.plate)}`:''}</span></div><div class="sap-eq-health"><b>${s.health}%</b><span class="${s.crit?'sap-status-crit':s.warn?'sap-status-warn':'sap-status-ok'}">${s.crit?`${s.crit} alerta${s.crit===1?'':'s'}`:s.warn?`${s.warn} próximo${s.warn===1?'':'s'}`:'OK'}</span></div></button>`).join('');renderMaintenanceEquipmentDetail(MAINT_SELECTED_TAG,states);renderMaintenanceHistory();populateMaintenanceAssetOptions(MAINT_SELECTED_TAG);}
+function selectMaintenanceEquipment(tag){MAINT_SELECTED_TAG=tag;renderMantenimiento();}
+function renderMaintenanceEquipmentDetail(tag,states=null){const s=(states||MAINTENANCE_ASSETS.map(maintenanceAssetStatus)).find(x=>x.asset.tag===tag),box=document.getElementById('maintenance-equipment-detail');if(!s||!box)return;const a=s.asset;const alerts=s.comps.filter(x=>x.status.key!=='ok');box.innerHTML=`<div class="sap-eq-photo">${s.photo?`<img src="${escapeHtml(s.photo)}" alt="${escapeHtml(a.tag)}">`:`<div class="placeholder"><b>${a.icon}</b>Adjunta una fotografía de la unidad desde un evento de mantenimiento.</div>`}</div><div class="sap-detail-head"><div><h2>${escapeHtml(a.tag)} · ${escapeHtml(a.brand)} ${escapeHtml(a.model)}</h2><p>${escapeHtml(a.type)} · ${escapeHtml(a.location)}${a.plate!=='—'?` · Placa ${escapeHtml(a.plate)}`:''}</p></div><button class="btn btn-primary btn-sm" onclick="openMaintenanceEventModal('${a.tag}')">+ Orden / evento</button></div><div class="sap-master-data"><div class="sap-master-box"><span>Lectura actual</span><strong>${maintenanceFmt(a,s.current)}</strong></div><div class="sap-master-box"><span>Salud técnica</span><strong>${s.health}%</strong></div><div class="sap-master-box"><span>Componentes</span><strong>${s.comps.length}</strong></div><div class="sap-master-box"><span>Configuración</span><strong>${escapeHtml(a.extra)}</strong></div></div><div class="sap-component-summary"><span class="ok">${s.ok} OK</span><span class="warn">${s.warn} por programar / monitoreo</span><span class="crit">${s.crit} vencido / falla</span></div><div class="sap-component-table-wrap"><table class="sap-component-table"><thead><tr><th>Componente</th><th>Plan</th><th>Estado</th><th>Último / base</th><th>Próximo</th><th>Brecha</th><th>Consumo de intervalo</th><th>Acción</th></tr></thead><tbody>${s.comps.map(({comp,status})=>`<tr><td><strong>${escapeHtml(comp.name)}</strong></td><td>${comp.conditionBased?'Por condición':maintenanceFmt(a,comp.interval)}</td><td><span class="sap-comp-status ${status.key}">${escapeHtml(status.label)}</span></td><td>${status.last?maintenanceFmt(a,status.last):'—'}</td><td>${status.next?maintenanceFmt(a,status.next):'Según condición'}</td><td>${status.remaining===null?'—':maintenanceFmt(a,status.remaining)}</td><td><div class="sap-healthbar"><span style="width:${status.pct}%"></span></div></td><td>${escapeHtml(comp.action)}</td></tr>`).join('')}</tbody></table></div><div class="sap-maint-alerts">${alerts.length?alerts.slice(0,8).map(({comp,status})=>`<div class="sap-maint-alert ${status.key==='crit'?'crit':''}"><strong>${escapeHtml(comp.name)} · ${escapeHtml(status.label)}</strong><span>${status.remaining!==null?`Restan ${maintenanceFmt(a,status.remaining)} para el punto planificado.`:'Seguimiento por condición o evento registrado.'} ${escapeHtml(comp.action)}</span></div>`).join(''):'<div class="maint-empty">Todos los componentes se encuentran dentro del plan configurado.</div>'}</div>`;}
+function populateMaintenanceAssetOptions(selected=''){const sel=document.getElementById('maint-event-asset');if(!sel)return;sel.innerHTML=MAINTENANCE_ASSETS.map(a=>`<option value="${a.tag}" ${a.tag===selected?'selected':''}>${a.tag} · ${a.type}</option>`).join('');populateMaintenanceComponentOptions(selected||sel.value);sel.onchange=()=>populateMaintenanceComponentOptions(sel.value);}
+function populateMaintenanceComponentOptions(tag){const sel=document.getElementById('maint-event-component'),asset=MAINTENANCE_ASSETS.find(a=>a.tag===tag);if(!sel||!asset)return;sel.innerHTML=maintenanceComponentSet(asset).map(c=>`<option value="${c.key}">${escapeHtml(c.name)}</option>`).join('')+`<option value="otro">Otro / sistema general</option>`;}
+function resetMaintenanceModal(){document.getElementById('maint-event-id').value='';document.getElementById('maint-event-date').value=new Date().toISOString().split('T')[0];document.getElementById('maint-event-type').value='preventivo';document.getElementById('maint-event-status').value='operativo';document.getElementById('maint-event-meter').value='';document.getElementById('maint-event-issue').value='';document.getElementById('maint-event-action').value='';['unit','failure','component'].forEach(k=>{['','-camera'].forEach(s=>{const el=document.getElementById(`maint-photo-${k}${s}`);if(el)el.value='';});const box=document.getElementById(`maint-preview-${k}`);if(box)box.innerHTML='Sin imagen';});}
+function openMaintenanceEventModal(tag=''){resetMaintenanceModal();const useTag=tag||MAINT_SELECTED_TAG||MAINTENANCE_ASSETS[0].tag;populateMaintenanceAssetOptions(useTag);document.getElementById('maint-event-asset').value=useTag;populateMaintenanceComponentOptions(useTag);const asset=MAINTENANCE_ASSETS.find(a=>a.tag===useTag);document.getElementById('maint-event-meter').placeholder=asset?.meterType==='Horómetro'?'Horómetro actual':'Kilometraje actual';openModal('modal-maintenance-event');}
+function previewMaintenanceFile(input,previewId,siblingId){if(siblingId){const sib=document.getElementById(siblingId);if(sib)sib.value='';}const file=input?.files?.[0],box=document.getElementById(previewId);if(!box)return;if(!file){box.innerHTML='Sin imagen';return;}const fr=new FileReader();fr.onload=()=>box.innerHTML=`<img src="${fr.result}" alt="Evidencia">`;fr.readAsDataURL(file);}
 function maintenanceSelectedFile(kind){return document.getElementById(`maint-photo-${kind}`)?.files?.[0]||document.getElementById(`maint-photo-${kind}-camera`)?.files?.[0]||null;}
-async function maintenanceFileToDataUrl(file){if(!file)return '';return await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file);});}
-async function saveMaintenanceEvent(){
-  ensureMaintenanceData();
-  const assetTag=document.getElementById('maint-event-asset').value;
-  const date=document.getElementById('maint-event-date').value;
-  const type=document.getElementById('maint-event-type').value;
-  const status=document.getElementById('maint-event-status').value;
-  const meter=Number(document.getElementById('maint-event-meter').value||0);
-  const component=document.getElementById('maint-event-component').value.trim();
-  const issue=document.getElementById('maint-event-issue').value.trim();
-  const action=document.getElementById('maint-event-action').value.trim();
-  if(!assetTag||!date||!type||!status){showToast('Completa los datos obligatorios del evento de mantenimiento','warning');return;}
-  const [photoUnitUrl,photoFailureUrl,photoComponentUrl]=await Promise.all([maintenanceFileToDataUrl(maintenanceSelectedFile('unit')),maintenanceFileToDataUrl(maintenanceSelectedFile('failure')),maintenanceFileToDataUrl(maintenanceSelectedFile('component'))]);
-  APP.data.mantenimientoRegistros.unshift({id:'m_'+Date.now(),assetTag,date,type,status,meter:Number.isFinite(meter)&&meter>0?meter:'',component,issue,action,photoUnitUrl,photoFailureUrl,photoComponentUrl,registeredBy:APP.user?.login||APP.user?.nombre||'sistema',createdAt:new Date().toISOString()});
-  persistMaintenanceData();
-  closeModal('modal-maintenance-event');
-  renderMantenimiento();
-  showToast('Evento de mantenimiento registrado','success');
-}
-function scrollToMaintenanceHistory(tag){
-  navigateTo('mantenimiento');
-  setTimeout(()=>{const row=document.querySelector(`[data-maint-asset="${CSS.escape(tag)}"]`);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.style.background='#f2fbf4';setTimeout(()=>row.style.background='',1800);} },180);
-}
+async function uploadMaintenanceEvidence(file,tag,kind){if(!file)return '';const ext=(file.name?.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`${tag}/${Date.now()}_${kind}.${ext}`;try{const {error}=await db.storage.from('mantenimiento-evidencias').upload(path,file,{upsert:false,contentType:file.type||'image/jpeg'});if(error)throw error;const {data}=db.storage.from('mantenimiento-evidencias').getPublicUrl(path);return data?.publicUrl||'';}catch(err){console.warn('No se pudo subir evidencia de mantenimiento:',err);return '';}}
+async function saveMaintenanceEvent(){const assetTag=document.getElementById('maint-event-asset').value,date=document.getElementById('maint-event-date').value,type=document.getElementById('maint-event-type').value,status=document.getElementById('maint-event-status').value,meter=Number(document.getElementById('maint-event-meter').value||0),componentKey=document.getElementById('maint-event-component').value,asset=MAINTENANCE_ASSETS.find(a=>a.tag===assetTag),comp=maintenanceComponentSet(asset||MAINTENANCE_ASSETS[0]).find(c=>c.key===componentKey),issue=document.getElementById('maint-event-issue').value.trim(),action=document.getElementById('maint-event-action').value.trim();if(!assetTag||!date||!componentKey){showToast('Completa equipo, fecha y componente','warning');return;}if(!navigator.onLine){showToast('Conéctate a internet para registrar mantenimiento y evidencias','warning');return;}try{const [unit,failure,componentPhoto]=await Promise.all([uploadMaintenanceEvidence(maintenanceSelectedFile('unit'),assetTag,'unidad'),uploadMaintenanceEvidence(maintenanceSelectedFile('failure'),assetTag,'falla'),uploadMaintenanceEvidence(maintenanceSelectedFile('component'),assetTag,'componente')]);const row={equipo_tag:assetTag,fecha:date,tipo:type,estado:status,lectura:Number.isFinite(meter)&&meter>0?meter:null,componente_key:componentKey,componente:comp?.name||'Otro / sistema general',hallazgo:issue,accion:action,foto_unidad_url:unit,foto_falla_url:failure,foto_componente_url:componentPhoto,registrado_por:APP.user?.login||APP.user?.name||'sistema'};const {data,error}=await db.from('mantenimiento_registros').insert([row]).select('*').single();if(error)throw error;APP.data.mantenimientoRegistros.unshift(data);closeModal('modal-maintenance-event');MAINT_SELECTED_TAG=assetTag;renderMantenimiento();showToast('Orden / evento de mantenimiento registrado','success');}catch(err){console.error(err);showToast('No se pudo guardar mantenimiento. Ejecuta el SQL de mantenimiento en Supabase.','error');}}
+function renderMaintenanceHistory(){const tbody=document.getElementById('maintenance-history-body');if(!tbody)return;const all=[...maintenanceRecords()].sort((a,b)=>`${b.fecha||''} ${b.created_at||''}`.localeCompare(`${a.fecha||''} ${a.created_at||''}`));tbody.innerHTML=all.length?all.map(r=>{const a=MAINTENANCE_ASSETS.find(x=>x.tag===r.equipo_tag)||{meterType:'Horómetro'};const imgs=[r.foto_unidad_url,r.foto_falla_url,r.foto_componente_url].filter(Boolean);return `<tr><td>${formatDate(r.fecha)}</td><td><strong>${escapeHtml(r.equipo_tag)}</strong></td><td>${escapeHtml(r.tipo||'—')}</td><td>${escapeHtml(r.estado||'—')}</td><td>${r.lectura?maintenanceFmt(a,r.lectura):'—'}</td><td>${escapeHtml(r.componente||'—')}</td><td>${escapeHtml(r.hallazgo||'—')}</td><td>${escapeHtml(r.accion||'—')}</td><td>${imgs.length?imgs.map(u=>`<img src="${escapeHtml(u)}" alt="Evidencia">`).join(' '):'—'}</td><td>${escapeHtml(r.registrado_por||'—')}</td></tr>`;}).join(''):'<tr><td colspan="10" style="text-align:center;color:var(--text-s);padding:28px">Aún no existen órdenes o eventos de mantenimiento registrados.</td></tr>';}
 
 /* ===== PWA INSTALL ===== */
 let deferredPrompt = null;
