@@ -1100,6 +1100,92 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 @media(max-width:700px){.activity-calendar-weekdays{display:none}.activity-calendar-grid{grid-template-columns:1fr;gap:8px}.activity-calendar-day{min-height:0;padding:10px 11px;display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px}.activity-calendar-day.other{display:none}.activity-calendar-day-number{font-size:16px;margin:0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px}.activity-calendar-items{min-width:0}.activity-calendar-item{font-size:10px;padding:7px}.activity-calendar-item strong{font-size:11px}.patio-live-board,.patio-material-summary{grid-template-columns:1fr}.command-kpis-operational{grid-template-columns:1fr 1fr!important}}
 @media(max-width:430px){.command-kpis-operational{grid-template-columns:1fr!important}.activity-calendar-actions .btn{min-width:44px}}
 
+
+/* ===== SEAMX · Patios operacional avanzado ===== */
+.patio-advanced-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:18px;margin-bottom:18px}
+.patio-origin-board{display:grid;gap:10px}
+.patio-origin-item{border:1px solid var(--border);border-radius:14px;padding:12px;background:linear-gradient(145deg,#fff,#f7fbf8);box-shadow:0 8px 20px rgba(13,61,26,.05)}
+.patio-origin-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.patio-origin-rank{width:34px;height:34px;border-radius:12px;background:#eaf5ed;color:#1a5c2a;display:grid;place-items:center;font-size:12px;font-weight:900}
+.patio-origin-main{min-width:0;flex:1}
+.patio-origin-main strong{display:block;font-size:14px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.patio-origin-main span{display:block;font-size:10px;color:var(--text-m);margin-top:3px}
+.patio-origin-tn{text-align:right;white-space:nowrap}
+.patio-origin-tn strong{display:block;font-size:18px;color:var(--navy)}
+.patio-origin-tn span{display:block;font-size:10px;color:var(--text-m);margin-top:2px}
+.patio-origin-bar{height:8px;border-radius:999px;background:#e7f1e8;overflow:hidden;margin-top:10px}
+.patio-origin-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#0d3d1a,#35a553)}
+.patio-origin-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.patio-origin-pill{padding:8px 9px;border-radius:10px;background:#f7faf8;border:1px solid #e5eee7}
+.patio-origin-pill span{display:block;font-size:9px;color:var(--text-s);font-weight:800;text-transform:uppercase}
+.patio-origin-pill strong{display:block;font-size:12px;color:var(--navy);margin-top:3px}
+.patio-class-board{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.patio-class-card{border:1px solid var(--border);border-radius:16px;padding:14px;background:linear-gradient(145deg,#fff,#f7fbf8);display:grid;gap:11px}
+.patio-class-card.heavy{box-shadow:inset 0 0 0 1px rgba(26,92,42,.06)}
+.patio-class-card.light{box-shadow:inset 0 0 0 1px rgba(33,150,83,.08)}
+.patio-class-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;font-size:10px;font-weight:900;background:#edf7ef;color:#225f31}
+.patio-class-badge i{width:9px;height:9px;border-radius:50%;background:#1d6a31}
+.patio-class-title{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.patio-class-title h4{font-size:17px;color:var(--navy)}
+.patio-class-title strong{font-size:26px;color:var(--navy);line-height:1}
+.patio-class-sub{font-size:11px;color:var(--text-m)}
+.patio-class-lane{height:12px;border-radius:999px;background:#ebf4ed;overflow:hidden}
+.patio-class-lane span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#123d20,#3aaa50)}
+.patio-class-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.patio-class-meta .mini{padding:8px;border-radius:10px;background:#f8fbf9;border:1px solid #e6efea}
+.patio-class-meta .mini span{display:block;font-size:9px;color:var(--text-s);font-weight:800;text-transform:uppercase}
+.patio-class-meta .mini strong{display:block;font-size:12px;color:var(--navy);margin-top:3px}
+.patio-class-leading{padding:10px;border-radius:12px;background:#f8fbf9;border:1px dashed #d8e7dd;font-size:11px;color:#486452;line-height:1.45}
+.patio-class-leading b{color:var(--navy)}
+.patio-feed-card .patio-movement-feed{max-height:530px}
+@media(max-width:980px){.patio-advanced-grid{grid-template-columns:1fr}.patio-class-board{grid-template-columns:1fr}}
+@media(max-width:700px){.patio-origin-meta{grid-template-columns:1fr 1fr}.patio-origin-top{align-items:center}.patio-origin-rank{width:30px;height:30px}.patio-class-title{align-items:center}.patio-class-title strong{font-size:22px}}
+
+/* ===== SEAMX · Mantenimiento avanzado ===== */
+.maint-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px;margin-bottom:18px}
+.maint-note{margin-bottom:18px;padding:14px 16px;border:1px dashed #cfe0d2;border-radius:16px;background:linear-gradient(145deg,#fbfefb,#f3faf4);font-size:12px;color:#557164;line-height:1.6}
+.maint-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:18px;margin-bottom:18px}
+.maint-assets-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(305px,1fr));gap:14px}
+.maint-asset-card{border:1px solid var(--border);border-radius:18px;background:linear-gradient(180deg,#fff,#fbfefb);box-shadow:0 10px 28px rgba(13,61,26,.06);overflow:hidden;display:grid}
+.maint-asset-photo{height:165px;background:linear-gradient(145deg,#f5faf6,#edf5ee);display:grid;place-items:center;position:relative;overflow:hidden}
+.maint-asset-photo img{width:100%;height:100%;object-fit:cover}
+.maint-asset-photo .placeholder{display:grid;place-items:center;color:#6a8572;font-size:13px;text-align:center;padding:18px;line-height:1.45}
+.maint-asset-photo .placeholder strong{font-size:40px;display:block;line-height:1;margin-bottom:8px}
+.maint-asset-body{padding:16px;display:grid;gap:12px}
+.maint-chip-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.maint-type-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#eef7f0;color:#1d6a31;font-size:10px;font-weight:900;text-transform:uppercase}
+.maint-health{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:10px;font-weight:900}
+.maint-health.ok{background:#eaf7ef;color:#1f7a39}.maint-health.warn{background:#fff6df;color:#a26500}.maint-health.crit{background:#fdecec;color:#c0392b}
+.maint-name{font-size:21px;font-weight:900;color:var(--navy);line-height:1.15}
+.maint-meta{font-size:11px;color:var(--text-m);line-height:1.55}
+.maint-meter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.maint-meter-box{padding:10px;border-radius:12px;background:#f8fbf9;border:1px solid #e6efea}
+.maint-meter-box span{display:block;font-size:9px;color:var(--text-s);font-weight:800;text-transform:uppercase}
+.maint-meter-box strong{display:block;font-size:14px;color:var(--navy);margin-top:4px}
+.maint-progress{height:10px;border-radius:999px;background:#e8f2ea;overflow:hidden}
+.maint-progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#0d3d1a,#39a84f)}
+.maint-progress-caption{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--text-m);font-weight:700}
+.maint-mini-chart{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.maint-mini-seg{height:36px;border-radius:9px;background:#edf5ef;position:relative;overflow:hidden;border:1px solid #e1ebe3}
+.maint-mini-seg span{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#46b85d,#0d3d1a)}
+.maint-mini-seg b{position:absolute;left:50%;transform:translateX(-50%);bottom:4px;font-size:9px;color:#fff;z-index:1}
+.maint-tags{display:flex;flex-wrap:wrap;gap:7px}
+.maint-tag{padding:6px 9px;border-radius:999px;background:#f1f6f2;border:1px solid #dbe7de;font-size:10px;color:#3c5f45;font-weight:700}
+.maint-plan-box{padding:11px 12px;border-radius:13px;background:#fbfdfb;border:1px dashed #cfe0d2;font-size:11px;color:#486452;line-height:1.55}
+.maint-plan-box b{color:var(--navy)}
+.maint-actions{display:flex;gap:8px;flex-wrap:wrap}
+.maint-attention-card{display:grid;gap:10px}
+.maint-attention-item{border:1px solid var(--border);border-radius:14px;padding:12px;background:linear-gradient(145deg,#fff,#f9fcfa)}
+.maint-attention-item strong{display:block;font-size:13px;color:var(--navy)}
+.maint-attention-item span{display:block;font-size:11px;color:var(--text-m);margin-top:4px;line-height:1.45}
+.maint-attention-meta{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:8px;font-size:10px;color:var(--text-s);font-weight:800;flex-wrap:wrap}
+.maint-thumb-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.maint-thumb-row img{width:60px;height:60px;border-radius:10px;object-fit:cover;border:1px solid #dbe7de;background:#fff}
+.maint-empty{padding:24px 18px;text-align:center;border:1px dashed var(--border);border-radius:14px;color:var(--text-m);font-size:12px;background:#fbfdfc}
+.maint-history-table img{width:46px;height:46px;object-fit:cover;border-radius:9px;border:1px solid #dbe7de}
+@media(max-width:980px){.maint-summary-grid{grid-template-columns:repeat(2,1fr)}.maint-layout{grid-template-columns:1fr}}
+@media(max-width:700px){.maint-summary-grid{grid-template-columns:1fr}.maint-meter-grid{grid-template-columns:1fr}.maint-mini-chart{grid-template-columns:repeat(3,1fr)}}
+
 </style>
 </head>
 <body>
@@ -1649,19 +1735,19 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <div class="stat-card info"><div class="stat-label">Vehículos en patio</div><div class="stat-value" id="patio-kpi-balance">0</div><div class="stat-sub">sin hora de salida</div></div>
         </div>
 
-        <div class="patio-ops-grid">
-          <div class="card patio-live-card">
-            <div class="card-header"><div><div class="card-title">Patio en vivo</div><div class="card-subtitle">Vehículos que actualmente permanecen dentro del patio</div></div><span class="patio-live-badge"><i></i> Tiempo real</span></div>
-            <div id="patio-live-board" class="patio-live-board"></div>
+        <div class="patio-advanced-grid">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Procedencia operacional</div><div class="card-subtitle">Consolidado dinámico por procedencia, toneladas, ingresos y mezcla de material</div></div></div>
+            <div id="patio-procedencia-board" class="patio-origin-board"></div>
           </div>
-          <div class="card patio-flow-card">
+          <div class="card patio-feed-card">
             <div class="card-header"><div><div class="card-title">Últimos movimientos</div><div class="card-subtitle">Secuencia operacional de ingresos y salidas registradas</div></div></div>
             <div id="patio-movement-feed" class="patio-movement-feed"></div>
           </div>
         </div>
-        <div class="card patio-material-card" style="margin-bottom:20px">
-          <div class="card-header"><div><div class="card-title">Material actualmente en patio</div><div class="card-subtitle">Resumen operativo de los vehículos sin salida registrada</div></div></div>
-          <div id="patio-material-summary" class="patio-material-summary"></div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><div><div class="card-title">Clasificación del material</div><div class="card-subtitle">Balance dinámico de material pesado y liviano, sin usar gráficos tipo dashboard</div></div></div>
+          <div id="patio-mix-board" class="patio-class-board"></div>
         </div>
 
         <div class="card" style="padding:0">
@@ -1810,8 +1896,42 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
       <!-- PAGE: GESTIÓN DE MANTENIMIENTO -->
       <div id="view-mantenimiento" style="display:none">
-        <div class="page-header"><div><div class="page-title">Gestión de mantenimiento</div><div class="page-subtitle">Módulo reservado para la gestión futura de equipos ECOSEAM</div></div></div>
-        <div class="maintenance-empty"><div class="maintenance-card"><div class="maintenance-icon">⚙</div><h2>Gestión de mantenimiento</h2><p>Este módulo se está preparando para integrar posteriormente la gestión de los equipos de ECOSEAM.</p><div class="maintenance-status">EN EJECUCIÓN</div></div></div>
+        <div class="page-header">
+          <div>
+            <div class="page-title">Gestión de mantenimiento</div>
+            <div class="page-subtitle">Seguimiento predictivo y correctivo de flota y equipos ECOSEAM</div>
+          </div>
+          <div style="display:flex;gap:9px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="renderMantenimiento()">↻ Actualizar vista</button>
+            <button class="btn btn-primary" onclick="openMaintenanceEventModal()">+ Registrar evento</button>
+          </div>
+        </div>
+        <div class="maint-note">Se configuró la pestaña con los equipos indicados: excavadoras Liebherr R922 con accesorio garra, minibus Hyundai H350 y camionetas Toyota Hilux. Cada unidad muestra lectura operacional, próximo mantenimiento estimado, estado predictivo, evidencias fotográficas y registro de fallas o componentes cambiados. La <b>ECM-809</b> corresponde a la excavadora completa con su garra Potenza y el pesómetro <b>Steelyard</b> instalado.</div>
+        <div class="maint-summary-grid">
+          <div class="stat-card success"><div class="stat-label">Equipos controlados</div><div class="stat-value" id="maint-kpi-total">0</div><div class="stat-sub">unidades en seguimiento</div></div>
+          <div class="stat-card amber"><div class="stat-label">Próximos a intervenir</div><div class="stat-value" id="maint-kpi-upcoming">0</div><div class="stat-sub">programar pronto</div></div>
+          <div class="stat-card danger"><div class="stat-label">Alertas críticas</div><div class="stat-value" id="maint-kpi-critical">0</div><div class="stat-sub">requieren atención</div></div>
+          <div class="stat-card info"><div class="stat-label">Disponibilidad estimada</div><div class="stat-value" id="maint-kpi-availability">0%</div><div class="stat-sub">flota operativa</div></div>
+        </div>
+        <div class="maint-layout">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Flota y equipos</div><div class="card-subtitle">Vista predictiva por activo, con mini gráfico de avance hacia el próximo mantenimiento</div></div></div>
+            <div id="maintenance-assets-grid" class="maint-assets-grid"></div>
+          </div>
+          <div class="card maint-attention-card">
+            <div class="card-header"><div><div class="card-title">Fallas y observaciones</div><div class="card-subtitle">Hallazgos abiertos, monitoreos y últimas intervenciones</div></div></div>
+            <div id="maintenance-attention-list"></div>
+          </div>
+        </div>
+        <div class="card maint-history-table" style="padding:0">
+          <div class="card-header" style="padding:18px 20px 0"><div><div class="card-title">Historial de mantenimiento</div><div class="card-subtitle">Registro cronológico de preventivos, correctivos e inspecciones con evidencia fotográfica</div></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Equipo</th><th>Tipo</th><th>Estado</th><th>Lectura</th><th>Componente / Hallazgo</th><th>Acción</th><th>Evidencias</th><th>Registrado por</th></tr></thead>
+              <tbody id="maintenance-history-body"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- PAGE: ASISTENTE DE SEGURIDAD -->
@@ -2567,6 +2687,31 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 </div>
 
 <!-- ==================== JAVASCRIPT ==================== -->
+
+<div class="modal-overlay" id="modal-maintenance-event">
+  <div class="modal" style="max-width:980px">
+    <div class="modal-header"><div><div class="modal-title">Registrar evento de mantenimiento</div><div class="card-subtitle">Puedes adjuntar foto del equipo, del componente cambiado o de la falla detectada.</div></div><button class="modal-close" onclick="closeModal('modal-maintenance-event')">×</button></div>
+    <input type="hidden" id="maint-event-id">
+    <div class="form-grid cols-2">
+      <div class="form-group"><label class="form-label">Equipo *</label><select class="form-control" id="maint-event-asset"></select></div>
+      <div class="form-group"><label class="form-label">Fecha *</label><input class="form-control" id="maint-event-date" type="date"></div>
+      <div class="form-group"><label class="form-label">Tipo de evento *</label><select class="form-control" id="maint-event-type"><option value="preventivo">Preventivo</option><option value="correctivo">Correctivo</option><option value="inspeccion">Inspección</option><option value="falla">Falla detectada</option><option value="cambio">Cambio de componente</option></select></div>
+      <div class="form-group"><label class="form-label">Estado *</label><select class="form-control" id="maint-event-status"><option value="operativo">Operativo</option><option value="monitoreo">En monitoreo</option><option value="pendiente">Pendiente de intervención</option><option value="critico">Crítico / fuera de servicio</option></select></div>
+      <div class="form-group"><label class="form-label">Lectura operacional</label><input class="form-control" id="maint-event-meter" type="number" min="0" step="1" placeholder="Horómetro o kilometraje"></div>
+      <div class="form-group"><label class="form-label">Componente / sistema</label><input class="form-control" id="maint-event-component" type="text" placeholder="Ej.: garra, sistema hidráulico, filtro, pesómetro"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Hallazgo / falla</label><textarea class="form-control" id="maint-event-issue" rows="3" placeholder="Describe la falla detectada, condición encontrada o motivo de la intervención."></textarea></div>
+    <div class="form-group"><label class="form-label">Acción realizada / requerida</label><textarea class="form-control" id="maint-event-action" rows="3" placeholder="Ej.: cambio de componente, ajuste, lubricación, seguimiento programado, derivación a taller."></textarea></div>
+    <div class="evidence-grid">
+      <div class="evidence-box"><label>Foto del equipo / unidad</label><div class="evidence-preview" id="maint-preview-unit">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="maint-photo-unit" type="file" accept="image/*" onchange="previewMaintenanceFile(this,'maint-preview-unit','maint-photo-unit-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="maint-photo-unit-camera" type="file" accept="image/*" capture="environment" onchange="previewMaintenanceFile(this,'maint-preview-unit','maint-photo-unit')"></label></div></div>
+      <div class="evidence-box"><label>Foto de falla / hallazgo</label><div class="evidence-preview" id="maint-preview-failure">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="maint-photo-failure" type="file" accept="image/*" onchange="previewMaintenanceFile(this,'maint-preview-failure','maint-photo-failure-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="maint-photo-failure-camera" type="file" accept="image/*" capture="environment" onchange="previewMaintenanceFile(this,'maint-preview-failure','maint-photo-failure')"></label></div></div>
+      <div class="evidence-box"><label>Foto de componente cambiado</label><div class="evidence-preview" id="maint-preview-component">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="maint-photo-component" type="file" accept="image/*" onchange="previewMaintenanceFile(this,'maint-preview-component','maint-photo-component-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="maint-photo-component-camera" type="file" accept="image/*" capture="environment" onchange="previewMaintenanceFile(this,'maint-preview-component','maint-photo-component')"></label></div></div>
+    </div>
+    <div class="form-hint" style="margin-top:10px">Compatible con Android, iPhone y escritorio. Puedes tomar la foto o adjuntarla desde galería / archivos.</div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-maintenance-event')">Cancelar</button><button class="btn btn-primary" onclick="saveMaintenanceEvent()">Guardar evento</button></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -2594,7 +2739,8 @@ const APP = {
     programaciones: [],
     handoverPendings: [],
     handoverHeaders: [],
-    handoverReceipts: []
+    handoverReceipts: [],
+    mantenimientoRegistros: []
   }
 };
 
@@ -3175,7 +3321,7 @@ async function loadAllDataOnline() {
   if(APP.currentView === 'patios') renderPatios();
   if(APP.currentView === 'ocupabilidad') renderOcupabilidad();
   if(APP.currentView === 'coproductos') renderCoproductos();
-  if(APP.currentView === 'mantenimiento') { /* módulo en ejecución */ }
+  if(APP.currentView === 'mantenimiento') renderMantenimiento();
   if(APP.currentView === 'programacion') renderProgramacion();
   if(APP.currentView === 'comando') renderCommandCenter();
   if(APP.currentView === 'entrega') renderHandover();
@@ -3193,6 +3339,7 @@ async function loadAllData(){
       if(APP.currentView==='patios')renderPatios();
       if(APP.currentView==='ocupabilidad')renderOcupabilidad();
       if(APP.currentView==='restricciones')renderRestricciones();
+      if(APP.currentView==='mantenimiento')renderMantenimiento();
       return;
     }
   }
@@ -3959,7 +4106,7 @@ function navigateTo(view) {
   if(view === 'ocupabilidad') renderOcupabilidad();
   if(view === 'coproductos') renderCoproductos();
   if(view === 'resumen') renderResumenWhatsapp();
-  if(view === 'mantenimiento') { /* contenido intencionalmente reservado */ }
+  if(view === 'mantenimiento') renderMantenimiento();
   if(view === 'programacion') { renderProgramacionDraftList(); renderProgramacion(); }
   restoreCurrentViewPosition(view);
 }
@@ -6552,14 +6699,172 @@ function patioVehicleElapsedMinutes(m){
   if(!m?.fecha||!m?.inicio)return 0;const t=new Date(`${m.fecha}T${m.inicio}:00`);if(Number.isNaN(t.getTime()))return 0;return Math.max(0,Math.round((Date.now()-t.getTime())/60000));
 }
 function renderPatioOperationalView(data){
-  const liveBox=document.getElementById('patio-live-board'),feed=document.getElementById('patio-movement-feed'),mat=document.getElementById('patio-material-summary');if(!liveBox||!feed||!mat)return;
-  const rows=[...(data||[])],live=rows.filter(m=>!m.fin).sort((a,b)=>patioVehicleElapsedMinutes(b)-patioVehicleElapsedMinutes(a));
-  liveBox.innerHTML=live.length?live.map(m=>{const v=vehicleVisual(m.vehiculo),mins=patioVehicleElapsedMinutes(m);return `<div class="patio-live-unit"><div class="patio-live-icon">${v.icon}</div><div class="patio-live-info"><strong>${escapeHtml(m.placa||m.vehiculo||'Vehículo')}</strong><span>${escapeHtml(m.vehiculo||'')} · ${Number(m.peso||0).toFixed(2)} tn</span><span>${escapeHtml(m.descripcion||'Sin descripción')}</span></div><div class="patio-live-time"><span>Ingreso ${escapeHtml(m.inicio||'—')}</span><b>${fmtDurationMinutes(mins)}</b></div></div>`;}).join(''):'<div class="patio-empty-state">No hay vehículos con permanencia abierta en el patio.</div>';
-  const events=[];for(const m of rows){events.push({date:m.fecha,time:m.inicio||'',type:'in',m});if(m.fin)events.push({date:m.fecha,time:m.fin,type:'out',m});}
+  const procBox=document.getElementById('patio-procedencia-board'),mixBox=document.getElementById('patio-mix-board'),feed=document.getElementById('patio-movement-feed');
+  if(!procBox||!mixBox||!feed)return;
+  const rows=[...(data||[])];
+  const maxTn=Math.max(1,...rows.map(m=>Number(m.peso||0)));
+  const byProc={};
+  for(const m of rows){
+    const key=(m.procedencia||'Sin procedencia').trim()||'Sin procedencia';
+    if(!byProc[key])byProc[key]={tn:0,ing:0,sal:0,veh:0,pesado:0,liviano:0};
+    const item=byProc[key];
+    const peso=Number(m.peso||0);
+    item.tn+=peso; item.veh+=1; item.ing+=1; if(m.fin)item.sal+=1;
+    if(String(m.tipoResiduo||'').toLowerCase().includes('livian'))item.liviano+=peso;else item.pesado+=peso;
+  }
+  const procEntries=Object.entries(byProc).sort((a,b)=>b[1].tn-a[1].tn);
+  const maxProc=Math.max(1,...procEntries.map(([,v])=>v.tn));
+  procBox.innerHTML=procEntries.length?procEntries.map(([name,v],idx)=>{const pesadoPct=v.tn?((v.pesado/v.tn)*100):0;const livianoPct=v.tn?((v.liviano/v.tn)*100):0;return `<div class="patio-origin-item"><div class="patio-origin-top"><div style="display:flex;gap:10px;min-width:0;flex:1"><div class="patio-origin-rank">${idx+1}</div><div class="patio-origin-main"><strong>${escapeHtml(name)}</strong><span>${v.veh} registro${v.veh===1?'':'s'} · ${v.ing} ingreso${v.ing===1?'':'s'}${v.sal?` · ${v.sal} salida${v.sal===1?'':'s'}`:''}</span></div></div><div class="patio-origin-tn"><strong>${v.tn.toFixed(2)}</strong><span>tn acumuladas</span></div></div><div class="patio-origin-bar"><span style="width:${Math.max(10,(v.tn/maxProc)*100)}%"></span></div><div class="patio-origin-meta"><div class="patio-origin-pill"><span>Pesado</span><strong>${v.pesado.toFixed(2)} tn</strong></div><div class="patio-origin-pill"><span>Liviano</span><strong>${v.liviano.toFixed(2)} tn</strong></div><div class="patio-origin-pill"><span>% Pesado</span><strong>${pesadoPct.toFixed(0)}%</strong></div><div class="patio-origin-pill"><span>% Liviano</span><strong>${livianoPct.toFixed(0)}%</strong></div></div></div>`;}).join(''):'<div class="patio-empty-state">No hay movimientos para consolidar por procedencia con los filtros actuales.</div>';
+
+  const classify=(label)=>{const items=rows.filter(m=>String(m.tipoResiduo||'').toLowerCase().includes(label==='Liviano'?'livian':'pesad'));const tn=items.reduce((a,m)=>a+Number(m.peso||0),0);const sal=items.filter(m=>m.fin).length;const open=items.filter(m=>!m.fin).length;const byP={};items.forEach(m=>{const p=(m.procedencia||'Sin procedencia').trim()||'Sin procedencia';byP[p]=(byP[p]||0)+Number(m.peso||0)});const lead=Object.entries(byP).sort((a,b)=>b[1]-a[1])[0];return {items,tn,sal,open,lead};};
+  const pesado=classify('Pesado'),liviano=classify('Liviano');
+  const totalMix=Math.max(1,pesado.tn+liviano.tn);
+  const renderClass=(title,obj,cls)=>`<div class="patio-class-card ${cls}"><span class="patio-class-badge"><i></i>${title}</span><div class="patio-class-title"><div><h4>${title}</h4><div class="patio-class-sub">Tonelaje filtrado según registros de control de patios</div></div><strong>${obj.tn.toFixed(2)} tn</strong></div><div class="patio-class-lane"><span style="width:${Math.max(8,(obj.tn/totalMix)*100)}%"></span></div><div class="patio-class-meta"><div class="mini"><span>Registros</span><strong>${obj.items.length}</strong></div><div class="mini"><span>Con salida</span><strong>${obj.sal}</strong></div><div class="mini"><span>Sin salida</span><strong>${obj.open}</strong></div></div><div class="patio-class-leading">${obj.lead?`Procedencia líder: <b>${escapeHtml(obj.lead[0])}</b> con <b>${obj.lead[1].toFixed(2)} tn</b>.`: 'Sin procedencia predominante para este grupo.'}</div></div>`;
+  mixBox.innerHTML=renderClass('Pesado',pesado,'heavy')+renderClass('Liviano',liviano,'light');
+
+  const events=[];for(const m of rows){events.push({date:m.fecha,time:m.inicio||'',type:'in',m});if(m.fin)events.push({date:m.fecha,time:m.fin||'',type:'out',m});}
   events.sort((a,b)=>`${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
-  feed.innerHTML=events.length?events.slice(0,12).map(e=>`<div class="patio-feed-item"><div class="patio-feed-icon">${e.type==='in'?'↘':'↗'}</div><div class="patio-feed-main"><strong>${e.type==='in'?'Ingreso':'Salida'} · ${escapeHtml(e.m.placa||e.m.vehiculo||'Vehículo')}</strong><span>${escapeHtml(e.m.descripcion||'Sin descripción')} · ${Number(e.m.peso||0).toFixed(2)} tn</span></div><div class="patio-feed-time">${formatDate(e.date)}<br>${escapeHtml(e.time||'—')}</div></div>`).join(''):'<div class="patio-empty-state">Sin movimientos para los filtros seleccionados.</div>';
-  const byMat={};for(const m of live){const key=(m.tipoResiduo||m.subclase||'Sin clasificar').trim()||'Sin clasificar';if(!byMat[key])byMat[key]={tn:0,count:0};byMat[key].tn+=Number(m.peso||0);byMat[key].count++;}
-  const mats=Object.entries(byMat).sort((a,b)=>b[1].tn-a[1].tn);mat.innerHTML=mats.length?mats.map(([name,v])=>`<div class="patio-material-chip"><span>${escapeHtml(name)}</span><strong>${v.tn.toFixed(2)} tn</strong><span>${v.count} vehículo${v.count===1?'':'s'} en patio</span></div>`).join(''):'<div class="patio-empty-state">Actualmente no hay material asociado a vehículos con permanencia abierta.</div>';
+  feed.innerHTML=events.length?events.slice(0,14).map(e=>`<div class="patio-feed-item"><div class="patio-feed-icon">${e.type==='in'?'↘':'↗'}</div><div class="patio-feed-main"><strong>${e.type==='in'?'Ingreso':'Salida'} · ${escapeHtml(e.m.placa||e.m.vehiculo||'Vehículo')}</strong><span>${escapeHtml(e.m.procedencia||'Sin procedencia')} · ${escapeHtml(e.m.tipoResiduo||'Sin tipo')} · ${Number(e.m.peso||0).toFixed(2)} tn</span></div><div class="patio-feed-time">${formatDate(e.date)}<br>${escapeHtml(e.time||'—')}</div></div>`).join(''):'<div class="patio-empty-state">Sin movimientos para los filtros seleccionados.</div>';
+}
+
+/* ===== MANTENIMIENTO AVANZADO ===== */
+const MAINTENANCE_LOCAL_KEY='seamx_mantenimiento_records_v1';
+const MAINTENANCE_ASSETS=[
+  {tag:'ECM-801',type:'Excavadora con garra',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:3860,location:'Operaciones Mina',intervalBase:250,accessories:['Garra Potenza GS1254 · Cap. 2,000 kg'],notes:['Serie excavadora: WLHZ1442AZD054030']},
+  {tag:'ECM-809',type:'Excavadora con garra + pesómetro',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:3420,location:'Operaciones Mina',intervalBase:250,accessories:['Garra Potenza GS1254 · Serie 206678 · Cap. 2,000 kg','Pesómetro Steelyard instalado']},
+  {tag:'ECM-802',type:'Excavadora con garra',icon:'🚜',brand:'Liebherr',model:'R922',plate:'—',meterType:'Horómetro',baseMeter:3715,location:'Operaciones Mina',intervalBase:250,accessories:['Garra Potenza GS1254 · Cap. 2,000 kg']},
+  {tag:'ECM-503',type:'Minibus',icon:'🚌',brand:'Hyundai',model:'H350',plate:'M6Y-967',meterType:'Kilometraje',baseMeter:32800,location:'Transporte personal',intervalBase:5000,accessories:['Servicio de transporte de personal']},
+  {tag:'ECM-508',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'BSX-732',meterType:'Kilometraje',baseMeter:41200,location:'Operaciones Mina',intervalBase:5000,accessories:['Unidad de apoyo operativo']},
+  {tag:'ECM-505',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'M6L-868',meterType:'Kilometraje',baseMeter:45600,location:'Operaciones Mina',intervalBase:5000,accessories:['Unidad de apoyo operativo']},
+  {tag:'ECM-507',type:'Camioneta',icon:'🚙',brand:'Toyota',model:'Hilux',plate:'BUF-773',meterType:'Kilometraje',baseMeter:39800,location:'Operaciones Mina',intervalBase:5000,accessories:['Unidad de apoyo operativo']}
+];
+const MAINT_PLAN_LIBRARY={
+  excavadora:{250:['Filtro de motor','Filtro de petróleo','Filtro separador','Aceite de motor'],500:['Filtros de aire primario y secundario'],1000:['Filtro de pilotaje','Filtro hidráulico','Filtro de tanque hidráulico','Filtro A/C'],2000:['Aceite de transmisión (cubos)','Refrigerante'],4000:['Aceite hidráulico'],5000:['Polea de motor y revisión mayor']},
+  pickup:{5000:['Aceite de motor','Filtro de aceite','Engrase general'],10000:['Filtro de combustible','Líquido de inyectores'],15000:['Filtro de aire'],20000:['Aceite de transmisión y diferenciales','Limpieza de frenos'],25000:['Filtro de aire cabina','Inspección sistema eléctrico'],30000:['Revisión mayor de lubricantes y suspensión']},
+  minibus:{5000:['Cambio de aceite de motor','Cambio de filtro de aceite','Revisión de batería'],10000:['Filtro de aire acondicionado','Sistema eléctrico'],15000:['Filtro de aire y combustible'],20000:['Aceite transmisión y corona','Refrigerante','Limpieza de frenos'],25000:['Inspección integral'],30000:['Revisión mayor'],35000:['Revisión integral de tren motriz']}
+};
+function ensureMaintenanceData(){
+  if(!Array.isArray(APP.data.mantenimientoRegistros))APP.data.mantenimientoRegistros=[];
+  if(!APP.data.mantenimientoRegistros.length){
+    try{const saved=JSON.parse(localStorage.getItem(MAINTENANCE_LOCAL_KEY)||'[]');if(Array.isArray(saved)&&saved.length)APP.data.mantenimientoRegistros=saved;}catch(_){ }
+  }
+  if(!APP.data.mantenimientoRegistros.length){
+    const today=new Date();
+    const fmt=d=>new Date(d).toISOString().split('T')[0];
+    APP.data.mantenimientoRegistros=[
+      {id:'m1',assetTag:'ECM-801',date:fmt(today.getTime()-9*86400000),type:'preventivo',status:'operativo',meter:3750,component:'Servicio 3,750 h',issue:'Cambio programado de filtros y lubricación.',action:'Mantenimiento preventivo ejecutado y unidad liberada.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'},
+      {id:'m2',assetTag:'ECM-809',date:fmt(today.getTime()-3*86400000),type:'inspeccion',status:'monitoreo',meter:3420,component:'Pesómetro Steelyard',issue:'Se detectó desvío menor en lectura del pesómetro.',action:'Mantener seguimiento y recalibrar en la próxima parada.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'},
+      {id:'m3',assetTag:'ECM-508',date:fmt(today.getTime()-1*86400000),type:'correctivo',status:'pendiente',meter:41200,component:'Neumático posterior',issue:'Desgaste irregular y pérdida gradual de presión.',action:'Programar cambio en la próxima guardia.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'},
+      {id:'m4',assetTag:'ECM-503',date:fmt(today.getTime()-6*86400000),type:'preventivo',status:'operativo',meter:30000,component:'Servicio 30,000 km',issue:'Mantenimiento programado ejecutado.',action:'Cambio de aceite, filtro y revisión general.',photoUnitUrl:'',photoFailureUrl:'',photoComponentUrl:'',registeredBy:'admin'}
+    ];
+    persistMaintenanceData();
+  }
+}
+function persistMaintenanceData(){
+  try{localStorage.setItem(MAINTENANCE_LOCAL_KEY,JSON.stringify(APP.data.mantenimientoRegistros||[]));}catch(_){ }
+  try{cacheAppData();}catch(_){ }
+}
+function maintenanceAssetByTag(tag){return MAINTENANCE_ASSETS.find(a=>a.tag===tag)||null;}
+function maintenanceRecordsForTag(tag){return (APP.data.mantenimientoRegistros||[]).filter(r=>r.assetTag===tag).sort((a,b)=>`${b.date} ${b.createdAt||''}`.localeCompare(`${a.date} ${a.createdAt||''}`));}
+function maintenanceFormatMeter(asset,val){if(!Number.isFinite(Number(val)))return '—';const num=Number(val);return asset.meterType==='Horómetro'?`${num.toLocaleString('es-PE')} h`:`${num.toLocaleString('es-PE')} km`;}
+function maintenancePlanKey(asset){if(asset.type.toLowerCase().includes('minibus'))return 'minibus';if(asset.type.toLowerCase().includes('camioneta'))return 'pickup';return 'excavadora';}
+function maintenanceNextWindow(asset,current){const step=Number(asset.intervalBase||250);const next=Math.ceil(Math.max(1,current)/step)*step;const prev=Math.max(0,next-step);return {prev,next,step};}
+function maintenanceState(asset){
+  const recs=maintenanceRecordsForTag(asset.tag);
+  const latest=recs[0]||null;
+  const current=Number(latest?.meter||asset.baseMeter||0);
+  const wnd=maintenanceNextWindow(asset,current);
+  const total=Math.max(1,wnd.next-wnd.prev);
+  const advanced=Math.max(0,current-wnd.prev);
+  const pct=Math.max(4,Math.min(100,(advanced/total)*100));
+  const gap=Math.max(0,wnd.next-current);
+  const thresholdWarn=asset.meterType==='Horómetro'?80:1200;
+  const thresholdCrit=asset.meterType==='Horómetro'?30:300;
+  const latestStatus=String(latest?.status||'operativo');
+  let healthKey='ok', healthLabel='Operativo';
+  if(latestStatus==='critico'){healthKey='crit';healthLabel='Crítico';}
+  else if(latestStatus==='pendiente'){healthKey='warn';healthLabel='Pendiente';}
+  else if(gap<=thresholdCrit){healthKey='crit';healthLabel='Vence pronto';}
+  else if(gap<=thresholdWarn||latestStatus==='monitoreo'){healthKey='warn';healthLabel='En monitoreo';}
+  const photo=latest?.photoUnitUrl||recs.find(r=>r.photoUnitUrl)?.photoUnitUrl||'';
+  const openIssues=recs.filter(r=>['pendiente','critico','monitoreo'].includes(String(r.status||'')));
+  const planLib=MAINT_PLAN_LIBRARY[maintenancePlanKey(asset)]||{};
+  const planTasks=planLib[wnd.next]||planLib[asset.intervalBase]||Object.values(planLib)[0]||[];
+  return {asset,recs,latest,current,wnd,pct,gap,healthKey,healthLabel,photo,openIssues,planTasks};
+}
+function renderMantenimiento(){
+  ensureMaintenanceData();
+  const assets=MAINTENANCE_ASSETS.map(maintenanceState);
+  const total=assets.length;
+  const upcoming=assets.filter(a=>a.healthKey==='warn').length;
+  const critical=assets.filter(a=>a.healthKey==='crit').length;
+  const available=assets.filter(a=>a.healthKey!=='crit').length;
+  const totalEl=document.getElementById('maint-kpi-total');if(totalEl)totalEl.textContent=String(total);
+  const upEl=document.getElementById('maint-kpi-upcoming');if(upEl)upEl.textContent=String(upcoming);
+  const critEl=document.getElementById('maint-kpi-critical');if(critEl)critEl.textContent=String(critical);
+  const avaEl=document.getElementById('maint-kpi-availability');if(avaEl)avaEl.textContent=`${Math.round((available/Math.max(1,total))*100)}%`;
+  const grid=document.getElementById('maintenance-assets-grid');
+  if(grid)grid.innerHTML=assets.map(s=>{const asset=s.asset;const tags=[asset.plate&&asset.plate!=='—'?`Placa ${asset.plate}`:null,asset.location,...(asset.accessories||[])].filter(Boolean);const mini=[0.18,0.35,0.52,0.68,0.84,1].map((p,idx)=>{const filled=Math.max(8,Math.min(100,Math.round(Math.min(1,s.pct/100 + (idx-2)*0.02)*100)));return `<div class="maint-mini-seg"><span style="height:${filled}%"></span><b>${idx===5?s.wnd.next:(s.wnd.prev+Math.round((idx+1)*(s.wnd.step/6)))}</b></div>`;}).join('');const healthClass=s.healthKey==='crit'?'crit':s.healthKey==='warn'?'warn':'ok';return `<article class="maint-asset-card" id="maint-${asset.tag}"><div class="maint-asset-photo">${s.photo?`<img src="${escapeHtml(s.photo)}" alt="${escapeHtml(asset.tag)}">`:`<div class="placeholder"><div><strong>${asset.icon}</strong>${escapeHtml(asset.type)}<br><small>Adjunta una foto en el registro para mostrar la unidad aquí.</small></div></div>`}</div><div class="maint-asset-body"><div class="maint-chip-row"><span class="maint-type-chip">${escapeHtml(asset.type)}</span><span class="maint-health ${healthClass}">${escapeHtml(s.healthLabel)}</span></div><div><div class="maint-name">${escapeHtml(asset.tag)}</div><div class="maint-meta">${escapeHtml(asset.brand)} ${escapeHtml(asset.model)}${asset.plate&&asset.plate!=='—'?` · Placa ${escapeHtml(asset.plate)}`:''}<br>${escapeHtml(asset.meterType)} · ${escapeHtml(asset.location)}</div></div><div class="maint-meter-grid"><div class="maint-meter-box"><span>Lectura actual</span><strong>${maintenanceFormatMeter(asset,s.current)}</strong></div><div class="maint-meter-box"><span>Próximo MP</span><strong>${maintenanceFormatMeter(asset,s.wnd.next)}</strong></div><div class="maint-meter-box"><span>Brecha</span><strong>${maintenanceFormatMeter(asset,s.gap)}</strong></div></div><div class="maint-progress"><span style="width:${s.pct}%"></span></div><div class="maint-progress-caption"><span>${maintenanceFormatMeter(asset,s.wnd.prev)} desde el último tramo</span><span>${maintenanceFormatMeter(asset,s.wnd.next)} meta siguiente</span></div><div class="maint-mini-chart">${mini}</div><div class="maint-tags">${tags.map(t=>`<span class="maint-tag">${escapeHtml(t)}</span>`).join('')}</div><div class="maint-plan-box"><b>Próxima intervención sugerida:</b> ${escapeHtml(s.planTasks.join(', ')||'Inspección general.')} ${s.latest?.component?`<br><b>Último componente/hallazgo:</b> ${escapeHtml(s.latest.component)}`:''}</div><div class="maint-actions"><button class="btn btn-primary btn-sm" onclick="openMaintenanceEventModal('${asset.tag}')">Registrar evento</button><button class="btn btn-outline btn-sm" onclick="scrollToMaintenanceHistory('${asset.tag}')">Ver historial</button></div></div></article>`;}).join('');
+  const att=document.getElementById('maintenance-attention-list');
+  if(att){
+    const issues=assets.flatMap(s=>s.openIssues.slice(0,3).map(r=>({asset:s.asset,record:r})) ).sort((a,b)=>`${b.record.date}`.localeCompare(`${a.record.date}`));
+    att.innerHTML=issues.length?issues.slice(0,12).map(({asset,record})=>`<div class="maint-attention-item"><strong>${escapeHtml(asset.tag)} · ${escapeHtml(asset.type)}</strong><span><b>${escapeHtml(record.component||record.type||'Evento')}</b><br>${escapeHtml(record.issue||'Sin detalle registrado.')}</span><div class="maint-attention-meta"><span>${formatDate(record.date)} · ${escapeHtml(record.status||'operativo')}</span><span>${maintenanceFormatMeter(asset,record.meter)}</span></div>${(record.photoFailureUrl||record.photoComponentUrl)?`<div class="maint-thumb-row">${record.photoFailureUrl?`<img src="${escapeHtml(record.photoFailureUrl)}" alt="Falla">`:''}${record.photoComponentUrl?`<img src="${escapeHtml(record.photoComponentUrl)}" alt="Componente">`:''}</div>`:''}</div>`).join(''):'<div class="maint-empty">No hay fallas ni observaciones activas. La flota se encuentra en condición controlada.</div>';
+  }
+  const tbody=document.getElementById('maintenance-history-body');
+  if(tbody){
+    const all=[...(APP.data.mantenimientoRegistros||[])].sort((a,b)=>`${b.date} ${b.createdAt||''}`.localeCompare(`${a.date} ${a.createdAt||''}`));
+    tbody.innerHTML=all.length?all.map(r=>{const asset=maintenanceAssetByTag(r.assetTag)||{tag:r.assetTag,type:'Equipo',meterType:'Horómetro'};const thumbs=[r.photoUnitUrl,r.photoFailureUrl,r.photoComponentUrl].filter(Boolean);return `<tr data-maint-asset="${escapeHtml(r.assetTag)}"><td>${formatDate(r.date)}</td><td><strong>${escapeHtml(r.assetTag)}</strong><br><small>${escapeHtml(asset.type||'')}</small></td><td>${escapeHtml(String(r.type||'evento').replace(/^./,c=>c.toUpperCase()))}</td><td><span class="badge ${r.status==='critico'?'badge-open':r.status==='pendiente'?'badge-pause':'badge-done'}">${escapeHtml(r.status||'operativo')}</span></td><td>${maintenanceFormatMeter(asset,Number(r.meter||0))}</td><td><b>${escapeHtml(r.component||'—')}</b><br><small>${escapeHtml(r.issue||'Sin hallazgo registrado.')}</small></td><td>${escapeHtml(r.action||'—')}</td><td>${thumbs.length?thumbs.map(u=>`<img src="${escapeHtml(u)}" alt="Evidencia">`).join(' '):'—'}</td><td>${escapeHtml(r.registeredBy||'—')}</td></tr>`;}).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-s);padding:30px">Aún no se registran eventos de mantenimiento.</td></tr>';
+  }
+  populateMaintenanceAssetOptions();
+}
+function populateMaintenanceAssetOptions(selected=''){
+  const sel=document.getElementById('maint-event-asset');if(!sel)return;
+  sel.innerHTML=MAINTENANCE_ASSETS.map(a=>`<option value="${escapeHtml(a.tag)}" ${a.tag===selected?'selected':''}>${escapeHtml(a.tag)} · ${escapeHtml(a.type)}</option>`).join('');
+}
+function resetMaintenanceModal(){
+  document.getElementById('maint-event-id').value='';
+  document.getElementById('maint-event-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('maint-event-type').value='preventivo';
+  document.getElementById('maint-event-status').value='operativo';
+  document.getElementById('maint-event-meter').value='';
+  document.getElementById('maint-event-component').value='';
+  document.getElementById('maint-event-issue').value='';
+  document.getElementById('maint-event-action').value='';
+  ['unit','failure','component'].forEach(k=>{['','-camera'].forEach(s=>{const el=document.getElementById(`maint-photo-${k}${s}`);if(el)el.value='';});const prev=document.getElementById(`maint-preview-${k==='unit'?'unit':k}`);if(prev)prev.innerHTML='Sin imagen';});
+}
+function openMaintenanceEventModal(tag=''){
+  ensureMaintenanceData();
+  resetMaintenanceModal();
+  populateMaintenanceAssetOptions(tag||MAINTENANCE_ASSETS[0]?.tag||'');
+  const asset=maintenanceAssetByTag(tag||MAINTENANCE_ASSETS[0]?.tag||'');
+  if(asset)document.getElementById('maint-event-meter').placeholder=asset.meterType==='Horómetro'?'Horómetro actual':'Kilometraje actual';
+  const sel=document.getElementById('maint-event-asset');if(sel)sel.onchange=()=>{const a=maintenanceAssetByTag(sel.value);document.getElementById('maint-event-meter').placeholder=a?.meterType==='Horómetro'?'Horómetro actual':'Kilometraje actual';};
+  openModal('modal-maintenance-event');
+}
+function previewMaintenanceFile(input,previewId,siblingId){if(siblingId){const sib=document.getElementById(siblingId);if(sib)sib.value='';}const file=input?.files?.[0];const box=document.getElementById(previewId);if(!box)return;if(!file){box.innerHTML='Sin imagen';return;}const reader=new FileReader();reader.onload=()=>{box.innerHTML=`<img src="${reader.result}" alt="Evidencia">`;};reader.readAsDataURL(file);}
+function maintenanceSelectedFile(kind){return document.getElementById(`maint-photo-${kind}`)?.files?.[0]||document.getElementById(`maint-photo-${kind}-camera`)?.files?.[0]||null;}
+async function maintenanceFileToDataUrl(file){if(!file)return '';return await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file);});}
+async function saveMaintenanceEvent(){
+  ensureMaintenanceData();
+  const assetTag=document.getElementById('maint-event-asset').value;
+  const date=document.getElementById('maint-event-date').value;
+  const type=document.getElementById('maint-event-type').value;
+  const status=document.getElementById('maint-event-status').value;
+  const meter=Number(document.getElementById('maint-event-meter').value||0);
+  const component=document.getElementById('maint-event-component').value.trim();
+  const issue=document.getElementById('maint-event-issue').value.trim();
+  const action=document.getElementById('maint-event-action').value.trim();
+  if(!assetTag||!date||!type||!status){showToast('Completa los datos obligatorios del evento de mantenimiento','warning');return;}
+  const [photoUnitUrl,photoFailureUrl,photoComponentUrl]=await Promise.all([maintenanceFileToDataUrl(maintenanceSelectedFile('unit')),maintenanceFileToDataUrl(maintenanceSelectedFile('failure')),maintenanceFileToDataUrl(maintenanceSelectedFile('component'))]);
+  APP.data.mantenimientoRegistros.unshift({id:'m_'+Date.now(),assetTag,date,type,status,meter:Number.isFinite(meter)&&meter>0?meter:'',component,issue,action,photoUnitUrl,photoFailureUrl,photoComponentUrl,registeredBy:APP.user?.login||APP.user?.nombre||'sistema',createdAt:new Date().toISOString()});
+  persistMaintenanceData();
+  closeModal('modal-maintenance-event');
+  renderMantenimiento();
+  showToast('Evento de mantenimiento registrado','success');
+}
+function scrollToMaintenanceHistory(tag){
+  navigateTo('mantenimiento');
+  setTimeout(()=>{const row=document.querySelector(`[data-maint-asset="${CSS.escape(tag)}"]`);if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.style.background='#f2fbf4';setTimeout(()=>row.style.background='',1800);} },180);
 }
 
 /* ===== PWA INSTALL ===== */
