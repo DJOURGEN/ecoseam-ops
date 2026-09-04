@@ -3,7 +3,7 @@
 <head>
   <!-- SEAMX · Plataforma operacional -->
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1058,6 +1058,39 @@ img,canvas,svg,video{max-width:100%}
 .sidebar-user{overflow:hidden!important;min-width:0!important}.sidebar-user-brand{min-width:0!important;width:100%!important}.sidebar-user-brand-copy{min-width:0!important;overflow:hidden!important}.sidebar-user-brand-copy strong,.sidebar-user-brand-copy span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sidebar-user-meta{min-width:0!important;width:100%!important}.sidebar-user .user-info{min-width:0!important;overflow:hidden!important}.sidebar-user .user-name{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.sidebar-user .user-role,.sidebar-user-caption{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}.sidebar-logout-btn{flex:0 0 auto!important}.sidebar-user-logo-wrap{flex:0 0 62px!important;width:62px!important;height:42px!important}.sidebar-user-logo{width:54px!important;max-width:54px!important}
 @media(max-width:768px){.sidebar-user{padding:10px!important;gap:9px!important}.sidebar-user-brand-copy span{font-size:8.5px!important}.sidebar-user-logo-wrap{flex-basis:58px!important;width:58px!important;height:40px!important}.sidebar-user-logo{width:50px!important}.sidebar-user .user-name{font-size:12px!important}.sidebar-user-caption{font-size:9px!important}}
 
+
+/* ===== Optimización multidispositivo + evidencias ===== */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0)}
+.evidence-file-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.evidence-file-btn{min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--navy);font-size:12px;font-weight:800;cursor:pointer;text-align:center}
+.evidence-file-btn.camera{background:var(--surface-1)}
+.evidence-file-btn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#act-edit-people-group .assign-people-grid{max-height:250px}
+@media(max-width:768px){
+  .content{padding-left:14px;padding-right:14px;padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
+  .topbar{padding-left:12px;padding-right:12px;padding-top:env(safe-area-inset-top,0px);height:auto;min-height:60px}
+  .modal-overlay{padding:12px;padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
+  .modal{max-width:100%!important;padding:18px 16px;border-radius:16px;margin:auto;max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .form-control,input,select,textarea{font-size:16px!important;max-width:100%;min-width:0}
+  input[type=date],input[type=time]{width:100%;min-width:0}
+  .btn,.modal-close,.evidence-file-btn{min-height:44px}
+  .modal-footer{position:sticky;bottom:-18px;background:#fff;padding-bottom:max(4px,env(safe-area-inset-bottom,0px));z-index:3;flex-wrap:wrap}
+  .modal-footer .btn{flex:1;min-width:125px}
+  .table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .activity-group-grid{grid-template-columns:1fr!important}
+  .evidence-file-actions{grid-template-columns:1fr 1fr}
+  .mobile-nav{padding-bottom:env(safe-area-inset-bottom,0px)}
+}
+@media(max-width:390px){
+  .content{padding-left:10px;padding-right:10px}
+  .activity-kpis{grid-template-columns:1fr 1fr}
+  .evidence-file-actions{grid-template-columns:1fr}
+  .modal{padding:16px 13px}
+}
+@supports not (height:100dvh){@media(max-width:768px){.modal{max-height:calc(100vh - 24px)}}}
+
 </style>
 </head>
 <body>
@@ -1485,7 +1518,7 @@ img,canvas,svg,video{max-width:100%}
 
         <div id="activities-management-section" class="activity-section" style="display:none">
           <div class="card">
-            <div class="activity-section-head"><div><div class="activity-section-title">Control visual por actividad</div><div class="activity-section-sub">Actividades iguales agrupadas, personal involucrado y estado individual en una sola vista.</div></div><span class="activity-count-badge" id="team-activity-count">0 actividades</span></div>
+            <div class="activity-section-head"><div><div class="activity-section-title">Control visual por actividad</div><div class="activity-section-sub">Asignaciones independientes, personal involucrado y estado compartido de cada equipo en una sola vista.</div></div><span class="activity-count-badge" id="team-activity-count">0 actividades</span></div>
             <div id="activity-team-board" class="activity-team-board"></div>
           </div>
         </div>
@@ -2028,6 +2061,14 @@ img,canvas,svg,video{max-width:100%}
       <label class="form-label">Nombre del operador</label>
       <input class="form-control" id="act-operador" type="text" placeholder="Nombre y apellido del operador">
     </div>
+    <div class="form-group" id="act-edit-people-group" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+        <label class="form-label" style="margin:0">Personal involucrado</label>
+        <span class="prog-counter" id="act-edit-person-count">0 personas</span>
+      </div>
+      <div id="act-edit-people-grid" class="assign-people-grid"></div>
+      <div class="form-hint">Selecciona únicamente al personal que continuará asignado a esta actividad. Disponible para Administración.</div>
+    </div>
     <div class="form-group">
       <label class="form-label">Área / Patio</label>
       <select class="form-control" id="act-area">
@@ -2094,11 +2135,11 @@ img,canvas,svg,video{max-width:100%}
     <input type="hidden" id="evidence-activity-id">
     <div class="form-group"><label class="form-label">Descripción de lo realizado *</label><textarea class="form-control" id="evidence-description" rows="4" placeholder="Describe brevemente el trabajo ejecutado, resultado, condición final o información relevante."></textarea></div>
     <div class="evidence-grid">
-      <div class="evidence-box"><label>Foto antes</label><input id="evidence-before" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-before')"><div class="evidence-preview" id="evidence-preview-before">Sin imagen</div></div>
-      <div class="evidence-box"><label>Foto durante</label><input id="evidence-during" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-during')"><div class="evidence-preview" id="evidence-preview-during">Sin imagen</div></div>
-      <div class="evidence-box"><label>Foto después</label><input id="evidence-after" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-after')"><div class="evidence-preview" id="evidence-preview-after">Sin imagen</div></div>
+      <div class="evidence-box"><label>Foto antes</label><div class="evidence-preview" id="evidence-preview-before">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="evidence-before" type="file" accept="image/*" onchange="previewActivityEvidence(this,'evidence-preview-before','evidence-before-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="evidence-before-camera" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-before','evidence-before')"></label></div></div>
+      <div class="evidence-box"><label>Foto durante</label><div class="evidence-preview" id="evidence-preview-during">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="evidence-during" type="file" accept="image/*" onchange="previewActivityEvidence(this,'evidence-preview-during','evidence-during-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="evidence-during-camera" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-during','evidence-during')"></label></div></div>
+      <div class="evidence-box"><label>Foto después</label><div class="evidence-preview" id="evidence-preview-after">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="evidence-after" type="file" accept="image/*" onchange="previewActivityEvidence(this,'evidence-preview-after','evidence-after-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="evidence-after-camera" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-after','evidence-after')"></label></div></div>
     </div>
-    <div class="form-hint" id="evidence-upload-hint" style="margin-top:10px">Las fotografías se comprimen antes de subir para optimizar el uso desde celular. Puedes adjuntar una, dos o las tres evidencias.</div>
+    <div class="form-hint" id="evidence-upload-hint" style="margin-top:10px">Puedes tomar la foto con la cámara o adjuntarla desde la galería/archivos. Las imágenes se comprimen automáticamente para Android, iPhone y escritorio.</div>
     <div id="activity-detail-review" class="activity-detail-review" style="display:none"></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-actividad-evidencias')">Cerrar</button><button class="btn btn-primary" id="btn-save-evidence" onclick="saveActivityEvidence()">✓ Finalizar actividad</button></div>
   </div>
@@ -3967,6 +4008,35 @@ function calcRestDuration() {
   }
 }
 
+function renderEditActivityPeople(selected=[]){
+  const grid=document.getElementById('act-edit-people-grid');if(!grid)return;
+  const selectedNorm=new Set(selected.map(activityNormalize));
+  grid.innerHTML=activityAssignmentPeople().map(p=>`<label class="assign-person-chip"><input type="checkbox" value="${escapeHtml(p.name)}" data-login="${escapeHtml(p.login||'')}" ${selectedNorm.has(activityNormalize(p.name))?'checked':''} onchange="updateEditActivityPeopleCount()"><span class="assign-person-mark">${escapeHtml(activityInitials(p.name))}</span><span>${escapeHtml(p.name)}${p.login?`<small style="display:block;font-size:9px;color:var(--text-m);font-weight:600">${escapeHtml(p.login)}</small>`:''}</span></label>`).join('');
+  updateEditActivityPeopleCount();
+}
+function updateEditActivityPeopleCount(){const n=document.querySelectorAll('#act-edit-people-grid input:checked').length,el=document.getElementById('act-edit-person-count');if(el)el.textContent=`${n} ${n===1?'persona':'personas'}`;}
+function selectedEditActivityPeople(){return [...document.querySelectorAll('#act-edit-people-grid input:checked')].map(x=>({name:x.value,login:x.dataset.login||''}));}
+async function saveEditedActivityGroup(editId,fields){
+  const original=APP.data.actividades.find(x=>String(x.id)===String(editId));if(!original)return false;
+  if(!activityCanEditRecord())return null;
+  if(!navigator.onLine){showToast('Para modificar el personal involucrado debes estar en línea','warning');return false;}
+  const members=activityGroupMembers(original),selected=selectedEditActivityPeople();
+  if(!selected.length){showToast('Selecciona al menos una persona involucrada','warning');return false;}
+  const ids=members.map(x=>x.id).filter(x=>x!==undefined&&x!==null);
+  const commonPatch={fecha:fields.fecha,guardia:fields.guardia,area:fields.area,actividad:fields.actividad,inicio:fields.inicio||null,fin:fields.fin||null,duracion:fields.calc?.duracion||0,hh:fields.calc?.hh||0,obs:fields.obs||''};
+  const existingByName=new Map(members.map(x=>[activityNormalize(x.operador),x]));
+  const selectedNorm=new Set(selected.map(x=>activityNormalize(x.name)));
+  const removeIds=members.filter(x=>!selectedNorm.has(activityNormalize(x.operador))).map(x=>x.id);
+  try{
+    if(ids.length){const {error}=await db.from('actividades').update(commonPatch).in('id',ids);if(error)throw error;}
+    if(removeIds.length){const {error}=await db.from('actividades').delete().in('id',removeIds);if(error)throw error;}
+    const template=members[0]||original,group=activityAssignmentGroupId(original),newRows=[];
+    selected.forEach((p,i)=>{if(existingByName.has(activityNormalize(p.name)))return;const person=resolveActivityPerson(p.name);const memberId=`${group}::MEM::${Date.now().toString(36)}-${i+1}-${simpleActivityHash(p.name)}`;newRows.push(appActividadToDb({fecha:fields.fecha,guardia:fields.guardia,operador:p.name,operadorLogin:p.login||person.login,area:fields.area,actividad:fields.actividad,obs:fields.obs,inicio:template.inicio||fields.inicio||'',fin:template.fin||fields.fin||'',estado:template.estado||'pendiente',revision:template.revision||null,comentario_rev:template.comentario_rev||'',origen:template.origen||'asignacion',asignacionId:memberId,asignadoPor:template.asignadoPor||APP.user?.login||'',asignadoNombre:template.asignadoNombre||APP.user?.name||'',inicioReal:template.inicioReal||'',finReal:template.finReal||'',pausas:template.pausas||[],descripcionCierre:template.descripcionCierre||'',fotoAntesUrl:template.fotoAntesUrl||'',fotoDuranteUrl:template.fotoDuranteUrl||'',fotoDespuesUrl:template.fotoDespuesUrl||'',calc:template.calc||fields.calc}));});
+    if(newRows.length){const {error}=await db.from('actividades').insert(newRows);if(error)throw error;}
+    return true;
+  }catch(err){console.error(err);showToast('No se pudo actualizar el personal de la actividad','error');return false;}
+}
+
 /* ===== SAVE ACTIVIDAD ===== */
 async function saveActividad() {
   if(esGerenciaSoloLectura()){ showToast('Gerencia tiene acceso solo de visualización','warning'); return; }
@@ -3990,6 +4060,9 @@ async function saveActividad() {
   fields.calc = {duracion:dur, hh:dur};
 
   const editId = document.getElementById('act-edit-id').value;
+  if(editId&&activityCanEditRecord()){
+    const ok=await saveEditedActivityGroup(editId,fields);if(ok===false)return;if(ok===true){showToast('Actividad y personal involucrado actualizados','success');closeModal('modal-actividad');resetActForm();await loadAllData();return;}
+  }
   if(!navigator.onLine){
     const row=appActividadToDb(fields);
     if(editId){queueOfflineMutation('actividades','update',row,{key:'id',value:Number(editId)},'Actividad');const idx=APP.data.actividades.findIndex(x=>String(x.id)===String(editId));if(idx>=0)APP.data.actividades[idx]={...APP.data.actividades[idx],...fields};}
@@ -4035,8 +4108,8 @@ function resetActForm() {
 }
 
 function resetActivityEditFieldVisibility(){
-  const operatorGroup=document.getElementById('act-operador-group'),stateGroup=document.getElementById('act-estado-group'),operator=document.getElementById('act-operador'),state=document.getElementById('act-estado');
-  if(operatorGroup)operatorGroup.style.display='';if(stateGroup)stateGroup.style.display='';if(operator)operator.disabled=false;if(state)state.disabled=false;
+  const operatorGroup=document.getElementById('act-operador-group'),stateGroup=document.getElementById('act-estado-group'),peopleGroup=document.getElementById('act-edit-people-group'),operator=document.getElementById('act-operador'),state=document.getElementById('act-estado');
+  if(operatorGroup)operatorGroup.style.display='';if(stateGroup)stateGroup.style.display='';if(peopleGroup)peopleGroup.style.display='none';if(operator)operator.disabled=false;if(state)state.disabled=false;
 }
 
 function editActividad(id) {
@@ -4053,6 +4126,8 @@ function editActividad(id) {
   const operatorGroup=document.getElementById('act-operador-group');if(operatorGroup)operatorGroup.style.display='none';
   const stateGroup=document.getElementById('act-estado-group');if(stateGroup)stateGroup.style.display='none';
   document.getElementById('act-operador').disabled=true;document.getElementById('act-estado').disabled=true;
+  const peopleGroup=document.getElementById('act-edit-people-group');if(peopleGroup)peopleGroup.style.display=activityCanEditRecord()?'block':'none';
+  if(activityCanEditRecord()){const members=activityGroupMembers(a);renderEditActivityPeople(members.map(x=>x.operador));}
   document.getElementById('act-area').value=a.area;
   document.getElementById('act-actividad').value=a.actividad;
   document.getElementById('act-inicio').value=a.inicio;
@@ -6212,8 +6287,8 @@ async function saveAssignedActivity(){
   const fecha=document.getElementById('assign-fecha').value,guardia=document.getElementById('assign-guardia').value,area=document.getElementById('assign-area').value,actividad=document.getElementById('assign-actividad').value.trim(),detalle=document.getElementById('assign-detalle').value.trim();
   const checks=[...document.querySelectorAll('#assign-people-grid input:checked')];
   if(!fecha||!guardia||!area||!actividad||!checks.length){showToast('Completa fecha, guardia, área, actividad y personal','warning');return;}
-  const group=`MAN-${fecha}-${Date.now().toString(36)}`;
-  const rows=checks.map((c,i)=>{const p=resolveActivityPerson(c.value);return appActividadToDb({fecha,guardia,operador:p.name,operadorLogin:p.login,area,actividad,obs:detalle,inicio:'',fin:'',estado:'pendiente',revision:null,comentario_rev:'',origen:'asignacion',asignacionId:`${group}-${i+1}-${simpleActivityHash(p.name)}`,asignadoPor:APP.user.login||'',asignadoNombre:APP.user.name||'',inicioReal:'',finReal:'',pausas:[],descripcionCierre:'',fotoAntesUrl:'',fotoDuranteUrl:'',fotoDespuesUrl:'',calc:{duracion:0,hh:0}});});
+  const group=`GRP-MAN-${fecha}-${Date.now().toString(36)}`;
+  const rows=checks.map((c,i)=>{const p=resolveActivityPerson(c.value);return appActividadToDb({fecha,guardia,operador:p.name,operadorLogin:p.login,area,actividad,obs:detalle,inicio:'',fin:'',estado:'pendiente',revision:null,comentario_rev:'',origen:'asignacion',asignacionId:`${group}::MEM::${i+1}-${simpleActivityHash(p.name)}`,asignadoPor:APP.user.login||'',asignadoNombre:APP.user.name||'',inicioReal:'',finReal:'',pausas:[],descripcionCierre:'',fotoAntesUrl:'',fotoDuranteUrl:'',fotoDespuesUrl:'',calc:{duracion:0,hh:0}});});
   const btn=document.getElementById('btn-save-assignment');if(btn){btn.disabled=true;btn.textContent='Asignando…';}
   try{
     if(!navigator.onLine){rows.forEach(r=>{APP.data.actividades.unshift(dbActividadToApp({...r,id:offlineTempId()}));queueOfflineMutation('actividades','insert',r,null,'Actividad asignada');});cacheAppData();closeModal('modal-asignar-actividad');renderActividades();return;}
@@ -6225,9 +6300,12 @@ async function saveAssignedActivity(){
 async function syncProgramacionAssignments(p){
   if(!p?.fecha||!Array.isArray(p.actividades)||!p.actividades.length||!navigator.onLine)return;
   try{
-    const {data:existing,error:eErr}=await db.from('actividades').select('id,asignacion_id').eq('fecha',p.fecha);
-    if(eErr)throw eErr;const keys=new Set((existing||[]).map(x=>x.asignacion_id).filter(Boolean));const rows=[];
-    p.actividades.forEach((a,ai)=>(a.personal||[]).forEach(name=>{const person=resolveActivityPerson(name);const key=`PROG-${p.fecha}-${simpleActivityHash(`${a.area}|${a.descripcion}|${name}`)}`;if(keys.has(key))return;keys.add(key);rows.push(appActividadToDb({fecha:p.fecha,guardia:(person.guardia&&person.guardia!=='ambas')?person.guardia:(APP.user?.guardia&&APP.user.guardia!=='ambas'?APP.user.guardia:'A'),operador:name,operadorLogin:person.login,area:a.area,actividad:a.descripcion,obs:`Programación diaria · HSE: ${a.hse||'—'} · Supervisor: ${a.supervisor||'—'}`,inicio:'',fin:'',estado:'pendiente',revision:null,comentario_rev:'',origen:'programacion',asignacionId:key,asignadoPor:APP.user?.login||'',asignadoNombre:a.supervisor||APP.user?.name||'',inicioReal:'',finReal:'',pausas:[],descripcionCierre:'',fotoAntesUrl:'',fotoDuranteUrl:'',fotoDespuesUrl:'',calc:{duracion:0,hh:0}}));}));
+    const {data:existing,error:eErr}=await db.from('actividades').select('id,asignacion_id').eq('fecha',p.fecha);if(eErr)throw eErr;
+    const keys=new Set((existing||[]).map(x=>x.asignacion_id).filter(Boolean)),rows=[];
+    p.actividades.forEach((a,ai)=>{
+      const group=`GRP-PROG-${p.id||simpleActivityHash(`${p.fecha}|${p.guardia||''}`)}-${ai+1}-${simpleActivityHash(`${a.area}|${a.descripcion}|${a.supervisor||''}`)}`;
+      (a.personal||[]).forEach((name,pi)=>{const person=resolveActivityPerson(name),key=`${group}::MEM::${pi+1}-${simpleActivityHash(name)}`;if(keys.has(key))return;keys.add(key);rows.push(appActividadToDb({fecha:p.fecha,guardia:(person.guardia&&person.guardia!=='ambas')?person.guardia:(APP.user?.guardia&&APP.user.guardia!=='ambas'?APP.user.guardia:'A'),operador:name,operadorLogin:person.login,area:a.area,actividad:a.descripcion,obs:`Programación diaria · HSE: ${a.hse||'—'} · Supervisor: ${a.supervisor||'—'}`,inicio:'',fin:'',estado:'pendiente',revision:null,comentario_rev:'',origen:'programacion',asignacionId:key,asignadoPor:APP.user?.login||'',asignadoNombre:a.supervisor||APP.user?.name||'',inicioReal:'',finReal:'',pausas:[],descripcionCierre:'',fotoAntesUrl:'',fotoDuranteUrl:'',fotoDespuesUrl:'',calc:{duracion:0,hh:0}}));});
+    });
     if(rows.length){const {error}=await db.from('actividades').insert(rows);if(error)throw error;}
   }catch(err){console.warn('No se pudieron sincronizar actividades desde Programación diaria:',err);showToast('Programación guardada; verifica la configuración de Actividades en Supabase para sincronizar','warning');}
 }
@@ -6252,15 +6330,16 @@ async function updateAssignedActivity(id,action){
 function openActivityEvidence(id){
   const detailTitle=document.querySelector('#modal-actividad-evidencias .modal-title');if(detailTitle)detailTitle.textContent='Finalizar actividad';
   const descField=document.getElementById('evidence-description');if(descField)descField.readOnly=false;
-  ['evidence-before','evidence-during','evidence-after'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='';});
+  ['evidence-before','evidence-before-camera','evidence-during','evidence-during-camera','evidence-after','evidence-after-camera'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='';});
   const reviewBox=document.getElementById('activity-detail-review');if(reviewBox){reviewBox.style.display='none';reviewBox.innerHTML='';}
-  const hint=document.getElementById('evidence-upload-hint');if(hint)hint.textContent='Las fotografías se comprimen antes de subir para optimizar el uso desde celular. Puedes adjuntar una, dos o las tres evidencias.';
+  const hint=document.getElementById('evidence-upload-hint');if(hint)hint.textContent='Puedes tomar la foto con la cámara o adjuntarla desde la galería/archivos. Las imágenes se comprimen automáticamente para Android, iPhone y escritorio.';
   const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;if(activityIsFieldUser()&&!activityUserMatch(a)){showToast('Esta actividad no está asignada a tu usuario','error');return;}
   const members=activityGroupMembers(a),shared=activityGroupEvidence(members)||a;
   document.getElementById('evidence-activity-id').value=id;document.getElementById('evidence-activity-title').textContent=`${a.actividad} · ${a.area} · ${members.length} integrante${members.length===1?'':'s'}`;document.getElementById('evidence-description').value=shared.descripcionCierre||'';
-  ['evidence-before','evidence-during','evidence-after'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});[['evidence-preview-before',shared.fotoAntesUrl],['evidence-preview-during',shared.fotoDuranteUrl],['evidence-preview-after',shared.fotoDespuesUrl]].forEach(([pid,url])=>{const box=document.getElementById(pid);if(box)box.innerHTML=url?`<img src="${escapeHtml(url)}" alt="Evidencia">`:'Sin imagen';});openModal('modal-actividad-evidencias');
+  ['evidence-before','evidence-before-camera','evidence-during','evidence-during-camera','evidence-after','evidence-after-camera'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});[['evidence-preview-before',shared.fotoAntesUrl],['evidence-preview-during',shared.fotoDuranteUrl],['evidence-preview-after',shared.fotoDespuesUrl]].forEach(([pid,url])=>{const box=document.getElementById(pid);if(box)box.innerHTML=url?`<img src="${escapeHtml(url)}" alt="Evidencia">`:'Sin imagen';});openModal('modal-actividad-evidencias');
 }
-function previewActivityEvidence(input,previewId){const box=document.getElementById(previewId),file=input.files?.[0];if(!box)return;if(!file){box.textContent='Sin imagen';return;}const url=URL.createObjectURL(file);box.innerHTML=`<img src="${url}" alt="Vista previa">`;}
+function previewActivityEvidence(input,previewId,alternateId=''){const box=document.getElementById(previewId),file=input.files?.[0];if(!box)return;if(alternateId&&file){const alt=document.getElementById(alternateId);if(alt)alt.value='';}if(!file){box.textContent='Sin imagen';return;}const url=URL.createObjectURL(file);box.innerHTML=`<img src="${url}" alt="Vista previa">`;}
+function selectedActivityEvidenceFile(kind){return document.getElementById(`evidence-${kind}`)?.files?.[0]||document.getElementById(`evidence-${kind}-camera`)?.files?.[0]||null;}
 async function compressActivityPhoto(file){
   if(!file)return null;if(!String(file.type||'').startsWith('image/'))throw new Error('Selecciona una imagen válida.');if(file.size>15*1024*1024)throw new Error('Cada imagen debe pesar menos de 15 MB.');
   const bmp=await createImageBitmap(file),max=1600,scale=Math.min(1,max/Math.max(bmp.width,bmp.height)),w=Math.max(1,Math.round(bmp.width*scale)),h=Math.max(1,Math.round(bmp.height*scale));const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(bmp,0,0,w,h);bmp.close?.();return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('No se pudo procesar la fotografía')),'image/jpeg',.82));
@@ -6271,7 +6350,7 @@ async function saveActivityEvidence(){
   const members=activityGroupMembers(a),sharedExisting=activityGroupEvidence(members),desc=document.getElementById('evidence-description').value.trim();if(!desc){showToast('Describe lo realizado antes de finalizar','warning');return;}if(!navigator.onLine){showToast('Para cerrar con fotografías necesitas conexión. Puedes finalizar cuando recuperes señal.','warning');return;}
   const btn=document.getElementById('btn-save-evidence');btn.disabled=true;btn.textContent='Cerrando actividad para todo el equipo…';
   try{
-    const before=document.getElementById('evidence-before').files?.[0],during=document.getElementById('evidence-during').files?.[0],after=document.getElementById('evidence-after').files?.[0];const uploadBase=sharedExisting||a;const urls=await Promise.all([uploadActivityEvidence(before,uploadBase,'antes'),uploadActivityEvidence(during,uploadBase,'durante'),uploadActivityEvidence(after,uploadBase,'despues')]);
+    const before=selectedActivityEvidenceFile('before'),during=selectedActivityEvidenceFile('during'),after=selectedActivityEvidenceFile('after');const uploadBase=sharedExisting||a;const urls=await Promise.all([uploadActivityEvidence(before,uploadBase,'antes'),uploadActivityEvidence(during,uploadBase,'durante'),uploadActivityEvidence(after,uploadBase,'despues')]);
     const finish=activityNowIso(),reference=members.find(x=>x.inicioReal)||a,pausas=[...(reference.pausas||[])].map(p=>({...p}));const openPause=[...pausas].reverse().find(x=>x&&!x.fin);if(openPause)openPause.fin=finish;const sharedStart=reference.inicioReal||finish,sharedInicio=reference.inicio||activityNowTime();const hrs=activityEffectiveHours({...reference,inicioReal:sharedStart,pausas},finish);
     const patch={estado:'finalizado',inicio_real:sharedStart,inicio:sharedInicio,fin_real:finish,fin:activityNowTime(),pausas_json:pausas,descripcion_cierre:desc,foto_antes_url:urls[0]||sharedExisting?.fotoAntesUrl||a.fotoAntesUrl||'',foto_durante_url:urls[1]||sharedExisting?.fotoDuranteUrl||a.fotoDuranteUrl||'',foto_despues_url:urls[2]||sharedExisting?.fotoDespuesUrl||a.fotoDespuesUrl||'',duracion:hrs,hh:hrs};const ids=members.map(m=>m.id).filter(v=>v!==undefined&&v!==null);const {error}=await db.from('actividades').update(patch).in('id',ids);if(error)throw error;closeModal('modal-actividad-evidencias');await loadAllData();showToast(`Actividad finalizada · ${members.length} integrante${members.length===1?'':'s'} sincronizados`,'success');
   }catch(err){console.error(err);showToast('No se pudo finalizar: '+(err.message||'verifica la conexión'),'error');}finally{btn.disabled=false;btn.textContent='✓ Finalizar actividad';}
@@ -6292,7 +6371,7 @@ function viewActivityEvidence(id){
   const btn=document.getElementById('btn-save-evidence'),review=document.getElementById('activity-detail-review'),desc=document.getElementById('evidence-description'),hint=document.getElementById('evidence-upload-hint');
   if(btn)btn.style.display='none';
   if(desc)desc.readOnly=true;
-  ['evidence-before','evidence-during','evidence-after'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});
+  ['evidence-before','evidence-before-camera','evidence-during','evidence-during-camera','evidence-after','evidence-after-camera'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});
   if(hint)hint.textContent=shared.descripcionCierre?'Evidencias registradas para esta actividad.':'La actividad aún no cuenta con evidencias de cierre.';
   if(review){review.style.display=activityCanReview()?'block':'none';review.innerHTML=activityDetailReviewHtml(a,members);}
   const title=document.querySelector('#modal-actividad-evidencias .modal-title');if(title)title.textContent='Detalle de actividad';
@@ -6359,7 +6438,15 @@ function renderAssignmentPeople(selected=[]){
   grid.innerHTML=people.length?people.map(p=>`<label class="assign-person-chip"><input type="checkbox" value="${escapeHtml(p.name)}" data-login="${escapeHtml(p.login)}" ${selectedNorm.has(activityNormalize(p.name))?'checked':''} onchange="updateAssignmentPeopleCount()"><span class="assign-person-mark">${escapeHtml(activityInitials(p.name))}</span><span>${escapeHtml(p.name)}<small style="display:block;font-size:9px;color:var(--text-m);font-weight:600">${escapeHtml(p.role==='controlador'?'Controlador de patios':p.role==='mantenimiento'?'Mantenimiento':'Operador')}${p.login?' · '+escapeHtml(p.login):''}</small></span></label>`).join(''):`<div class="activity-empty" style="grid-column:1/-1"><strong>Sin usuarios disponibles</strong>Crea o activa usuarios con rol Operador, Controlador de patios o Mantenimiento.</div>`;
   updateAssignmentPeopleCount();
 }
-function activityLogicalGroupKey(a){return [a.fecha||'',a.guardia||'',activityNormalize(a.area),activityNormalize(a.actividad)].join('|');}
+function activityAssignmentGroupId(a){
+  const raw=String(a?.asignacionId||'');
+  if(raw.includes('::MEM::'))return raw.split('::MEM::')[0];
+  const oldManual=raw.match(/^(MAN-\d{4}-\d{2}-\d{2}-[^-]+)/);if(oldManual)return oldManual[1];
+  // Registros antiguos de Programación no contienen un identificador grupal confiable: se mantienen separados para no unir tareas iguales por error.
+  if(raw)return `ASSIGN:${raw}`;
+  return `ROW:${a?.id??simpleActivityHash(`${a?.fecha||''}|${a?.operador||''}|${a?.actividad||''}|${Math.random()}`)}`;
+}
+function activityLogicalGroupKey(a){return activityAssignmentGroupId(a);}
 function activityGroupMembers(aOrKey,data=APP.data.actividades||[]){const key=typeof aOrKey==='string'?aOrKey:activityLogicalGroupKey(aOrKey);return data.filter(x=>activityLogicalGroupKey(x)===key);}
 function activityGroups(data){const map=new Map();for(const a of data){const k=activityLogicalGroupKey(a);if(!map.has(k))map.set(k,[]);map.get(k).push(a);}return [...map.entries()].map(([key,members])=>({key,members}));}
 function activityGroupEvidence(group){const members=Array.isArray(group)?group:activityGroupMembers(group);return members.find(a=>a.descripcionCierre||a.fotoAntesUrl||a.fotoDuranteUrl||a.fotoDespuesUrl)||null;}
@@ -6371,7 +6458,7 @@ function renderActivitiesDashboard(data){
   const base=(APP.data.actividades||[]).filter(a=>a.fecha===activityToday()).filter(a=>activityIsFieldUser()?activityUserMatch(a):true),groups=activityGroups(base),total=groups.length;
   const statuses=groups.map(g=>activityGroupStatus(g));const process=statuses.filter(s=>s.key==='process').length,paused=statuses.filter(s=>s.key==='paused').length,done=statuses.filter(s=>s.key==='done').length,pending=statuses.filter(s=>s.key==='pending').length,pct=total?Math.round(done/total*100):0;
   const vals={assigned:total,process,paused,done,pending,progress:pct+'%'};Object.entries(vals).forEach(([k,v])=>{const el=document.getElementById('act-kpi-'+k);if(el)el.textContent=v;});
-  const operator=activityIsFieldUser();document.getElementById('activity-hero-title').textContent=operator?'Mis actividades de hoy':'Control visual de actividades';document.getElementById('activity-hero-sub').textContent=operator?'Revisa tus trabajos y el equipo asignado. Cualquier integrante puede iniciar, pausar, reanudar o cerrar la actividad; el estado y las evidencias se sincronizan para todos.':'Cada actividad se agrupa una sola vez, con conteo de personal, estado individual, evidencia compartida y revisión de supervisión.';document.getElementById('activities-page-subtitle').textContent=operator?'Trabajo asignado y ejecución diaria':'Asignación, ejecución, evidencias compartidas y aprobación';
+  const operator=activityIsFieldUser();document.getElementById('activity-hero-title').textContent=operator?'Mis actividades de hoy':'Control visual de actividades';document.getElementById('activity-hero-sub').textContent=operator?'Revisa tus trabajos y el equipo asignado. Cualquier integrante puede iniciar, pausar, reanudar o cerrar la actividad; el estado y las evidencias se sincronizan para todos.':'Cada asignación se muestra por separado, aunque tenga el mismo nombre que otra. El equipo, estado compartido, evidencias y revisión permanecen vinculados únicamente a esa asignación.';document.getElementById('activities-page-subtitle').textContent=operator?'Trabajo asignado y ejecución diaria':'Asignación, ejecución, evidencias compartidas y aprobación';
 }
 function activityOperatorUniqueRows(data){const map=new Map();for(const a of data){const k=activityLogicalGroupKey(a);if(!map.has(k)||activityUserMatch(a))map.set(k,a);}return [...map.values()];}
 function renderActivitiesOperator(data){const section=document.getElementById('activities-operator-section'),box=document.getElementById('my-activity-board');if(!section||!box)return;section.style.display=activityIsFieldUser()?'block':'none';if(!activityIsFieldUser())return;const rows=activityOperatorUniqueRows(data).sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))||String(a.id).localeCompare(String(b.id)));document.getElementById('my-activity-count').textContent=`${rows.length} ${rows.length===1?'actividad':'actividades'}`;box.innerHTML=rows.length?rows.map(activityTaskCard).join(''):`<div class="activity-empty" style="grid-column:1/-1"><strong>No tienes actividades asignadas</strong>No hay trabajos asignados a tu usuario para los filtros seleccionados.</div>`;}
@@ -6394,7 +6481,7 @@ async function saveRevision(){
 async function saveActivityEvidence(){
   const id=document.getElementById('evidence-activity-id').value,a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;if(activityIsFieldUser()&&!activityUserMatch(a)){showToast('Esta actividad no está asignada a tu usuario','error');return;}const desc=document.getElementById('evidence-description').value.trim();if(!desc){showToast('Describe lo realizado antes de finalizar','warning');return;}if(!navigator.onLine){showToast('Para cerrar con fotografías necesitas conexión. Puedes finalizar cuando recuperes señal.','warning');return;}
   const members=activityGroupMembers(a),existing=activityGroupEvidence(members),btn=document.getElementById('btn-save-evidence');btn.disabled=true;btn.textContent='Cerrando actividad grupal…';
-  try{const before=document.getElementById('evidence-before').files?.[0],during=document.getElementById('evidence-during').files?.[0],after=document.getElementById('evidence-after').files?.[0];const urls=await Promise.all([uploadActivityEvidence(before,a,'antes'),uploadActivityEvidence(during,a,'durante'),uploadActivityEvidence(after,a,'despues')]);const shared={descripcion:desc,before:urls[0]||existing?.fotoAntesUrl||a.fotoAntesUrl||'',during:urls[1]||existing?.fotoDuranteUrl||a.fotoDuranteUrl||'',after:urls[2]||existing?.fotoDespuesUrl||a.fotoDespuesUrl||''},finish=activityNowIso(),finishTime=activityNowTime();
+  try{const before=selectedActivityEvidenceFile('before'),during=selectedActivityEvidenceFile('during'),after=selectedActivityEvidenceFile('after');const urls=await Promise.all([uploadActivityEvidence(before,a,'antes'),uploadActivityEvidence(during,a,'durante'),uploadActivityEvidence(after,a,'despues')]);const shared={descripcion:desc,before:urls[0]||existing?.fotoAntesUrl||a.fotoAntesUrl||'',during:urls[1]||existing?.fotoDuranteUrl||a.fotoDuranteUrl||'',after:urls[2]||existing?.fotoDespuesUrl||a.fotoDespuesUrl||''},finish=activityNowIso(),finishTime=activityNowTime();
     for(const member of members){const pausas=[...(member.pausas||[])];const openPause=[...pausas].reverse().find(x=>x&&!x.fin);if(openPause)openPause.fin=finish;const hrs=member.inicioReal?activityEffectiveHours({...member,pausas},finish):Number(member.calc?.hh||0);const patch={estado:'finalizado',fin_real:member.finReal||finish,fin:member.fin||finishTime,pausas_json:pausas,descripcion_cierre:shared.descripcion,foto_antes_url:shared.before,foto_durante_url:shared.during,foto_despues_url:shared.after,duracion:hrs,hh:hrs,revision:null,comentario_rev:''};const {error}=await db.from('actividades').update(patch).eq('id',member.id);if(error)throw error;}
     closeModal('modal-actividad-evidencias');await loadAllData();showToast(`Actividad completada para ${members.length} involucrado${members.length===1?'':'s'} con evidencia compartida`,'success');
   }catch(err){console.error(err);showToast('No se pudo finalizar: '+(err.message||'verifica conexión y almacenamiento'),'error');}finally{btn.disabled=false;btn.textContent='✓ Finalizar actividad';}
