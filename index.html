@@ -1091,6 +1091,15 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 }
 @supports not (height:100dvh){@media(max-width:768px){.modal{max-height:calc(100vh - 24px)}}}
 
+
+/* ===== SEAMX · actualización seguimiento operacional ===== */
+.command-kpis-operational{grid-template-columns:repeat(4,minmax(150px,1fr))!important}
+.activity-calendar-card{padding:18px;overflow:hidden}.activity-calendar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.activity-calendar-actions{display:flex;gap:7px}.activity-calendar-title{font-size:19px;font-weight:850;color:var(--navy);text-transform:capitalize;margin:16px 0 10px}.activity-calendar-weekdays,.activity-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}.activity-calendar-weekdays span{text-align:center;font-size:10px;font-weight:850;color:var(--text-m);text-transform:uppercase;padding:4px}.activity-calendar-day{min-height:112px;border:1px solid var(--border);border-radius:11px;background:#fff;padding:8px;min-width:0}.activity-calendar-day.other{opacity:.38;background:var(--surface-1)}.activity-calendar-day.today{border:2px solid var(--navy);box-shadow:0 0 0 3px rgba(26,92,42,.06)}.activity-calendar-day-number{font-size:12px;font-weight:900;color:var(--navy);margin-bottom:6px}.activity-calendar-items{display:grid;gap:4px}.activity-calendar-item{display:block;width:100%;border-radius:7px;padding:5px 6px;font-size:9px;line-height:1.2;border-left:3px solid #b6cbb9;background:#f5f8f6;color:#294632;overflow:hidden}.activity-calendar-item strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9.5px}.activity-calendar-item small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;color:#667d6c}.activity-calendar-item.process{border-left-color:#0277bd;background:#eef7ff}.activity-calendar-item.paused{border-left-color:#f57f17;background:#fff6ec}.activity-calendar-item.done{border-left-color:#2e7d32;background:#eef8f0}.activity-calendar-more{font-size:9px;color:var(--text-m);padding:2px 4px}.activity-calendar-legend{display:flex;gap:13px;flex-wrap:wrap;margin-top:12px;font-size:10px;color:var(--text-s)}.activity-calendar-legend span{display:inline-flex;align-items:center;gap:5px}.activity-calendar-legend i{width:9px;height:9px;border-radius:3px;background:#b6cbb9}.activity-calendar-legend i.process{background:#0277bd}.activity-calendar-legend i.paused{background:#f57f17}.activity-calendar-legend i.done{background:#2e7d32}
+.patio-ops-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:18px;margin-bottom:18px}.patio-live-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:#eaf8ee;color:#1e7540;font-size:10px;font-weight:850}.patio-live-badge i{width:7px;height:7px;border-radius:50%;background:#20b25a;box-shadow:0 0 0 4px rgba(32,178,90,.12)}.patio-live-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;min-height:128px}.patio-live-unit{border:1px solid var(--border);border-radius:12px;padding:12px;background:linear-gradient(145deg,#fff,#f4faf5);display:grid;grid-template-columns:42px minmax(0,1fr);gap:10px;align-items:center}.patio-live-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#e7f4e9;font-size:22px}.patio-live-info{min-width:0}.patio-live-info strong{display:block;color:var(--navy);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.patio-live-info span{display:block;font-size:10px;color:var(--text-s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.patio-live-time{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding-top:7px;border-top:1px solid #e5eee7;font-size:10px;color:var(--text-m)}.patio-live-time b{font-size:12px;color:var(--navy)}.patio-movement-feed{display:grid;gap:8px;max-height:330px;overflow:auto}.patio-feed-item{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px;border:1px solid var(--border);border-radius:10px;background:#fff}.patio-feed-icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:#edf7ef}.patio-feed-main{min-width:0}.patio-feed-main strong{display:block;font-size:11px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.patio-feed-main span{display:block;font-size:9px;color:var(--text-m);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.patio-feed-time{font-size:9px;font-weight:800;color:var(--text-s);white-space:nowrap}.patio-material-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:10px}.patio-material-chip{padding:11px 12px;border-radius:11px;border:1px solid var(--border);background:#f8fbf9}.patio-material-chip span{display:block;font-size:10px;color:var(--text-s);font-weight:700}.patio-material-chip strong{display:block;font-size:17px;color:var(--navy);margin-top:3px}.patio-empty-state{grid-column:1/-1;padding:28px 18px;text-align:center;border:1px dashed var(--border);border-radius:12px;color:var(--text-m);font-size:12px;background:#fafcfb}
+@media(max-width:980px){.patio-ops-grid{grid-template-columns:1fr}.command-kpis-operational{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:700px){.activity-calendar-weekdays{display:none}.activity-calendar-grid{grid-template-columns:1fr;gap:8px}.activity-calendar-day{min-height:0;padding:10px 11px;display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px}.activity-calendar-day.other{display:none}.activity-calendar-day-number{font-size:16px;margin:0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px}.activity-calendar-items{min-width:0}.activity-calendar-item{font-size:10px;padding:7px}.activity-calendar-item strong{font-size:11px}.patio-live-board,.patio-material-summary{grid-template-columns:1fr}.command-kpis-operational{grid-template-columns:1fr 1fr!important}}
+@media(max-width:430px){.command-kpis-operational{grid-template-columns:1fr!important}.activity-calendar-actions .btn{min-width:44px}}
+
 </style>
 </head>
 <body>
@@ -1238,10 +1247,8 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
         <div id="command-executive-summary" class="executive-summary" style="display:none"></div>
         <div id="command-quick-actions" class="command-actions"></div>
 
-        <div class="command-kpis">
-          <div class="command-kpi"><span>HH acreditadas hoy</span><strong id="cmd-hh">0</strong><small>máx. 10 h/persona</small></div>
-          <div class="command-kpi"><span>Actividades en curso</span><strong id="cmd-activities">0</strong><small>pendientes + en proceso</small></div>
-          <div class="command-kpi danger"><span>Restricciones abiertas</span><strong id="cmd-restrictions">0</strong><small>requieren seguimiento</small></div>
+        <div class="command-kpis command-kpis-operational">
+          <div class="command-kpi"><span>Actividades asignadas</span><strong id="cmd-activities">0</strong><small>tareas del día, sin duplicar por personal</small></div>
           <div class="command-kpi"><span>Vehículos en patio</span><strong id="cmd-vehicles">0</strong><small>sin hora de salida</small></div>
           <div class="command-kpi alert occ4388"><span>Ocupabilidad 4388</span><strong id="cmd-occupancy">0%</strong><small id="cmd-occupancy-sub">áreas sobre el 40%</small></div>
           <div class="command-kpi"><span>Evacuación del mes</span><strong id="cmd-evac">0 tn</strong><small id="cmd-evac-sub">meta mensual</small></div>
@@ -1523,12 +1530,22 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           </div>
         </div>
 
-        <div class="card" style="padding:0;overflow:hidden">
-          <div class="card-header activity-history-head" style="padding:16px 18px 10px">
-            <div><div class="card-title">Historial de actividades</div><div class="card-subtitle">Trazabilidad individual de asignación, ejecución, evidencias y revisión</div></div>
-            <div class="activity-history-filter"><label>Filtrar tabla por fecha</label><div><input type="date" class="filter-select" id="activity-table-date" onchange="renderActividades()"><button class="btn btn-outline btn-sm" type="button" onclick="clearActivityTableDate()">Limpiar</button></div></div>
+        <div class="card activity-calendar-card">
+          <div class="activity-calendar-head">
+            <div>
+              <div class="card-title">Calendario de actividades</div>
+              <div class="card-subtitle">Consulta visual del trabajo registrado por día. Esta vista es solo lectura.</div>
+            </div>
+            <div class="activity-calendar-actions">
+              <button class="btn btn-outline btn-sm" type="button" onclick="changeActivityCalendarMonth(-1)" aria-label="Mes anterior">←</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="goActivityCalendarToday()">Hoy</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="changeActivityCalendarMonth(1)" aria-label="Mes siguiente">→</button>
+            </div>
           </div>
-          <div class="table-wrap"><table id="tabla-actividades"><thead><tr><th>Fecha</th><th>Personal</th><th>Área</th><th>Actividad</th><th>Inicio</th><th>Fin</th><th>HH</th><th>Estado</th><th>Evidencias</th><th>Revisión</th><th>Asignado por</th><th>Acciones</th></tr></thead><tbody id="tbody-actividades"></tbody></table></div>
+          <div class="activity-calendar-title" id="activity-calendar-title"></div>
+          <div class="activity-calendar-weekdays"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
+          <div id="activity-calendar" class="activity-calendar-grid"></div>
+          <div class="activity-calendar-legend"><span><i class="pending"></i>Sin iniciar</span><span><i class="process"></i>En ejecución</span><span><i class="paused"></i>En pausa</span><span><i class="done"></i>Finalizada</span></div>
         </div>
       </div>
 
@@ -1632,11 +1649,20 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <div class="stat-card info"><div class="stat-label">Vehículos en patio</div><div class="stat-value" id="patio-kpi-balance">0</div><div class="stat-sub">sin hora de salida</div></div>
         </div>
 
-        <div class="patio-chart-grid">
-          <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Tipo de residuo</div><div class="card-subtitle">Distribución del tonelaje ingresado: pesado y liviano</div></div></div><canvas id="chart-patio-residuo"></canvas></div>
-          <div class="card patio-chart-box"><div class="card-header"><div><div class="card-title">Ingresos por día</div><div class="card-subtitle">Toneladas ingresadas por fecha</div></div></div><canvas id="chart-patio-ingresos"></canvas></div>
+        <div class="patio-ops-grid">
+          <div class="card patio-live-card">
+            <div class="card-header"><div><div class="card-title">Patio en vivo</div><div class="card-subtitle">Vehículos que actualmente permanecen dentro del patio</div></div><span class="patio-live-badge"><i></i> Tiempo real</span></div>
+            <div id="patio-live-board" class="patio-live-board"></div>
+          </div>
+          <div class="card patio-flow-card">
+            <div class="card-header"><div><div class="card-title">Últimos movimientos</div><div class="card-subtitle">Secuencia operacional de ingresos y salidas registradas</div></div></div>
+            <div id="patio-movement-feed" class="patio-movement-feed"></div>
+          </div>
         </div>
-        <div class="card" style="margin-bottom:20px"><div class="card-header"><div><div class="card-title">Toneladas por gerencia</div><div class="card-subtitle">Solo ingresos · ordenada de mayor a menor tonelaje</div></div></div><div id="chart-patio-gerencia" class="pyramid-chart"></div></div>
+        <div class="card patio-material-card" style="margin-bottom:20px">
+          <div class="card-header"><div><div class="card-title">Material actualmente en patio</div><div class="card-subtitle">Resumen operativo de los vehículos sin salida registrada</div></div></div>
+          <div id="patio-material-summary" class="patio-material-summary"></div>
+        </div>
 
         <div class="card" style="padding:0">
           <div class="table-wrap">
@@ -3737,18 +3763,16 @@ const NAV_CONFIG = {
     {id:'patios',label:'Control de patios',icon:'truck'},
     {id:'ocupabilidad',label:'Ocupabilidad',icon:'map'},
     {id:'coproductos',label:'Coproductos 3D',icon:'cube'},
-    {id:'restricciones',label:'Restricciones',icon:'alert'},
     {id:'programacion',label:'Programación diaria',icon:'calendar'},
     {id:'entrega',label:'Entrega de guardia',icon:'transfer'},
     {id:'mantenimiento',label:'Gestión de mantenimiento',icon:'wrench'},
-    {id:'resumen',label:'Reporte de actividades',icon:'image'},
     {id:'admin',label:'Administración',icon:'user'},
   ],
   operador: ['actividades'],
   controlador: ['comando','actividades','patios','ocupabilidad','coproductos','entrega'],
-  supervisor: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento','resumen'],
-  gerencia: ['comando','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento'],
-  admin: ['comando','programacion','entrega','actividades','restricciones','patios','ocupabilidad','coproductos','mantenimiento','resumen','admin'],
+  supervisor: ['comando','programacion','entrega','actividades','patios','ocupabilidad','coproductos','mantenimiento'],
+  gerencia: ['comando','actividades','patios','ocupabilidad','coproductos','mantenimiento'],
+  admin: ['comando','programacion','entrega','actividades','patios','ocupabilidad','coproductos','mantenimiento','admin'],
   mantenimiento: ['actividades','mantenimiento'],
 };
 
@@ -4485,7 +4509,7 @@ function renderPatios(){
     const salidaBtn=editable&&!m.fin?`<button class="btn btn-success btn-sm" onclick="marcarSalidaVehiculo(${m.id})">✓ Marcar salida</button>`:'';
     return `<tr><td>${formatDate(m.fecha)}</td><td>${estado}</td><td><strong>${escapeHtml(m.patioRecepcion||'—')}</strong></td><td><strong>${escapeHtml(m.placa||'—')}</strong></td><td>${m.subclase}</td><td>${m.clase}</td><td>${m.tipoResiduo}</td><td title="${escapeHtml(m.descripcion)}" style="max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</td><td>${m.vehiculo}</td><td>${escapeHtml(m.empresa)}</td><td><strong>${m.peso.toFixed(3)}</strong></td><td>${escapeHtml(m.procedencia)}</td><td>${m.gerencia}</td><td>${m.inicio||'—'}</td><td>${m.fin||'<span style="color:var(--warning);font-weight:700">Pendiente</span>'}</td><td>${m.registradoPor||'—'}</td><td style="white-space:nowrap;display:flex;gap:6px;flex-wrap:wrap">${salidaBtn}${editable?`<button class="btn btn-outline btn-sm" onclick="openMovimientoModal(${m.id})">Editar</button>`:''}${APP.user?.role==='admin'?`<button class="btn btn-sm" style="background:var(--danger);color:#fff;padding:6px 10px" onclick="deleteMovimiento(${m.id})">×</button>`:''}</td></tr>`;
   }).join(''):`<tr><td colspan="17" style="text-align:center;padding:32px;color:var(--text-m)">No hay vehículos para los filtros seleccionados</td></tr>`;
-  renderPatioCharts(getPatioChartData());
+  renderPatioOperationalView(data);
 }
 function renderPatioCharts(data){
   const ingresos=data;
@@ -4937,10 +4961,9 @@ function getOccupancyPredictions(days=7){
   const data=calculateOcupabilidad(),cut=new Date();cut.setDate(cut.getDate()-6);const cutStr=cut.toISOString().slice(0,10);return data.map(a=>{const recent=a.movements.filter(m=>m.fecha>=cutStr);const net=recent.reduce((s,m)=>s+(m.type==='ingreso'?m.m2:-m.m2),0);const daily=net/7;const futureM2=Math.max(0,a.occupiedM2+daily*days);const futurePct=a.totalM2?futureM2/a.totalM2:0;let daysToLimit=null;if(a.pct>=OCC_LIMIT)daysToLimit=0;else if(daily>0)daysToLimit=Math.ceil(Math.max(0,a.limitM2-a.occupiedM2)/daily);return{...a,daily,futureM2,futurePct,futureStatus:getOccStatus(futurePct),daysToLimit};}).sort((a,b)=>b.futurePct-a.futurePct);
 }
 function commandAttentionItems(){
-  const items=[],occ=calculateOcupabilidad();occ.filter(a=>a.pct>OCC_LIMIT).sort((a,b)=>b.pct-a.pct).slice(0,3).forEach(a=>items.push({severity:'red',icon:'📍',title:`${a.short} supera el 40%`,desc:`Ocupabilidad actual ${(a.pct*100).toFixed(1)}%. Priorizar evacuación.`,view:'ocupabilidad',score:100+a.pct*100}));
+  const items=[],occ=calculateOcupabilidad();
+  occ.filter(a=>a.pct>OCC_LIMIT).sort((a,b)=>b.pct-a.pct).slice(0,3).forEach(a=>items.push({severity:'red',icon:'📍',title:`${a.short} supera el 40%`,desc:`Ocupabilidad actual ${(a.pct*100).toFixed(1)}%. Priorizar evacuación.`,view:'ocupabilidad',score:100+a.pct*100}));
   const live=(APP.data.movimientos||[]).filter(m=>!m.fin);live.map(m=>({m,min:vehicleStayMinutes(m)})).filter(x=>x.min>=120).sort((a,b)=>b.min-a.min).slice(0,2).forEach(x=>items.push({severity:x.min>=240?'red':'orange',icon:vehicleVisual(x.m.vehiculo).icon,title:`${x.m.placa||x.m.vehiculo} lleva ${fmtDurationMinutes(x.min)} en patio`,desc:`${x.m.vehiculo} · ${Number(x.m.peso||0).toFixed(2)} tn · ${x.m.descripcion||'sin descripción'}.`,view:'patios',score:80+x.min/30}));
-  const open=(APP.data.restricciones||[]).filter(r=>r.estado==='abierto');open.slice(0,2).forEach(r=>items.push({severity:'orange',icon:'⛔',title:`Restricción abierta en ${r.area}`,desc:`${r.tipo}: ${r.descripcion}`,view:'restricciones',score:70}));
-  if(['admin','supervisor','gerencia'].includes(APP.user?.role)){todayPersonHours().filter(p=>p.nonEffective>0.01).sort((a,b)=>b.nonEffective-a.nonEffective).slice(0,2).forEach(p=>items.push({severity:'yellow',icon:'👷',title:`${p.name} tiene ${p.nonEffective.toFixed(1)} h pendientes`,desc:'Brecha frente a la meta diaria acreditable de 10 h.',view:'actividades',score:40+p.nonEffective}));}
   const f=getEvacuationForecast();if(f.projected<f.target)items.push({severity:f.status==='bad'?'orange':'yellow',icon:'📉',title:`Forecast mensual: ${f.projected.toFixed(0)} de ${f.target.toFixed(0)} tn`,desc:`Ritmo requerido desde hoy: ${f.neededPerDay.toFixed(1)} tn/día.`,view:'comando',score:f.status==='bad'?75:45});
   return items.sort((a,b)=>b.score-a.score).slice(0,5);
 }
@@ -4956,14 +4979,17 @@ function renderCommandVehicleDetail(){const box=document.getElementById('command
 function renderOccupancyPredictions(){const box=document.getElementById('command-occupancy-prediction');if(!box)return;const rows=getOccupancyPredictions(7).slice(0,6);box.innerHTML=rows.map(a=>`<div class="prediction-row"><span class="prediction-name">${escapeHtml(a.short)}</span><span class="prediction-now">${(a.pct*100).toFixed(1)}%</span><span class="prediction-future ${a.futureStatus.key}" title="Tendencia neta ${a.daily.toFixed(1)} m²/día">→ ${(a.futurePct*100).toFixed(1)}%</span></div>`).join('');}
 function renderHandoverPreview(){const box=document.getElementById('command-handover-preview');if(!box||APP.user?.role==='gerencia')return;const today=seamxToday(),pending=(APP.data.actividades||[]).filter(a=>a.fecha===today&&a.estado!=='finalizado').length,open=(APP.data.restricciones||[]).filter(r=>r.estado==='abierto').length,vehicles=(APP.data.movimientos||[]).filter(m=>!m.fin).length,critical=calculateOcupabilidad().filter(a=>a.pct>OCC_LIMIT).length;box.innerHTML=`<div class="forecast-grid"><div class="forecast-metric"><span>Actividades pendientes</span><strong>${pending}</strong></div><div class="forecast-metric"><span>Restricciones abiertas</span><strong>${open}</strong></div><div class="forecast-metric"><span>Vehículos en patio</span><strong>${vehicles}</strong></div></div><div class="forecast-status ${critical?'warn':'ok'}" style="margin-top:9px">${critical?`${critical} área${critical===1?'':'s'} sobre 40% debe${critical===1?'':'n'} quedar señalada${critical===1?'':'s'} en el relevo.`:'Sin áreas sobre el límite de 40%.'}</div>`;}
 function renderCommandCenter(){
-  const ger=APP.user?.role==='gerencia',today=seamxToday(),acts=(APP.data.actividades||[]).filter(a=>a.fecha===today),person=commandPersonHours(acts),hh=person.reduce((s,p)=>s+p.credited,0),activeActs=acts.filter(a=>a.estado!=='finalizado').length,open=(APP.data.restricciones||[]).filter(r=>r.estado==='abierto').length,live=(APP.data.movimientos||[]).filter(m=>!m.fin),occ=calculateOcupabilidad(),total=occ.reduce((s,a)=>s+a.totalM2,0),occupied=occ.reduce((s,a)=>s+a.occupiedM2,0),occPct=total?occupied/total:0,crit=occ.filter(a=>a.pct>OCC_LIMIT).length,f=getEvacuationForecast(),pulse=getOperationalPulse();
+  const ger=APP.user?.role==='gerencia',today=seamxToday(),acts=(APP.data.actividades||[]).filter(a=>a.fecha===today),assignedTasks=activityGroups(acts).length,live=(APP.data.movimientos||[]).filter(m=>!m.fin),occ=calculateOcupabilidad(),total=occ.reduce((s,a)=>s+a.totalM2,0),occupied=occ.reduce((s,a)=>s+a.occupiedM2,0),occPct=total?occupied/total:0,crit=occ.filter(a=>a.pct>OCC_LIMIT).length,f=getEvacuationForecast(),pulse=getOperationalPulse();
   const handoverCard=document.getElementById('command-handover-card');if(handoverCard)handoverCard.style.display=ger?'none':'block';
-  const greet=document.getElementById('command-greeting');if(greet)greet.textContent=ger?'Resumen ejecutivo de la operación':'Control operacional en vivo';const mode=document.getElementById('command-mode-badge');if(mode)mode.textContent=ger?'Vista Gerencia':'Vista Operación';const sub=document.getElementById('command-subtitle');if(sub)sub.textContent=ger?'Indicadores, tendencias, riesgos y forecast para decisión ejecutiva.':'Prioridades, patio en vivo, forecast y próximos pendientes en una sola pantalla.';
+  const greet=document.getElementById('command-greeting');if(greet)greet.textContent=ger?'Resumen ejecutivo de la operación':'Control operacional en vivo';
+  const mode=document.getElementById('command-mode-badge');if(mode)mode.textContent=ger?'Vista Gerencia':'Vista Operación';
+  const sub=document.getElementById('command-subtitle');if(sub)sub.textContent=ger?'Indicadores, tendencias y forecast para decisión ejecutiva.':'Actividades asignadas, patio en vivo, ocupabilidad, forecast y próximos pendientes en una sola pantalla.';
   document.getElementById('command-pulse-score').textContent=pulse.score;document.getElementById('command-pulse-label').textContent=pulse.label;document.getElementById('command-pulse-note').textContent=`${commandAttentionItems().length} prioridades detectadas · actualizado ${new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'})}`;
-  document.getElementById('cmd-hh').textContent=hh.toFixed(1);document.getElementById('cmd-activities').textContent=activeActs;document.getElementById('cmd-restrictions').textContent=open;document.getElementById('cmd-vehicles').textContent=live.length;document.getElementById('cmd-occupancy').textContent=(occPct*100).toFixed(1)+'%';document.getElementById('cmd-occupancy-sub').textContent=`${crit} áreas sobre el 40%`;
-  const occSubEl=document.getElementById('cmd-occupancy-sub');if(occSubEl){occSubEl.style.display='block';occSubEl.style.width='100%';}document.getElementById('cmd-evac').textContent=f.actual.toFixed(0)+' tn';document.getElementById('cmd-evac-sub').textContent=`de ${f.target.toFixed(0)} tn`;
-  const actions=document.getElementById('command-quick-actions');if(actions)actions.innerHTML=ger?'':`<button class="btn btn-primary" onclick="navigateTo('actividades')">+ Gestionar actividades</button>${['admin','controlador'].includes(APP.user?.role)?`<button class="btn btn-outline" onclick="navigateTo('patios')">🚛 Registrar ingreso</button>`:''}${['admin','supervisor'].includes(APP.user?.role)?`<button class="btn btn-outline" onclick="navigateTo('restricciones')">⛔ Registrar restricción</button>`:''}<button class="btn btn-outline" onclick="navigateTo('entrega')">🔄 Preparar entrega</button>`;
-  const exec=document.getElementById('command-executive-summary');if(exec){exec.style.display=ger?'block':'none';exec.innerHTML=`<strong>Resumen SEAMX:</strong> ${pulse.label}. La ocupabilidad consolidada del Patio 4388 es ${(occPct*100).toFixed(1)}% con ${crit} áreas sobre el límite. El forecast de evacuación proyecta ${f.projected.toFixed(0)} tn frente a una meta de ${f.target.toFixed(0)} tn. Actualmente hay ${open} restricciones abiertas y ${live.length} vehículos en patio.`;}
+  document.getElementById('cmd-activities').textContent=assignedTasks;document.getElementById('cmd-vehicles').textContent=live.length;document.getElementById('cmd-occupancy').textContent=(occPct*100).toFixed(1)+'%';document.getElementById('cmd-occupancy-sub').textContent=`${crit} áreas sobre el 40%`;
+  const occSubEl=document.getElementById('cmd-occupancy-sub');if(occSubEl){occSubEl.style.display='block';occSubEl.style.width='100%';}
+  document.getElementById('cmd-evac').textContent=f.actual.toFixed(0)+' tn';document.getElementById('cmd-evac-sub').textContent=`de ${f.target.toFixed(0)} tn`;
+  const actions=document.getElementById('command-quick-actions');if(actions)actions.innerHTML=ger?'':`<button class="btn btn-primary" onclick="navigateTo('actividades')">+ Gestionar actividades</button>${['admin','controlador'].includes(APP.user?.role)?`<button class="btn btn-outline" onclick="navigateTo('patios')">🚛 Registrar ingreso</button>`:''}<button class="btn btn-outline" onclick="navigateTo('entrega')">🔄 Preparar entrega</button>`;
+  const exec=document.getElementById('command-executive-summary');if(exec){exec.style.display=ger?'block':'none';exec.innerHTML=`<strong>Resumen SEAMX:</strong> ${pulse.label}. Hay ${assignedTasks} actividad${assignedTasks===1?'':'es'} asignada${assignedTasks===1?'':'s'} hoy, ${live.length} vehículo${live.length===1?'':'s'} actualmente en patio y una ocupabilidad consolidada de ${(occPct*100).toFixed(1)}%. El forecast de evacuación proyecta ${f.projected.toFixed(0)} tn frente a una meta de ${f.target.toFixed(0)} tn.`;}
   renderAttention();renderForecast();renderLiveVehicles();renderOccupancyPredictions();renderHandoverPreview();updateOfflineUI();
 }
 const HANDOVER_ROLE_LABELS={operativo:'Operativos',controlador:'Controladores',supervision:'Supervisión',administrativo:'Administrativo'};
@@ -5338,24 +5364,31 @@ function renderActiveRestrictions(data) {
 
 
 /* ===== PROGRAMACIÓN DIARIA ===== */
-const PERSONAL_PROGRAMACION = [
-  'Jorge Cerquin','Jose Villanueva','Carlos Barrera','Marlon Vega',
-  'Daniel Sigueñas','Christian Vega','Hitler Chavez','Lucio Valentin',
-  'Miflin Acevedo','Jonatan Carhuallanqui','Dargor Portilla','Yonel Saavedra',
-  'Roger Madalengoitia','Junior Zapata','Stev Bolaños'
-];
-
 function canEditProgramacion(){
   return Boolean(APP.user && ['supervisor','admin'].includes(APP.user.role));
 }
 
+function programacionAssignableUsers(){
+  const rows=(APP.data.usuarios||[]).filter(u=>u&&u.activo!==false&&['operador','mantenimiento'].includes(String(u.rol||'').toLowerCase()));
+  const seen=new Set(),out=[];
+  for(const u of rows){
+    const nombre=[u.nombre,u.apellido].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()||u.login||'Usuario';
+    const key=nombre.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    if(!key||seen.has(key))continue;
+    seen.add(key);out.push({nombre,login:u.login||'',rol:String(u.rol||'').toLowerCase()});
+  }
+  return out.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+}
 function renderPersonalPicker(selected=[]){
   const box=document.getElementById('prog-personal-picker');
   if(!box)return;
-  box.innerHTML=PERSONAL_PROGRAMACION.map(nombre=>{
-    const iniciales=nombre.split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();
-    return `<label class="person-chip"><input type="checkbox" value="${escapeHtml(nombre)}" ${selected.includes(nombre)?'checked':''} onchange="updateProgPersonCount();previewProgramacionForm()"><span class="person-chip-mark">${iniciales}</span><span>${escapeHtml(nombre)}</span></label>`;
-  }).join('');
+  const users=programacionAssignableUsers();
+  const selectedNorm=new Set((selected||[]).map(x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()));
+  box.innerHTML=users.length?users.map(u=>{
+    const iniciales=u.nombre.split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();
+    const key=u.nombre.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    return `<label class="person-chip"><input type="checkbox" value="${escapeHtml(u.nombre)}" ${selectedNorm.has(key)?'checked':''} onchange="updateProgPersonCount();previewProgramacionForm()"><span class="person-chip-mark">${escapeHtml(iniciales)}</span><span style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(u.nombre)}</b><small style="display:block;color:var(--text-m);font-size:9px">${u.rol==='mantenimiento'?'Mantenimiento':'Operador'}</small></span></label>`;
+  }).join(''):'<div class="wa-empty" style="grid-column:1/-1">No existen usuarios activos con rol Operador o Mantenimiento.</div>';
   updateProgPersonCount();
 }
 
@@ -6159,8 +6192,8 @@ async function imageUrlToDataUrl(url){
 
 async function downloadCoproductosPDF(){
   if(!window.jspdf?.jsPDF){showToast('No se pudo cargar el generador PDF','error');return;}
-  const rows=[...APP.data.coproductos].sort((a,b)=>getCoproStock(b).stock-getCoproStock(a).stock);
-  if(!rows.length){showToast('No hay coproductos para generar el catálogo','warning');return;}
+  const rows=[...APP.data.coproductos].filter(c=>getCoproStock(c).stock>0.0001).sort((a,b)=>getCoproStock(b).stock-getCoproStock(a).stock);
+  if(!rows.length){showToast('No hay coproductos con stock para generar el catálogo','warning');return;}
   showToast('Generando catálogo técnico profesional...','success');
   const {jsPDF}=window.jspdf; const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   const W=210,H=297,M=14; const green=[23,103,55],dark=[10,48,27],mint=[237,247,239],lime=[133,196,65],orange=[232,119,34],gray=[91,108,97],lineGray=[207,222,211];
@@ -6172,7 +6205,7 @@ async function downloadCoproductosPDF(){
   // Portada ejecutiva
   pdf.setFillColor(...dark);pdf.rect(0,0,W,H,'F');pdf.setFillColor(...lime);pdf.rect(0,0,8,H,'F');try{pdf.addImage(ECOSEAM_LOGO_DATA_URL,'PNG',151,15,43,29,undefined,'FAST');}catch(e){}
   pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(25);pdf.text('CATÁLOGO TÉCNICO',M+5,78);pdf.setFontSize(20);pdf.text('DE COPRODUCTOS',M+5,91);pdf.setFont('helvetica','normal');pdf.setFontSize(10);pdf.text('Inventario, composición estimada y prioridad de evacuación',M+5,103);
-  pdf.setFillColor(255,255,255);pdf.roundedRect(M+5,128,176,70,4,4,'F');const cards=[['Tipos registrados',rows.length],['Stock actual',totalStock.toFixed(2)+' tn'],['Ingresos acumulados',totalIngresos.toFixed(2)+' tn'],['Alertas de evacuación',alertas.length]];cards.forEach((a,i)=>{const x=M+12+(i%2)*84,y=139+Math.floor(i/2)*28;pdf.setTextColor(...gray);pdf.setFontSize(8);pdf.text(a[0],x,y);pdf.setTextColor(...(i===3&&alertas.length?orange:green));pdf.setFont('helvetica','bold');pdf.setFontSize(15);pdf.text(String(a[1]),x,y+10);});
+  pdf.setFillColor(255,255,255);pdf.roundedRect(M+5,128,176,70,4,4,'F');const cards=[['Materiales en stock',rows.length],['Stock actual',totalStock.toFixed(2)+' tn'],['Ingresos acumulados',totalIngresos.toFixed(2)+' tn'],['Alertas de evacuación',alertas.length]];cards.forEach((a,i)=>{const x=M+12+(i%2)*84,y=139+Math.floor(i/2)*28;pdf.setTextColor(...gray);pdf.setFontSize(8);pdf.text(a[0],x,y);pdf.setTextColor(...(i===3&&alertas.length?orange:green));pdf.setFont('helvetica','bold');pdf.setFontSize(15);pdf.text(String(a[1]),x,y+10);});
   pdf.setTextColor(220,236,224);pdf.setFont('helvetica','normal');pdf.setFontSize(8);pdf.text('Emitido: '+new Date().toLocaleDateString('es-PE',{year:'numeric',month:'long',day:'numeric'}),M+5,258);pdf.text('Documento generado desde SEAMX · Toda la operación en un solo lugar',M+5,266);footer('Portada');
   // Resumen gerencial
   pdf.addPage();header('RESUMEN GERENCIAL','Indicadores consolidados y prioridades operativas');let y=43;
@@ -6491,11 +6524,43 @@ function activityTaskActions(a){
   let actions=`<button class="btn btn-outline btn-sm" onclick="viewActivityEvidence(${a.id})">Ver detalle</button>`;if(activityCanReview()&&(a.descripcionCierre||activityEvidenceCount(a)))actions+=` <button class="btn btn-sm" style="background:#0f766e;color:#fff;padding:6px 9px" onclick="openRevision(${a.id})">Revisar</button>`;if(activityCanEditRecord())actions+=` <button class="btn btn-outline btn-sm" onclick="editActividad(${a.id})">Editar</button> <button class="btn btn-sm" style="background:#fdedec;color:#b42318;padding:6px 9px" onclick="deleteActividad(${a.id})">×</button>`;return actions;
 }
 function renderActividades(){
-  toggleActivityRange();const data=activityFilteredData(),btn=document.getElementById('btn-asignar-actividad');if(btn)btn.style.display=activityCanAssign()?'inline-flex':'none';renderActivitiesDashboard(data);renderActivitiesOperator(data);renderActivitiesManagement(data);
-  const tbody=document.getElementById('tbody-actividades');if(!tbody)return;const tableDate=document.getElementById('activity-table-date')?.value||'';const tableData=tableDate?data.filter(a=>a.fecha===tableDate):data;if(!tableData.length){tbody.innerHTML='<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--text-m)">Sin actividades para los filtros seleccionados</td></tr>';return;}
-  tbody.innerHTML=tableData.map(a=>{const st=activityStatusInfo(a.estado),e=activityEvidenceCount(a),rev=a.revision||'pending';return `<tr><td>${formatDate(a.fecha)}</td><td><strong>${escapeHtml(a.operador)}</strong></td><td>${escapeHtml(a.area)}</td><td style="max-width:260px"><strong style="font-size:12px">${escapeHtml(a.actividad)}</strong><div style="font-size:10px;color:var(--text-m);margin-top:2px">${escapeHtml(a.obs||'')}</div></td><td>${a.inicio||'—'}</td><td>${a.fin||'—'}</td><td>${Number(a.calc?.hh||0).toFixed(1)} h</td><td><span class="activity-status ${st.key}">${st.label}</span></td><td>${e}/3${a.descripcionCierre?' · cierre ✓':''}</td><td class="activity-table-review"><span class="activity-review-badge ${rev}">${activityReviewLabel(rev)}</span></td><td>${escapeHtml(a.asignadoNombre||a.asignadoPor||'—')}</td><td style="white-space:nowrap">${activityTaskActions(a)}</td></tr>`;}).join('');
+  toggleActivityRange();const data=activityFilteredData(),btn=document.getElementById('btn-asignar-actividad');if(btn)btn.style.display=activityCanAssign()?'inline-flex':'none';renderActivitiesDashboard(data);renderActivitiesOperator(data);renderActivitiesManagement(data);renderActivityCalendar(activityCalendarDataset());
 }
 function filterActividades(){renderActividades();}
+
+
+/* ===== SEAMX · Calendario de actividades y Control de patios operacional ===== */
+let ACTIVITY_CALENDAR_CURSOR=new Date();
+function activityCalendarDateParts(date){return {y:date.getFullYear(),m:date.getMonth()};}
+function activityCalendarDataset(){let rows=[...(APP.data.actividades||[])];if(activityIsFieldUser())rows=rows.filter(activityUserMatch);return rows;}
+function goActivityCalendarToday(){ACTIVITY_CALENDAR_CURSOR=new Date();renderActivityCalendar(activityCalendarDataset());}
+function changeActivityCalendarMonth(delta){const d=new Date(ACTIVITY_CALENDAR_CURSOR);d.setDate(1);d.setMonth(d.getMonth()+Number(delta||0));ACTIVITY_CALENDAR_CURSOR=d;renderActivityCalendar(activityCalendarDataset());}
+function activityCalendarGroupRows(rows){return activityGroups(rows).map(g=>{const first=g.members[0],st=activityGroupStatus(g.members);return{...g,first,status:st,people:g.members.map(x=>x.operador).filter(Boolean)};});}
+function renderActivityCalendar(data){
+  const box=document.getElementById('activity-calendar'),title=document.getElementById('activity-calendar-title');if(!box)return;
+  const cursor=new Date(ACTIVITY_CALENDAR_CURSOR);const y=cursor.getFullYear(),m=cursor.getMonth();
+  if(title)title.textContent=new Intl.DateTimeFormat('es-PE',{month:'long',year:'numeric'}).format(new Date(y,m,1));
+  const first=new Date(y,m,1),last=new Date(y,m+1,0);const mondayOffset=(first.getDay()+6)%7;const start=new Date(y,m,1-mondayOffset);const endOffset=(7-((last.getDay()+6)%7)-1);const end=new Date(y,m,last.getDate()+endOffset);
+  const rows=activityCalendarGroupRows(data||[]);const byDate=new Map();for(const g of rows){const k=g.first.fecha;if(!byDate.has(k))byDate.set(k,[]);byDate.get(k).push(g);}
+  const cells=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){const date=new Date(d),iso=`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`,items=(byDate.get(iso)||[]),same=date.getMonth()===m,today=iso===seamxToday();
+    const visible=items.slice(0,4).map(g=>`<div class="activity-calendar-item ${g.status.key}" title="${escapeHtml(g.first.actividad)} · ${escapeHtml(g.people.join(', '))}"><strong>${escapeHtml(g.first.actividad)}</strong><small>${escapeHtml(g.first.area||'General')} · ${g.people.length} ${g.people.length===1?'persona':'personas'} · ${g.status.label}</small></div>`).join('');
+    cells.push(`<div class="activity-calendar-day ${same?'':'other'} ${today?'today':''}"><div class="activity-calendar-day-number">${date.getDate()}</div><div class="activity-calendar-items">${visible}${items.length>4?`<div class="activity-calendar-more">+ ${items.length-4} actividad${items.length-4===1?'':'es'}</div>`:''}</div></div>`);
+  }
+  box.innerHTML=cells.join('');
+}
+function patioVehicleElapsedMinutes(m){
+  if(!m?.fecha||!m?.inicio)return 0;const t=new Date(`${m.fecha}T${m.inicio}:00`);if(Number.isNaN(t.getTime()))return 0;return Math.max(0,Math.round((Date.now()-t.getTime())/60000));
+}
+function renderPatioOperationalView(data){
+  const liveBox=document.getElementById('patio-live-board'),feed=document.getElementById('patio-movement-feed'),mat=document.getElementById('patio-material-summary');if(!liveBox||!feed||!mat)return;
+  const rows=[...(data||[])],live=rows.filter(m=>!m.fin).sort((a,b)=>patioVehicleElapsedMinutes(b)-patioVehicleElapsedMinutes(a));
+  liveBox.innerHTML=live.length?live.map(m=>{const v=vehicleVisual(m.vehiculo),mins=patioVehicleElapsedMinutes(m);return `<div class="patio-live-unit"><div class="patio-live-icon">${v.icon}</div><div class="patio-live-info"><strong>${escapeHtml(m.placa||m.vehiculo||'Vehículo')}</strong><span>${escapeHtml(m.vehiculo||'')} · ${Number(m.peso||0).toFixed(2)} tn</span><span>${escapeHtml(m.descripcion||'Sin descripción')}</span></div><div class="patio-live-time"><span>Ingreso ${escapeHtml(m.inicio||'—')}</span><b>${fmtDurationMinutes(mins)}</b></div></div>`;}).join(''):'<div class="patio-empty-state">No hay vehículos con permanencia abierta en el patio.</div>';
+  const events=[];for(const m of rows){events.push({date:m.fecha,time:m.inicio||'',type:'in',m});if(m.fin)events.push({date:m.fecha,time:m.fin,type:'out',m});}
+  events.sort((a,b)=>`${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+  feed.innerHTML=events.length?events.slice(0,12).map(e=>`<div class="patio-feed-item"><div class="patio-feed-icon">${e.type==='in'?'↘':'↗'}</div><div class="patio-feed-main"><strong>${e.type==='in'?'Ingreso':'Salida'} · ${escapeHtml(e.m.placa||e.m.vehiculo||'Vehículo')}</strong><span>${escapeHtml(e.m.descripcion||'Sin descripción')} · ${Number(e.m.peso||0).toFixed(2)} tn</span></div><div class="patio-feed-time">${formatDate(e.date)}<br>${escapeHtml(e.time||'—')}</div></div>`).join(''):'<div class="patio-empty-state">Sin movimientos para los filtros seleccionados.</div>';
+  const byMat={};for(const m of live){const key=(m.tipoResiduo||m.subclase||'Sin clasificar').trim()||'Sin clasificar';if(!byMat[key])byMat[key]={tn:0,count:0};byMat[key].tn+=Number(m.peso||0);byMat[key].count++;}
+  const mats=Object.entries(byMat).sort((a,b)=>b[1].tn-a[1].tn);mat.innerHTML=mats.length?mats.map(([name,v])=>`<div class="patio-material-chip"><span>${escapeHtml(name)}</span><strong>${v.tn.toFixed(2)} tn</strong><span>${v.count} vehículo${v.count===1?'':'s'} en patio</span></div>`).join(''):'<div class="patio-empty-state">Actualmente no hay material asociado a vehículos con permanencia abierta.</div>';
+}
 
 /* ===== PWA INSTALL ===== */
 let deferredPrompt = null;
