@@ -1,4 +1,4 @@
-const CACHE_NAME='seamx-shell-ops-current-20260903';
+const CACHE_NAME='seamx-shell-current-ops';
 
 const CORE_ASSETS=[
   './',
@@ -55,11 +55,7 @@ self.addEventListener('install',event=>{
 
         }catch(_){
 
-          /*
-           * Algunos recursos externos pueden
-           * no estar disponibles temporalmente.
-           * Esto no impide instalar SEAMX.
-           */
+          /* Recurso opcional */
 
         }
 
@@ -104,9 +100,6 @@ self.addEventListener('activate',event=>{
 
 self.addEventListener('fetch',event=>{
 
-  /*
-   * Solamente almacenamos solicitudes GET.
-   */
   if(event.request.method!=='GET'){
     return;
   }
@@ -116,14 +109,8 @@ self.addEventListener('fetch',event=>{
 
 
   /*
-   * SUPABASE
-   *
-   * La información operacional debe obtenerse
-   * directamente desde Supabase.
-   *
-   * No queremos que actividades, usuarios,
-   * estados, evidencias o movimientos queden
-   * atrapados en una respuesta antigua.
+   * Supabase siempre trabaja con datos actuales.
+   * No se almacenan sus respuestas en caché.
    */
   if(
     requestUrl.origin.includes('supabase.co')
@@ -139,15 +126,9 @@ self.addEventListener('fetch',event=>{
 
 
     /*
-     * ==========================
-     * NAVEGACIÓN / INDEX.HTML
-     * ==========================
-     *
-     * Primero busca la versión más reciente
-     * publicada en GitHub / Netlify.
-     *
-     * Si el dispositivo está sin conexión,
-     * carga la última copia disponible.
+     * index.html:
+     * primero intenta cargar la versión publicada.
+     * Si no existe conexión utiliza la copia offline.
      */
     if(
       event.request.mode==='navigate'
@@ -188,14 +169,7 @@ self.addEventListener('fetch',event=>{
 
 
     /*
-     * ==========================
-     * RECURSOS ESTÁTICOS
-     * ==========================
-     *
-     * Imágenes, librerías, etc.
-     *
-     * Se muestra primero la copia almacenada
-     * y se intenta actualizar en segundo plano.
+     * Recursos estáticos.
      */
     const cached=
       await cache.match(event.request);
@@ -233,8 +207,7 @@ self.addEventListener('fetch',event=>{
 
 
     /*
-     * Si todavía no existe una copia,
-     * descargar el recurso y almacenarlo.
+     * Recurso todavía no almacenado.
      */
     try{
 
