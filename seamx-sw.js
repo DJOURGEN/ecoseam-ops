@@ -1,10 +1,11 @@
-const CACHE_NAME='seamx-shell-live-activity-review';
+const CACHE_NAME='seamx-shell-ops-current-20260903';
 
 const CORE_ASSETS=[
   './',
   './index.html',
   './logo-ecoseam.png',
   './manifest.json',
+
   'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
   'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js',
@@ -15,61 +16,97 @@ const CORE_ASSETS=[
 ];
 
 self.addEventListener('install',event=>{
+
   event.waitUntil((async()=>{
-    const cache=await caches.open(CACHE_NAME);
+
+    const cache=
+      await caches.open(CACHE_NAME);
 
     await Promise.allSettled(
-      CORE_ASSETS.map(async url=>{
-        try{
-          const response=await fetch(
-            url,
-            {
-              mode:url.startsWith('http') ? 'cors' : 'same-origin',
-              cache:'no-cache'
-            }
-          );
 
-          if(response.ok || response.type==='opaque'){
+      CORE_ASSETS.map(async url=>{
+
+        try{
+
+          const response=
+            await fetch(
+              url,
+              {
+                mode:
+                  url.startsWith('http')
+                    ? 'cors'
+                    : 'same-origin',
+
+                cache:'no-cache'
+              }
+            );
+
+          if(
+            response.ok ||
+            response.type==='opaque'
+          ){
+
             await cache.put(
               url,
               response.clone()
             );
+
           }
 
         }catch(_){
-          /* recurso opcional */
+
+          /*
+           * Algunos recursos externos pueden
+           * no estar disponibles temporalmente.
+           * Esto no impide instalar SEAMX.
+           */
+
         }
+
       })
+
     );
 
     await self.skipWaiting();
+
   })());
+
 });
 
+
 self.addEventListener('activate',event=>{
+
   event.waitUntil((async()=>{
 
-    const keys=await caches.keys();
+    const keys=
+      await caches.keys();
 
     await Promise.all(
+
       keys
         .filter(
-          k=>
-            k.startsWith('seamx-shell-') &&
-            k!==CACHE_NAME
+          key=>
+            key.startsWith('seamx-shell-') &&
+            key!==CACHE_NAME
         )
         .map(
-          k=>caches.delete(k)
+          key=>caches.delete(key)
         )
+
     );
 
     await self.clients.claim();
 
   })());
+
 });
+
 
 self.addEventListener('fetch',event=>{
 
+  /*
+   * Solamente almacenamos solicitudes GET.
+   */
   if(event.request.method!=='GET'){
     return;
   }
@@ -77,20 +114,44 @@ self.addEventListener('fetch',event=>{
   const requestUrl=
     new URL(event.request.url);
 
-  // Supabase siempre debe consultar información actual.
+
+  /*
+   * SUPABASE
+   *
+   * La información operacional debe obtenerse
+   * directamente desde Supabase.
+   *
+   * No queremos que actividades, usuarios,
+   * estados, evidencias o movimientos queden
+   * atrapados en una respuesta antigua.
+   */
   if(
     requestUrl.origin.includes('supabase.co')
   ){
     return;
   }
 
+
   event.respondWith((async()=>{
 
     const cache=
       await caches.open(CACHE_NAME);
 
-    // Navegación principal
-    if(event.request.mode==='navigate'){
+
+    /*
+     * ==========================
+     * NAVEGACIÓN / INDEX.HTML
+     * ==========================
+     *
+     * Primero busca la versión más reciente
+     * publicada en GitHub / Netlify.
+     *
+     * Si el dispositivo está sin conexión,
+     * carga la última copia disponible.
+     */
+    if(
+      event.request.mode==='navigate'
+    ){
 
       try{
 
@@ -125,9 +186,20 @@ self.addEventListener('fetch',event=>{
 
     }
 
-    // Recursos estáticos
+
+    /*
+     * ==========================
+     * RECURSOS ESTÁTICOS
+     * ==========================
+     *
+     * Imágenes, librerías, etc.
+     *
+     * Se muestra primero la copia almacenada
+     * y se intenta actualizar en segundo plano.
+     */
     const cached=
       await cache.match(event.request);
+
 
     if(cached){
 
@@ -159,6 +231,11 @@ self.addEventListener('fetch',event=>{
 
     }
 
+
+    /*
+     * Si todavía no existe una copia,
+     * descargar el recurso y almacenarlo.
+     */
     try{
 
       const network=
