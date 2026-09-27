@@ -1805,12 +1805,10 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
         <div class="page-header">
           <div>
             <div class="page-title">Ocupabilidad del Patio 4388</div>
-            <div class="page-subtitle">Los ingresos se toman automáticamente de Control de patios; las evacuaciones se registran únicamente aquí</div>
+            <div class="page-subtitle">Ingresos desde Control de patios y evacuaciones desde Excel IDO se integran automáticamente para recalcular la ocupabilidad.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-outline" onclick="renderOcupabilidad()">↻ Actualizar</button>
-            <button class="btn btn-outline" onclick="compartirReporteOcupabilidad()">▣ Reporte WhatsApp</button>
-            <button class="btn btn-primary" id="btn-nueva-evacuacion" onclick="openEvacuacionModal()">+ Registrar evacuación</button>
+            <span class="occ-plan-badge" style="padding:9px 12px;background:#eafaf1;color:#1e8449;border-color:#bfe2c7">● Sincronización automática</span>
           </div>
         </div>
 
@@ -1875,11 +1873,11 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
         <div class="card" style="padding:0">
           <div class="card-header" style="padding:18px 20px 0">
-            <div><div class="card-title">Evacuaciones registradas</div><div class="card-subtitle">Estos registros reducen únicamente el área seleccionada</div></div>
+            <div><div class="card-title">Evacuaciones automáticas · Excel IDO</div><div class="card-subtitle">SEAMX clasifica cada salida por descripción y descuenta automáticamente el área correspondiente del Patio 4388.</div></div>
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Fecha</th><th>Área</th><th>Descripción</th><th>Toneladas</th><th>m² reducidos</th><th>Registrado por</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Clase</th><th>Subclase</th><th>Descripción</th><th>Zona de carga</th><th>Peso (tn)</th><th>Área detectada</th><th>m² liberados</th><th>Ticket</th></tr></thead>
               <tbody id="tbody-ocupabilidad-evacuaciones"></tbody>
             </table>
           </div>
@@ -3230,13 +3228,18 @@ function appMovimientoToDb(m) {
 function dbOcupabilidadEvacuacionToApp(row){
   return {
     id: row.id,
-    fecha: row.fecha,
+    fecha: row.fecha || '',
     areaId: row.area_id || '',
+    clase: row.clase || '',
+    subclase: row.subclase || '',
+    tipoResiduo: row.tipo_residuo || '',
     descripcion: row.descripcion || '',
-    toneladas: Number(row.toneladas || 0),
+    zonaCarga: row.zona_carga || row.origen || '',
+    toneladas: Number(row.peso_tn ?? row.peso_4388 ?? row.toneladas ?? 0),
+    ticketBalanza: row.ticket_balanza || '',
     observacion: row.observacion || '',
-    registradoPor: row.registrado_por || '',
-    createdAt: row.created_at || ''
+    registradoPor: row.registrado_por || 'Excel IDO',
+    createdAt: row.created_at || row.fecha_sincronizacion || ''
   };
 }
 function appOcupabilidadEvacuacionToDb(e){
@@ -3302,7 +3305,7 @@ async function loadAllDataOnline() {
     db.from('restricciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('usuarios').select('*').order('id', { ascending: true }),
     db.from('movimientos_material').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
-    db.from('ocupabilidad_evacuaciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
+    db.from('evacuaciones_excel').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('coproductos').select('*').order('id', { ascending: false }),
     db.from('movimientos_coproductos').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('seguridad_documentos').select('*').eq('activo',true).order('created_at',{ascending:false}),
@@ -3320,7 +3323,7 @@ async function loadAllDataOnline() {
   if(restRes.error) console.error('Error cargando restricciones:', restRes.error);
   if(userRes.error) console.error('Error cargando usuarios:', userRes.error);
   if(movRes.error) console.error('Error cargando movimientos:', movRes.error);
-  if(occEvacRes.error) console.warn('Evacuaciones de ocupabilidad pendientes de configurar:', occEvacRes.error.message);
+  if(occEvacRes.error) console.warn('Evacuaciones automáticas desde Excel pendientes de configurar:', occEvacRes.error.message);
   if(coproRes.error) console.error('Error cargando coproductos:', coproRes.error);
   if(coproMovRes.error) console.error('Error cargando movimientos de coproductos:', coproMovRes.error);
   if(segDocRes.error) console.warn('Módulo seguridad pendiente de configurar:', segDocRes.error.message);
@@ -3383,6 +3386,17 @@ async function loadAllData(){
   try{await loadAllDataOnline();}
   catch(err){console.error('Carga online falló:',err);if(restoreCachedAppData()){showToast('Usando la última información guardada en este equipo','warning');updateOfflineUI();}}
 }
+
+// Actualiza evacuaciones automáticas sin botón manual.
+setInterval(async()=>{
+  if(!navigator.onLine||APP.currentView!=='ocupabilidad')return;
+  try{
+    const {data,error}=await db.from('evacuaciones_excel').select('*').order('fecha',{ascending:false}).order('id',{ascending:false});
+    if(error)return;
+    APP.data.ocupabilidadEvacuaciones=(data||[]).map(dbOcupabilidadEvacuacionToApp);
+    renderOcupabilidad();
+  }catch(e){console.warn('Actualización automática de evacuaciones:',e);}
+},60000);
 
 /* ===== SAMPLE DATA ===== */
 function initSampleData() {
@@ -4750,6 +4764,19 @@ function inferOccAreaFromIngreso(m){
   if(/livian|baranda|escalera|anaquel|malla|calamina|locker|cama|estante|bandeja|perno|clavo|lata|estructura pequena|rejilla/.test(t))return getOccAreaById('rrmm_livianos');
   return getOccAreaById(String(m?.tipoResiduo||'').toLowerCase().includes('livian')?'rrmm_livianos':'rrmm_varios_op');
 }
+function inferOccAreaFromEvacuacion(e){
+  const pseudo={
+    descripcion:`${e?.descripcion||''} ${e?.clase||''}`,
+    tipoResiduo:e?.tipoResiduo||e?.clase||'',
+    subclase:e?.subclase||''
+  };
+  return inferOccAreaFromIngreso(pseudo);
+}
+function isEvacuacionPatio4388(e){
+  const z=occNormalizeText(e?.zonaCarga||'');
+  return !z || /4388/.test(z);
+}
+
 function getOccStatus(pct){
   if(pct>OCC_LIMIT)return{key:'critical',label:'Sobre el límite'};
   if(pct>=0.35)return{key:'alert',label:'Próximo al límite'};
@@ -4767,12 +4794,13 @@ function calculateOcupabilidad(){
     item.movements.push({fecha:m.fecha,type:'ingreso',tn,m2,descripcion:m.descripcion||'Ingreso de Control de patios',source:'Control de patios'});
   });
   (APP.data.ocupabilidadEvacuaciones||[]).forEach(e=>{
-    if(!e.fecha||e.fecha<=OCC_BASE_DATE)return;
-    const item=byId[e.areaId],tn=Number(e.toneladas||0);
+    if(!e.fecha||e.fecha<=OCC_BASE_DATE||!isEvacuacionPatio4388(e))return;
+    const area=e.areaId?getOccAreaById(e.areaId):inferOccAreaFromEvacuacion(e);
+    const item=area?byId[area.id]:null,tn=Number(e.toneladas||0);
     if(!item||!Number.isFinite(tn)||tn<=0)return;
     const m2=tn/item.factor;
     item.tnOut+=tn;item.m2Out+=m2;item.occupiedM2-=m2;
-    item.movements.push({fecha:e.fecha,type:'evacuacion',tn,m2,descripcion:e.descripcion||'Evacuación',source:'Ocupabilidad'});
+    item.movements.push({fecha:e.fecha,type:'evacuacion',tn,m2,descripcion:e.descripcion||'Evacuación Excel IDO',source:'Excel IDO'});
   });
   result.forEach(item=>{
     item.occupiedM2=Math.max(0,item.occupiedM2);
@@ -4912,7 +4940,6 @@ function renderOcupabilidad(){
   const data=calculateOcupabilidad(),totalArea=data.reduce((s,a)=>s+a.totalM2,0),occupied=data.reduce((s,a)=>s+a.occupiedM2,0),base=data.reduce((s,a)=>s+a.baseM2,0),pct=totalArea?occupied/totalArea:0,critical=data.filter(a=>a.pct>OCC_LIMIT).length,net=occupied-base;
   const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
   set('occ-kpi-total',(pct*100).toFixed(1)+'%');set('occ-kpi-m2',occupied.toFixed(1));set('occ-kpi-critical',critical);set('occ-kpi-net',(net>=0?'+':'')+net.toFixed(1));set('occ-last-update','Actualizado '+new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}));
-  const btn=document.getElementById('btn-nueva-evacuacion');if(btn)btn.style.display=canEditOcupabilidad()?'inline-flex':'none';
   document.querySelectorAll('.occ-zone').forEach(zone=>{
     const item=data.find(a=>a.id===zone.dataset.areaId);if(!item)return;
     zone.classList.remove('status-ok','status-alert','status-critical','selected');zone.classList.add('status-'+item.status.key);if(item.id===OCC_SELECTED_AREA_ID)zone.classList.add('selected');
@@ -4980,8 +5007,21 @@ async function deleteOcupabilidadEvacuacion(id){
 }
 function renderOcupabilidadEvacuaciones(){
   const tbody=document.getElementById('tbody-ocupabilidad-evacuaciones');if(!tbody)return;
-  const rows=[...(APP.data.ocupabilidadEvacuaciones||[])].sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))||Number(b.id)-Number(a.id));
-  tbody.innerHTML=rows.length?rows.map(e=>{const area=getOccAreaById(e.areaId),m2=area?e.toneladas/area.factor:0;return`<tr><td>${formatDate(e.fecha)}</td><td><strong>${escapeHtml(area?.short||e.areaId)}</strong></td><td>${escapeHtml(e.descripcion)}</td><td>${e.toneladas.toFixed(3)}</td><td><strong>${m2.toFixed(2)}</strong></td><td>${escapeHtml(e.registradoPor||'—')}</td><td style="white-space:nowrap">${canEditOcupabilidad()?`<button class="btn btn-outline btn-sm" onclick="openEvacuacionModal(${e.id})">Editar</button> <button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteOcupabilidadEvacuacion(${e.id})">×</button>`:'<span class="occ-table-badge">Solo lectura</span>'}</td></tr>`;}).join(''):`<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--text-m)">No hay evacuaciones registradas.</td></tr>`;
+  const rows=[...(APP.data.ocupabilidadEvacuaciones||[])].filter(isEvacuacionPatio4388).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))||Number(b.id)-Number(a.id));
+  tbody.innerHTML=rows.length?rows.map(e=>{
+    const area=e.areaId?getOccAreaById(e.areaId):inferOccAreaFromEvacuacion(e),tn=Number(e.toneladas||0),m2=area&&Number.isFinite(tn)?tn/area.factor:0;
+    return `<tr>
+      <td>${formatDate(e.fecha)}</td>
+      <td>${escapeHtml(e.clase||'—')}</td>
+      <td>${escapeHtml(e.subclase||'—')}</td>
+      <td><strong>${escapeHtml(e.descripcion||'—')}</strong></td>
+      <td>${escapeHtml(e.zonaCarga||'Patio 4388')}</td>
+      <td><strong>${tn.toFixed(3)}</strong></td>
+      <td><span class="occ-table-badge">${escapeHtml(area?.short||'Sin clasificar')}</span></td>
+      <td><strong>${m2.toFixed(2)}</strong></td>
+      <td>${escapeHtml(e.ticketBalanza||'—')}</td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--text-m)">Aún no hay evacuaciones sincronizadas desde Excel IDO.</td></tr>`;
 }
 
 /* ===== RENDER USUARIOS ===== */
