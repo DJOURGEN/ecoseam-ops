@@ -1,10 +1,11 @@
-const CACHE_NAME='seamx-shell-20260904-ops-maint';
+const CACHE_NAME = 'seamx-shell-20260928-v3';
 
-const CORE_ASSETS=[
+const CORE_ASSETS = [
   './',
   './index.html',
   './logo-ecoseam.png',
   './manifest.json',
+
   'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
   'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js',
@@ -14,164 +15,336 @@ const CORE_ASSETS=[
   'https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js'
 ];
 
-self.addEventListener('install',event=>{
-  event.waitUntil((async()=>{
-    const cache=await caches.open(CACHE_NAME);
+
+/* =========================================================
+   INSTALACION
+   ========================================================= */
+
+self.addEventListener('install', event => {
+
+  event.waitUntil((async () => {
+
+    const cache = await caches.open(CACHE_NAME);
 
     await Promise.allSettled(
-      CORE_ASSETS.map(async url=>{
-        try{
-          const response=await fetch(
+
+      CORE_ASSETS.map(async url => {
+
+        try {
+
+          const response = await fetch(
             url,
             {
-              mode:url.startsWith('http')?'cors':'same-origin',
-              cache:'no-cache'
+              mode: url.startsWith('http')
+                ? 'cors'
+                : 'same-origin',
+
+              cache: 'no-store'
             }
           );
 
-          if(response.ok||response.type==='opaque'){
-            await cache.put(url,response.clone());
+          if (
+            response.ok ||
+            response.type === 'opaque'
+          ) {
+
+            await cache.put(
+              url,
+              response.clone()
+            );
+
           }
 
-        }catch(_){}
+        } catch (_) {}
+
       })
+
     );
 
     await self.skipWaiting();
+
   })());
+
 });
 
-self.addEventListener('activate',event=>{
-  event.waitUntil((async()=>{
 
-    const keys=await caches.keys();
+/* =========================================================
+   ACTIVACION
+   ELIMINA CACHE ANTIGUO
+   ========================================================= */
+
+self.addEventListener('activate', event => {
+
+  event.waitUntil((async () => {
+
+    const keys = await caches.keys();
 
     await Promise.all(
+
       keys
-        .filter(
-          k=>
-            k.startsWith('seamx-shell-') &&
-            k!==CACHE_NAME
+        .filter(cacheName => {
+
+          return (
+            cacheName.startsWith('seamx-shell-') &&
+            cacheName !== CACHE_NAME
+          );
+
+        })
+
+        .map(cacheName =>
+          caches.delete(cacheName)
         )
-        .map(k=>caches.delete(k))
+
     );
 
     await self.clients.claim();
 
   })());
+
 });
 
-self.addEventListener('fetch',event=>{
 
-  if(event.request.method!=='GET'){
+/* =========================================================
+   FETCH
+   ========================================================= */
+
+self.addEventListener('fetch', event => {
+
+  if (
+    event.request.method !== 'GET'
+  ) {
     return;
   }
 
-  const requestUrl=
+
+  const requestUrl =
     new URL(event.request.url);
 
-  /*
-   * Supabase siempre consulta información
-   * actual y no utiliza la caché offline.
-   */
-  if(
-    requestUrl.origin.includes('supabase.co')
-  ){
+
+  /* =======================================================
+     SUPABASE
+     SIEMPRE ONLINE
+     NO CACHEAR DATOS OPERATIVOS
+     ======================================================= */
+
+  if (
+    requestUrl.hostname.includes(
+      'supabase.co'
+    )
+  ) {
+
+    event.respondWith(
+      fetch(
+        event.request,
+        {
+          cache: 'no-store'
+        }
+      )
+    );
+
     return;
+
   }
 
-  event.respondWith((async()=>{
 
-    const cache=
-      await caches.open(CACHE_NAME);
+  /* =======================================================
+     NETLIFY / INDEX PRINCIPAL
+     NETWORK FIRST
+     ======================================================= */
 
-    /*
-     * Aplicación principal:
-     * primero intenta obtener la última
-     * publicación disponible.
-     */
-    if(
-      event.request.mode==='navigate'
-    ){
+  if (
+    event.request.mode === 'navigate'
+  ) {
 
-      try{
+    event.respondWith((async () => {
 
-        const network=
+      const cache =
+        await caches.open(CACHE_NAME);
+
+
+      try {
+
+        const networkResponse =
           await fetch(
             event.request,
             {
-              cache:'no-cache'
+              cache: 'no-store'
             }
           );
 
-        if(network.ok){
+
+        if (
+          networkResponse.ok
+        ) {
 
           await cache.put(
             './index.html',
-            network.clone()
+            networkResponse.clone()
           );
 
         }
 
-        return network;
 
-      }catch(_){
+        return networkResponse;
 
-        return (
-          (await cache.match('./index.html')) ||
-          (await cache.match('./')) ||
-          Response.error()
+
+      } catch (_) {
+
+
+        const cachedIndex =
+          await cache.match(
+            './index.html'
+          );
+
+
+        if (cachedIndex) {
+          return cachedIndex;
+        }
+
+
+        const cachedRoot =
+          await cache.match('./');
+
+
+        if (cachedRoot) {
+          return cachedRoot;
+        }
+
+
+        return new Response(
+          'SEAMX no tiene conexión y no existe una versión offline disponible.',
+          {
+            status: 503,
+            headers: {
+              'Content-Type':
+                'text/plain; charset=utf-8'
+            }
+          }
         );
 
       }
 
-    }
+    })());
 
-    /*
-     * Recursos estáticos.
-     */
-    const cached=
-      await cache.match(event.request);
+    return;
 
-    if(cached){
+  }
 
-      event.waitUntil(
 
-        fetch(event.request)
+  /* =======================================================
+     ARCHIVOS DEL MISMO DOMINIO
+     STALE WHILE REVALIDATE
+     ======================================================= */
 
-          .then(response=>{
+  if (
+    requestUrl.origin ===
+    self.location.origin
+  ) {
 
-            if(
-              response.ok ||
-              response.type==='opaque'
-            ){
+    event.respondWith((async () => {
 
-              return cache.put(
+      const cache =
+        await caches.open(CACHE_NAME);
+
+
+      const cached =
+        await cache.match(
+          event.request
+        );
+
+
+      const networkPromise =
+
+        fetch(
+          event.request,
+          {
+            cache: 'no-cache'
+          }
+        )
+
+          .then(async response => {
+
+            if (
+              response.ok
+            ) {
+
+              await cache.put(
                 event.request,
                 response.clone()
               );
 
             }
 
+            return response;
+
           })
 
-          .catch(()=>{})
+          .catch(() => null);
 
+
+      if (cached) {
+
+        event.waitUntil(
+          networkPromise
+        );
+
+        return cached;
+
+      }
+
+
+      const network =
+        await networkPromise;
+
+
+      if (network) {
+        return network;
+      }
+
+
+      return Response.error();
+
+    })());
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     CDN / RECURSOS EXTERNOS
+     CACHE FIRST
+     ======================================================= */
+
+  event.respondWith((async () => {
+
+    const cache =
+      await caches.open(CACHE_NAME);
+
+
+    const cached =
+      await cache.match(
+        event.request
       );
 
-      return cached;
 
+    if (cached) {
+      return cached;
     }
 
-    try{
 
-      const network=
-        await fetch(event.request);
+    try {
 
-      if(
+      const network =
+        await fetch(
+          event.request
+        );
+
+
+      if (
         network.ok ||
-        network.type==='opaque'
-      ){
+        network.type === 'opaque'
+      ) {
 
         await cache.put(
           event.request,
@@ -180,9 +353,11 @@ self.addEventListener('fetch',event=>{
 
       }
 
+
       return network;
 
-    }catch(_){
+
+    } catch (_) {
 
       return Response.error();
 
