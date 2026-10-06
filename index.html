@@ -2152,7 +2152,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
             <div class="form-group" id="prog-area-otra-group" style="display:none"><label class="form-label">Especificar otra área *</label><input class="form-control" id="prog-area-otra" placeholder="Nombre del área" oninput="previewProgramacionForm()"></div>
             <div class="form-group"><label class="form-label">Descripción del trabajo *</label><textarea class="form-control" id="prog-descripcion" rows="3" placeholder="Ej.: Carguío, descarga y acomodo de MMV"></textarea></div>
             <div class="form-row">
-              <div class="form-group"><label class="form-label">Ingeniero HSE de esta actividad *</label><select class="form-control" id="prog-actividad-hse"><option value="">Seleccionar</option><option>Jeyson Araujo</option><option>Nicol Baca</option><option>Arturo Pajares</option><option>Andres Soto</option><option>Karolinne Aranda</option></select></div>
+              <div class="form-group"><label class="form-label">Supervisor HSE de esta actividad *</label><select class="form-control" id="prog-actividad-hse"><option value="">Seleccionar</option></select></div>
               <div class="form-group"><label class="form-label">Supervisor de esta actividad *</label><select class="form-control" id="prog-actividad-supervisor"><option value="">Seleccionar</option></select></div>
             </div>
 
@@ -2705,6 +2705,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <option value="controlador">🏗️ Controlador de patios</option>
           <option value="mantenimiento">🔧 Mantenimiento</option>
           <option value="supervisor">🔍 Supervisor</option>
+          <option value="supervisor_hse">🦺 Supervisor HSE</option>
           <option value="gerencia">📊 Gerencia</option>
           <option value="admin">⚙️ Administrador</option>
         </select>
@@ -3476,7 +3477,7 @@ function initSampleData() {
 /* ===== ASISTENTE DOCUMENTAL DE SEGURIDAD ===== */
 function normalizarRolSeguridad(rol){
   const r=String(rol||'').trim().toLowerCase();
-  const map={administrador:'admin',administracion:'admin',administrativo:'admin',supervision:'supervisor',supervisor:'supervisor',gerente:'gerencia',gerencia:'gerencia',operadores:'operador',operator:'operador',maintenance:'mantenimiento',mantenedor:'mantenimiento',mantenimiento:'mantenimiento'};
+  const map={administrador:'admin',administracion:'admin',administrativo:'admin',supervision:'supervisor',supervisor:'supervisor',supervisor_hse:'supervisor',gerente:'gerencia',gerencia:'gerencia',operadores:'operador',operator:'operador',maintenance:'mantenimiento',mantenedor:'mantenimiento',mantenimiento:'mantenimiento'};
   return map[r]||r;
 }
 function puedeGestionarSeguridad(){return Boolean(APP.user&&['supervisor','admin'].includes(normalizarRolSeguridad(APP.user.role)));}
@@ -5170,7 +5171,7 @@ async function saveUsuario() {
 
 function renderUsuarios() {
   const tbody=document.getElementById('tbody-usuarios');
-  const rolColors={operador:'background:#e3f0e5;color:#1a5c2a',supervisor:'background:#e3f2fd;color:#0d47a1',controlador:'background:#e8f5e9;color:#1b5e20',mantenimiento:'background:#fff8e1;color:#8a5a00',gerencia:'background:#f3e5f5;color:#6a1b9a',admin:'background:#fff3e0;color:#e65100'};
+  const rolColors={supervisor_hse:'background:#fff8e1;color:#8a5a00',operador:'background:#e3f0e5;color:#1a5c2a',supervisor:'background:#e3f2fd;color:#0d47a1',controlador:'background:#e8f5e9;color:#1b5e20',mantenimiento:'background:#fff8e1;color:#8a5a00',gerencia:'background:#f3e5f5;color:#6a1b9a',admin:'background:#fff3e0;color:#e65100'};
   const thead=tbody.closest('table').querySelector('thead tr');
   if(thead)thead.innerHTML='<th>Usuario</th><th>Nombre completo</th><th>Contraseña</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th>';
   tbody.innerHTML=APP.data.usuarios.map(u=>`
@@ -5178,7 +5179,7 @@ function renderUsuarios() {
       <td><code style="font-size:13px;background:var(--surface-1);padding:2px 8px;border-radius:4px;color:var(--teal);font-weight:600">${escapeHtml(u.login)}</code></td>
       <td style="font-weight:500">${escapeHtml(`${u.nombre||''} ${u.apellido||''}`.trim())}</td>
       <td><span id="pass-${u.id}" style="font-family:monospace;font-size:13px;letter-spacing:2px">••••••</span><button onclick="togglePass(${u.id})" style="background:none;border:none;cursor:pointer;color:var(--text-m);padding:2px 6px;font-size:11px" title="Ver/ocultar contraseña">👁</button></td>
-      <td><span class="badge" style="${rolColors[u.rol]||'background:var(--surface-2);color:var(--text-s)'};text-transform:capitalize">${escapeHtml(u.rol)}</span></td>
+      <td><span class="badge" style="${rolColors[u.rol]||'background:var(--surface-2);color:var(--text-s)'};text-transform:capitalize">${escapeHtml(u.rol==='supervisor_hse'?'Supervisor HSE':u.rol)}</span></td>
       <td>${u.guardia==='ambas'?'A y B':'Guardia '+escapeHtml(u.guardia)}</td>
       <td><span class="badge ${u.activo?'badge-done':'badge-open'}">${u.activo?'Activo':'Inactivo'}</span></td>
       <td style="white-space:nowrap">
@@ -5746,10 +5747,10 @@ function removeProgramacionCharla(index){
   PROGRAMACION_CHARLAS_DRAFT.splice(index,1);renderProgramacionCharlas();previewProgramacionForm();
 }
 
-function programacionSupervisores(){
+function programacionSupervisores(rol='supervisor'){
   const seen=new Set();
   return (APP.data.usuarios||[])
-    .filter(u=>u&&u.activo!==false&&normalizarRolSeguridad(u.rol||u.role)==='supervisor')
+    .filter(u=>u&&u.activo!==false&&String(u.rol||u.role||'').trim().toLowerCase()===rol)
     .map(u=>[u.nombre,u.apellido].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()||String(u.login||'').trim())
     .filter(nombre=>{
       const key=nombre.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -5760,6 +5761,7 @@ function programacionSupervisores(){
 }
 
 function renderProgramacionSupervisores(nombre){
+  renderProgramacionHSE();
   const el=document.getElementById('prog-actividad-supervisor');if(!el)return;
   const seleccionado=nombre===undefined?el.value:nombre;
   const normalizar=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
@@ -5767,6 +5769,16 @@ function renderProgramacionSupervisores(nombre){
   el.innerHTML='<option value="">'+(supervisores.length?'Seleccionar':'Sin supervisores activos')+'</option>'+
     supervisores.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
   el.value=supervisores.find(n=>normalizar(n)===normalizar(seleccionado))||'';
+}
+
+function renderProgramacionHSE(nombre){
+  const el=document.getElementById('prog-actividad-hse');if(!el)return;
+  const seleccionado=nombre===undefined?el.value:nombre;
+  const normalizar=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+  const usuarios=programacionSupervisores('supervisor_hse');
+  el.innerHTML='<option value="">'+(usuarios.length?'Seleccionar':'Sin supervisores HSE activos')+'</option>'+
+    usuarios.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  el.value=usuarios.find(n=>normalizar(n)===normalizar(seleccionado))||'';
 }
 
 function setProgramacionSupervisor(nombre=''){
@@ -5806,7 +5818,7 @@ function loadProgramacionActividad(key){
   document.getElementById('prog-area').value=base.includes(a.area)?a.area:'Otros';
   document.getElementById('prog-area-otra').value=base.includes(a.area)?'':a.area;
   document.getElementById('prog-descripcion').value=a.descripcion;
-  document.getElementById('prog-actividad-hse').value=a.hse||'';
+  renderProgramacionHSE(a.hse||'');
   setProgramacionSupervisor(a.supervisor||APP.user?.name||'');
   toggleProgOtraArea();renderPersonalPicker(a.personal||[]);renderProgramacionDraftList();
 }
