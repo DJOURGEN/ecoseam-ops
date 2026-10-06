@@ -2153,7 +2153,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
             <div class="form-group"><label class="form-label">Descripción del trabajo *</label><textarea class="form-control" id="prog-descripcion" rows="3" placeholder="Ej.: Carguío, descarga y acomodo de MMV"></textarea></div>
             <div class="form-row">
               <div class="form-group"><label class="form-label">Ingeniero HSE de esta actividad *</label><select class="form-control" id="prog-actividad-hse"><option value="">Seleccionar</option><option>Jeyson Araujo</option><option>Nicol Baca</option><option>Arturo Pajares</option><option>Andres Soto</option><option>Karolinne Aranda</option></select></div>
-              <div class="form-group"><label class="form-label">Supervisor de esta actividad *</label><select class="form-control" id="prog-actividad-supervisor"><option value="">Seleccionar</option><option>Alan Rodriguez</option><option>Ericxs Chavez</option><option>Oscar Cueva</option><option>Elvin Rojas</option></select></div>
+              <div class="form-group"><label class="form-label">Supervisor de esta actividad *</label><select class="form-control" id="prog-actividad-supervisor"><option value="">Seleccionar</option></select></div>
             </div>
 
             <div class="prog-section-title"><span>👥</span> Personal de esta actividad <span class="prog-counter" id="prog-person-count" style="margin-left:auto">0 personas</span></div>
@@ -3378,6 +3378,7 @@ async function loadAllDataOnline() {
   APP.data.actividades = (actRes.data || []).map(dbActividadToApp);
   APP.data.restricciones = (restRes.data || []).map(dbRestriccionToApp);
   APP.data.usuarios = userRes.data || [];
+  renderProgramacionSupervisores();
   APP.data.movimientos = (movRes.data || []).map(dbMovimientoToApp);
   APP.data.ocupabilidadEvacuaciones = (occEvacRes.data || []).map(dbOcupabilidadEvacuacionToApp);
   APP.data.coproductos = (coproRes.data || []).map(dbCoproductoToApp);
@@ -5745,12 +5746,31 @@ function removeProgramacionCharla(index){
   PROGRAMACION_CHARLAS_DRAFT.splice(index,1);renderProgramacionCharlas();previewProgramacionForm();
 }
 
-function setProgramacionSupervisor(nombre=''){
+function programacionSupervisores(){
+  const seen=new Set();
+  return (APP.data.usuarios||[])
+    .filter(u=>u&&u.activo!==false&&normalizarRolSeguridad(u.rol||u.role)==='supervisor')
+    .map(u=>[u.nombre,u.apellido].filter(Boolean).join(' ').replace(/\s+/g,' ').trim()||String(u.login||'').trim())
+    .filter(nombre=>{
+      const key=nombre.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      if(!key||seen.has(key))return false;
+      seen.add(key);return true;
+    })
+    .sort((a,b)=>a.localeCompare(b,'es'));
+}
+
+function renderProgramacionSupervisores(nombre){
   const el=document.getElementById('prog-actividad-supervisor');if(!el)return;
-  const normalizar=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-  const buscado=normalizar(nombre);
-  const opcion=[...el.options].find(o=>o.value&&(buscado.includes(normalizar(o.value))||normalizar(o.value).includes(buscado)));
-  el.value=opcion?.value||'';
+  const seleccionado=nombre===undefined?el.value:nombre;
+  const normalizar=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+  const supervisores=programacionSupervisores();
+  el.innerHTML='<option value="">'+(supervisores.length?'Seleccionar':'Sin supervisores activos')+'</option>'+
+    supervisores.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+  el.value=supervisores.find(n=>normalizar(n)===normalizar(seleccionado))||'';
+}
+
+function setProgramacionSupervisor(nombre=''){
+  renderProgramacionSupervisores(nombre);
 }
 
 function clearProgramacionActivityInputs(){
@@ -5858,6 +5878,7 @@ function resetProgramacionForm(keepDate=true){
 }
 
 function renderProgramacion(){
+  renderProgramacionSupervisores();
   const card=document.getElementById('programacion-report-card'),list=document.getElementById('programacion-list');if(!card||!list)return;
   const editable=canEditProgramacion(),fecha=programacionFechaActual();
   const formCard=document.getElementById('programacion-form-card'),badge=document.getElementById('programacion-readonly-badge');
