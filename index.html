@@ -6349,7 +6349,12 @@ async function syncActividadesFromGoogleSheets(options={}){
 
 function normalizeSheetSubclase(value){
   // La hoja de Drive es la fuente de verdad; normalizar solamente ortografía inequívoca.
-  return String(value??'').trim(); // Conservar literalmente 'Metales' u otra subclase del Excel.
+  const raw=String(value??'').trim();
+  const normalized=raw.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ');
+  if(normalized==='metal'||normalized==='metales'||normalized==='metalico'||normalized==='metalicos')return 'Metálico';
+  if(normalized==='no metalico'||normalized==='no metalicos'||normalized==='no metales'||normalized==='caucho')return 'No metálico';
+  // No clasificar valores desconocidos como 'No metálico': mantenerlos para revisión.
+  return raw;
 }
 function normalizeSheetClase(value){
   const t=sheetKey(value);if(t.includes('nopelig'))return 'No peligroso';if(t.includes('pelig'))return 'Peligroso';return String(value||'').trim();
