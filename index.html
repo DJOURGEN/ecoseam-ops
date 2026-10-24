@@ -4636,7 +4636,9 @@ function openMovimientoModal(id=null){
   const currentTime = now.toTimeString().slice(0,5);
   const values = m || {fecha:today,movimiento:'ingreso',subclase:'',clase:'',tipoResiduo:'',descripcion:'',vehiculo:'',placa:'',patioRecepcion:'',empresa:'',peso:'',procedencia:'',gerencia:'',inicio:currentTime,fin:''};
   document.getElementById('mov-fecha').value=values.fecha;
-  document.getElementById('mov-subclase').value=values.subclase;
+  const subSelect=document.getElementById('mov-subclase');
+  if(values.subclase && ![...subSelect.options].some(o=>o.value===values.subclase)){subSelect.add(new Option(values.subclase,values.subclase));}
+  subSelect.value=values.subclase;
   document.getElementById('mov-clase').value=values.clase;
   document.getElementById('mov-residuo').value=values.tipoResiduo;
   document.getElementById('mov-descripcion').value=values.descripcion;
@@ -4729,11 +4731,11 @@ async function deleteMovimiento(id){
 }
 function getPatioFilteredData(){
   const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', t=document.getElementById('patio-tipo-mov')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'', p=document.getElementById('patio-recepcion-filtro')?.value||'';
-  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||(t==='en_patio'?!m.fin:!!m.fin))&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!t||(t==='en_patio'?!m.fin:!!m.fin))&&(!s||((s==='Metálico'?/^(metal|metales)/: /^(no metal|nometal)/).test(occNormalizeText(m.subclase))))&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
 }
 function getPatioChartData(){
   const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'', p=document.getElementById('patio-recepcion-filtro')?.value||'';
-  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||m.subclase===s)&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
+  return APP.data.movimientos.filter(m=>(!d||m.fecha>=d)&&(!h||m.fecha<=h)&&(!s||((s==='Metálico'?/^(metal|metales)/: /^(no metal|nometal)/).test(occNormalizeText(m.subclase))))&&(!g||m.gerencia===g)&&(!p||(p==='Otros'?!['4388','DEG'].includes(m.patioRecepcion):m.patioRecepcion===p)));
 }
 let PATIO_VISIBLE=10;
 function showMorePatioMovimientos(){PATIO_VISIBLE+=10;renderPatios();}
@@ -6347,11 +6349,7 @@ async function syncActividadesFromGoogleSheets(options={}){
 
 function normalizeSheetSubclase(value){
   // La hoja de Drive es la fuente de verdad; normalizar solamente ortografía inequívoca.
-  const raw=String(value??'').trim();
-  const t=sheetKey(raw);
-  if(t==='metalico'||t==='metal')return 'Metálico';
-  if(t==='nometalico'||t==='nometal')return 'No metálico';
-  return raw;
+  return String(value??'').trim(); // Conservar literalmente 'Metales' u otra subclase del Excel.
 }
 function normalizeSheetClase(value){
   const t=sheetKey(value);if(t.includes('nopelig'))return 'No peligroso';if(t.includes('pelig'))return 'Peligroso';return String(value||'').trim();
@@ -6375,9 +6373,9 @@ async function syncMovimientosFromGoogleSheets(options={}){
     if(!response.ok)throw new Error('Respuesta HTTP '+response.status);
     const payload=await response.json();if(payload.ok===false)throw new Error(payload.error||'El conector rechazó la solicitud');
     const rows=Array.isArray(payload)?payload:(Array.isArray(payload.filas)?payload.filas:[]);
-    const records=[];let skipped=0,existingLocal=0;
+    const records=[];const corrections=[];let skipped=0,existingLocal=0;
     rows.forEach((row,index)=>{
-      const externalId=sheetRowValue(row,['ID_EXTERNO','ID SEAMX','ID','Código'])||`${cfg.movementSheet}-${index+2}`;
+      const externalId=sheetRowValue(row,['ID_Registro','ID Registro','ID_EXTERNO','ID SEAMX','ID','Código'])||`${cfg.movementSheet}-${index+2}`;
       const seamxId=String(externalId).match(/^SEAMX-(\d+)$/i);
       if(seamxId&&(APP.data.movimientos||[]).some(m=>Number(m.id)===Number(seamxId[1]))){existingLocal++;return;}
       const fecha=parseSheetDate(sheetRowValue(row,['Fecha','Día']));
@@ -6386,7 +6384,13 @@ async function syncMovimientosFromGoogleSheets(options={}){
       if(!fecha||(!descripcion&&!peso)){skipped++;return;}
       const inicio=parseSheetTime(sheetRowValue(row,['Hora_inicio','Hora inicio','Hora de ingreso','Ingreso','Inicio']));
       const fin=parseSheetTime(sheetRowValue(row,['Hora_fin','Hora fin','Hora de salida','Salida','Fin']));
-      records.push({
+      // Primero comparar el identificador original; después coincidencia unívoca de fecha, placa, peso y descripción.
+      const old=(APP.data.movimientos||[]).find(m=>String(m.externalId||'')===String(externalId)) || (()=>{
+        const matches=(APP.data.movimientos||[]).filter(m=>m.fecha===fecha && sheetKey(m.placa)===sheetKey(sheetRowValue(row,['Placa'])) &&
+          sheetKey(m.descripcion)===sheetKey(descripcion) && Math.abs(Number(m.peso||0)-peso)<0.00001);
+        return matches.length===1?matches[0]:null;
+      })();
+      const record={
         external_id:String(externalId),origen:'google_sheets',fecha,movimiento:'ingreso',
         subclase:normalizeSheetSubclase(sheetRowValue(row,['Subclase','Sub clase'])),
         clase:normalizeSheetClase(sheetRowValue(row,['Clase'])),
@@ -6397,25 +6401,40 @@ async function syncMovimientosFromGoogleSheets(options={}){
         patio_recepcion:sheetRowValue(row,['Patio_recepcion','Patio recepción','Patio de recepción','Patio']),
         empresa:sheetRowValue(row,['Empresa']),
         peso_tn:peso,
-        procedencia:sheetRowValue(row,['Procedencia']),
+        procedencia:sheetRowValue(row,['Procedencia','Origen']),
         gerencia:normalizeGerenciaPatio(sheetRowValue(row,['Gerencia'])),
         hora_inicio:inicio||null,hora_fin:fin||null,
         registrado_por:sheetRowValue(row,['Registrado_por','Registrado por','Usuario','Responsable'])||'appsheet'
-      });
+      };
+      // Evitar alterar campos operativos que no estén presentes en la hoja fuente.
+      if(old){
+        const correction={id:old.id, subclase:record.subclase, clase:record.clase, tipo_residuo:record.tipo_residuo};
+        corrections.push(correction);
+        existingLocal++;
+      } else records.push(record);
     });
-    if(!records.length){
-      if(!silent)showToast(rows.length?`Sin registros nuevos · ${existingLocal} ya pertenecen a SEAMX`:'La hoja de patios no contiene filas','warning');
-      return true;
+    // Reparar filas antiguas ya cargadas en Supabase: la columna ID_Registro del Excel manda.
+    // Solo se actualizan las tres clasificaciones; no se borran movimientos ni horarios.
+    for(const correction of corrections){
+      const {id,...changes}=correction;
+      const {error}=await db.from('movimientos_material').update(changes).eq('id',id);
+      if(error)throw error;
     }
-    const {error}=await db.from('movimientos_material').upsert(records,{onConflict:'external_id'});
-    if(error){
-      console.error(error);
-      if(/external_id|schema cache|column/i.test(error.message||''))throw new Error('Falta ejecutar el SQL de integración disponible en Administración');
-      throw error;
+    if(records.length){
+      const {error}=await db.from('movimientos_material').upsert(records,{onConflict:'external_id'});
+      if(error){
+        console.error(error);
+        if(/external_id|schema cache|column/i.test(error.message||''))throw new Error('Falta ejecutar el SQL de integración disponible en Administración');
+        throw error;
+      }
+    }
+    if(!records.length&&!corrections.length){
+      if(!silent)showToast(rows.length?'Sin cambios de Control de patios':'La hoja de patios no contiene filas','warning');
+      return true;
     }
     localStorage.setItem('seamx_sheets_movements_last_sync',new Date().toISOString());
     await loadAllData();
-    if(!silent)showToast(`${records.length} registros de patios sincronizados${skipped?` · ${skipped} filas omitidas`:''}`,'success');
+    if(!silent)showToast(`${records.length} registros nuevos y ${corrections.length} registros corregidos desde Excel${skipped?` · ${skipped} filas omitidas`:''}`,'success');
     return true;
   }catch(err){console.error(err);if(!silent)showToast('No se pudo importar Control de patios: '+(err.message||'revisa la configuración'),'error');return false;}
 }
@@ -6893,7 +6912,7 @@ function patioBreakdownHtml(items){
   const sums={'Metálico':0,'No metálico':0,'Sin clasificar':0};
   items.forEach(m=>{
     const sub=occNormalizeText(m.subclase).replace(/\s+/g,' ').trim();
-    const key=/\bno\s*metalic/.test(sub)?'No metálico':/\bmetalic/.test(sub)?'Metálico':'Sin clasificar';
+    const key=/^(nometal|no metal|nometalic)/.test(sub)?'No metálico':/^(metal|metales)/.test(sub)?'Metálico':'Sin clasificar';
     sums[key]+=Math.max(0,Number(m.peso)||0);
   });
   return `<div class="patio-split"><div><span>Metálico</span><strong>${sums['Metálico'].toFixed(2)} tn</strong></div><div><span>No metálico</span><strong>${sums['No metálico'].toFixed(2)} tn</strong></div>${sums['Sin clasificar']>0?`<div class="pending"><span>Sin clasificar</span><strong>${sums['Sin clasificar'].toFixed(2)} tn</strong></div>`:''}</div>`;
