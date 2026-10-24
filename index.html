@@ -4003,6 +4003,8 @@ const NAV_CONFIG = {
     {id:'comando',label:'Centro de Comando',icon:'grid'},
     {id:'actividades',label:'Actividades',icon:'list'},
     {id:'patios',label:'Control de patios',icon:'truck'},
+    {id:'opsdashboard',label:'Dashboard',icon:'grid'},
+    {id:'habilitado',label:'Habilitado',icon:'wrench'},
     {id:'ocupabilidad',label:'Ocupabilidad',icon:'map'},
     {id:'coproductos',label:'Coproductos 3D',icon:'cube'},
     {id:'programacion',label:'Programación diaria',icon:'calendar'},
@@ -4011,10 +4013,10 @@ const NAV_CONFIG = {
     {id:'admin',label:'Administración',icon:'user'},
   ],
   operador: ['actividades'],
-  controlador: ['comando','actividades','patios','ocupabilidad','coproductos','entrega'],
-  supervisor: ['comando','programacion','entrega','actividades','patios','ocupabilidad','coproductos','mantenimiento'],
-  gerencia: ['comando','actividades','patios','ocupabilidad','coproductos','mantenimiento'],
-  admin: ['comando','programacion','entrega','actividades','patios','ocupabilidad','coproductos','mantenimiento','admin'],
+  controlador: ['comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','entrega'],
+  supervisor: ['comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
+  gerencia: ['comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
+  admin: ['comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento','admin'],
   mantenimiento: ['actividades','mantenimiento'],
 };
 
@@ -4039,6 +4041,8 @@ const VIEW_TITLES = {
   entrega:'Entrega de guardia',
   actividades:'Actividades',
   patios:'Control de patios',
+  opsdashboard:'Dashboard operacional',
+  habilitado:'Habilitado',
   ocupabilidad:'Ocupabilidad del Patio 4388',
   coproductos:'Coproductos 3D',
   restricciones:'Restricciones operativas',
@@ -4198,6 +4202,8 @@ function navigateTo(view) {
   if(view === 'restricciones') renderRestricciones();
   if(view === 'admin') renderUsuarios();
   if(view === 'patios') renderPatios();
+  if(view === 'opsdashboard') seamxRenderOpsDashboard();
+  if(view === 'habilitado') seamxRenderHabilitado();
   if(view === 'ocupabilidad') renderOcupabilidad();
   if(view === 'coproductos') renderCoproductos();
   if(view === 'resumen') renderResumenWhatsapp();
@@ -7027,6 +7033,89 @@ window.addEventListener('load',async()=>{
     }
   }catch(error){console.warn('No se pudo registrar el modo offline:',error);}
 });
+</script>
+
+<style>
+.seamx-ops-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:16px 0}
+.seamx-ops-metric{padding:16px;background:#fff;border:1px solid #c8deca;border-radius:12px}
+.seamx-ops-metric small{display:block;color:#54745b}.seamx-ops-metric strong{font-size:25px;color:#19552d}
+.seamx-ops-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.seamx-ops-panel{padding:18px;background:#fff;border:1px solid #c8deca;border-radius:12px;min-width:0}
+.seamx-ops-panel canvas{width:100%!important;height:290px!important}
+.seamx-ops-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:15px 0}
+.seamx-ops-controls label{font-size:12px;font-weight:700;color:#31633c}
+.seamx-ops-controls input,.seamx-ops-controls select{display:block;padding:9px;border:1px solid #b6d2bd;border-radius:8px;background:#fff}
+.seamx-habilitado-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.seamx-habilitado-item{border:1px solid #c8deca;background:white;border-radius:12px;padding:14px}
+.seamx-habilitado-item model-viewer{width:100%;height:240px;background:#e9f1ea}
+</style>
+<div id="view-opsdashboard" style="display:none">
+  <div class="page-header"><div><h2 class="page-title">Dashboard operacional</h2><p class="page-subtitle">Evacuación · Curva S · Transporte · Ocupabilidad</p></div></div>
+  <div class="seamx-ops-controls">
+    <label>Mes <input type="month" id="ops-mes" onchange="seamxRenderOpsDashboard()"></label>
+    <label>Guardia <select id="ops-guardia" onchange="seamxRenderOpsDashboard()"><option value="">Ambas</option><option value="A">A</option><option value="B">B</option></select></label>
+    <label>Programación (tn) <input id="ops-toneladas" type="number" min="0" step=".01" placeholder="Toneladas"></label>
+    <label>Fecha <input id="ops-fecha" type="date"></label>
+    <label>Guardia a programar <select id="ops-guardia-edit"><option value="A">A</option><option value="B">B</option></select></label>
+    <button class="btn btn-primary" onclick="seamxGuardarPrograma()">Guardar programación</button>
+  </div>
+  <p class="form-hint">Programación editable guardada en este navegador hasta habilitar la escritura autenticada en Supabase. Meta: 850 tn/mes, 425 tn/guardia. Valorización: corte del día 20 al 21 del mes siguiente (por confirmar criterio exacto).</p>
+  <div id="ops-metrics" class="seamx-ops-metrics"></div>
+  <div class="seamx-ops-charts">
+    <div class="seamx-ops-panel"><h3>Curva S · Programado vs evacuado (tn)</h3><canvas id="ops-curve"></canvas></div>
+    <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
+    <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div>
+    <div class="seamx-ops-panel"><h3>Ocupabilidad del Patio 4388</h3><canvas id="ops-occupancy"></canvas></div>
+  </div>
+</div>
+<div id="view-habilitado" style="display:none">
+  <div class="page-header"><div><h2 class="page-title">Habilitado de estructuras y equipos</h2><p class="page-subtitle">Intervenciones, plan de corte y modelos 3D</p></div></div>
+  <div class="seamx-ops-panel" style="margin-bottom:15px">
+    <div class="seamx-ops-controls">
+      <label>Estructura / equipo <input id="hab-nombre" placeholder="Middle Shell, Spider, tolva..."></label>
+      <label>Tipo <input id="hab-tipo" placeholder="Estructura / equipo"></label>
+      <label>Código <input id="hab-codigo" placeholder="Tag o código"></label>
+      <label>Estado <select id="hab-estado"><option>Programado</option><option>En proceso</option><option>Finalizado</option></select></label>
+      <label>Plan de corte (URL) <input id="hab-plan" type="url" placeholder="Enlace a PDF del plan"></label>
+      <label>Modelo 3D (URL .glb/.gltf) <input id="hab-modelo" type="url" placeholder="Enlace al modelo"></label>
+      <button class="btn btn-primary" onclick="seamxGuardarHabilitado()">Registrar habilitado</button>
+    </div>
+    <p class="form-hint">Registro temporal local. Para adjuntar archivos directamente y compartirlos con toda la operación se requiere habilitar almacenamiento y permisos por rol en Supabase. Los enlaces públicos de modelos GLB/GLTF se visualizan en 3D.</p>
+  </div>
+  <div id="habilitado-items" class="seamx-habilitado-grid"></div>
+</div>
+<script>
+const seamxOpsCharts={};
+function seamxOpsSafe(t){return String(t??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
+function seamxOpsMonth(){return document.getElementById('ops-mes')?.value||new Date().toISOString().slice(0,7)}
+function seamxOpsLocal(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
+function seamxOpsSave(key,v){localStorage.setItem(key,JSON.stringify(v))}
+function seamxOpsChart(id,type,labels,datasets){if(typeof Chart==='undefined')return;seamxOpsCharts[id]?.destroy();seamxOpsCharts[id]=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}})}
+function seamxOpsMaterialTipo(r){const d=String(r.descripcion||r.tipo_residuo||'').toLowerCase();return /liner|linners|hdpe|tuber[ií]a|faja/.test(d)?'Plataforma':'Tolva'}
+async function seamxRenderOpsDashboard(){
+  if(!document.getElementById('ops-mes').value)document.getElementById('ops-mes').value=new Date().toLocaleDateString('en-CA').slice(0,7);
+  if(!document.getElementById('ops-fecha').value)document.getElementById('ops-fecha').value=new Date().toLocaleDateString('en-CA');
+  const month=seamxOpsMonth(),guardia=document.getElementById('ops-guardia').value;
+  let res=await db.from('evacuaciones_excel').select('fecha,ticket_balanza,peso_tn,peso_4388,descripcion,tipo_residuo').gte('fecha',month+'-01').lt('fecha',new Date(Number(month.slice(0,4)),Number(month.slice(5)),1).toLocaleDateString('en-CA'));
+  if(res.error){console.error(res.error);showToast('Error al cargar evacuaciones','warning');return}
+  const tickets=new Map(),daily={};let evacuadas=0;
+  (res.data||[]).forEach(r=>{const d=String(r.fecha||'').slice(0,10),p=Number(r.peso_tn??r.peso_4388??0)||0;if(!d)return;evacuadas+=p;daily[d]=(daily[d]||0)+p;const t=String(r.ticket_balanza||'').trim();if(t){const k=d+'|'+t;const actual=tickets.get(k);const kind=seamxOpsMaterialTipo(r);if(!actual)tickets.set(k,{date:d,kind});else if(kind==='Plataforma')actual.kind='Plataforma'}})
+  const plan=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>x.fecha.startsWith(month)&&(!guardia||x.guardia===guardia));
+  const first=new Date(Number(month.slice(0,4)),Number(month.slice(5))-1,1),days=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
+  const dates=Array.from({length:days},(_,i)=>month+'-'+String(i+1).padStart(2,'0'));
+  let cumPlan=0,cumReal=0;const pc=[],rc=[];for(const d of dates){cumPlan+=plan.filter(x=>x.fecha===d).reduce((s,x)=>s+x.toneladas,0);cumReal+=daily[d]||0;pc.push(cumPlan);rc.push(cumReal)}
+  const inDaily={};(APP.data.movimientos||[]).forEach(m=>{if(String(m.fecha||'').startsWith(month)&&m.movimiento==='ingreso')inDaily[m.fecha]=(inDaily[m.fecha]||0)+Number(m.peso||0)});
+  const plataforma={},tolva={};for(const t of tickets.values()){const ob=t.kind==='Plataforma'?plataforma:tolva;ob[t.date]=(ob[t.date]||0)+1}
+  let occupied='—';try{const o=calculateOcupabilidad(),a=o.reduce((s,x)=>s+x.occupiedM2,0),b=o.reduce((s,x)=>s+x.totalM2,0);occupied=b?(100*a/b).toFixed(1)+'%':'—';seamxOpsChart('ops-occupancy','doughnut',o.map(x=>x.name),[{data:o.map(x=>Math.max(0,x.occupiedM2)),backgroundColor:['#1a5c2a','#00897b','#69f0ae','#d3ac38','#5f8769','#a8ceae','#f2c35a','#7f9586'] }])}catch(e){console.warn(e)}
+  const target=guardia?425:850;
+  document.getElementById('ops-metrics').innerHTML=[['Meta mensual',target.toFixed(0)+' tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Tickets únicos',tickets.size],['Ocupabilidad 4388',occupied]].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+  seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
+  seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
+  seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
+}
+function seamxGuardarPrograma(){if(!['admin','supervisor'].includes(APP.user?.role))return showToast('Solo supervisión y administración','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
+function seamxRenderHabilitado(){const data=seamxOpsLocal('seamx_habilitado_v1');document.getElementById('habilitado-items').innerHTML=data.map(x=>'<div class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo)+' · '+seamxOpsSafe(x.codigo)+' · '+seamxOpsSafe(x.estado)+'</p>'+(x.modelo?'<model-viewer src="'+seamxOpsSafe(x.modelo)+'" camera-controls auto-rotate></model-viewer>':'<p class="form-hint">Sin modelo 3D</p>')+(x.plan?'<a href="'+seamxOpsSafe(x.plan)+'" target="_blank" rel="noopener noreferrer">Ver plan de corte</a>':'')+'</div>').join('')||'<p class="form-hint">Aún no hay estructuras registradas.</p>'}
+function seamxGuardarHabilitado(){if(!['admin','supervisor'].includes(APP.user?.role))return showToast('Solo supervisión y administración','warning');const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Ingresa el nombre de la estructura','warning');const rows=seamxOpsLocal('seamx_habilitado_v1');rows.push({nombre,tipo:val('hab-tipo'),codigo:val('hab-codigo'),estado:val('hab-estado'),plan:val('hab-plan'),modelo:val('hab-modelo')});seamxOpsSave('seamx_habilitado_v1',rows);seamxRenderHabilitado();showToast('Habilitado guardado en este navegador','success')}
 </script>
 </body>
 </html>
