@@ -7059,7 +7059,7 @@ window.addEventListener('load',async()=>{
     <label>Guardia a programar <select id="ops-guardia-edit"><option value="A">A</option><option value="B">B</option></select></label>
     <button class="btn btn-primary" onclick="seamxGuardarPrograma()">Guardar programación</button>
   </div>
-  <p class="form-hint">Programación editable guardada en este navegador hasta habilitar la escritura autenticada en Supabase. Meta: 850 tn/mes, 425 tn/guardia. Valorización: corte del día 20 al 21 del mes siguiente (por confirmar criterio exacto).</p>
+  <p class="form-hint">Programación editable guardada en este navegador hasta habilitar la escritura autenticada en Supabase. Meta mensual: 850 tn (425 por guardia). Meta por periodo valorizable: 850 tn, desde el día 20 del mes seleccionado hasta el 21 del mes siguiente, ambos inclusive.</p>
   <div id="ops-metrics" class="seamx-ops-metrics"></div>
   <div class="seamx-ops-charts">
     <div class="seamx-ops-panel"><h3>Curva S · Programado vs evacuado (tn)</h3><canvas id="ops-curve"></canvas></div>
@@ -7107,8 +7107,16 @@ async function seamxRenderOpsDashboard(){
   const inDaily={};(APP.data.movimientos||[]).forEach(m=>{if(String(m.fecha||'').startsWith(month)&&m.movimiento==='ingreso')inDaily[m.fecha]=(inDaily[m.fecha]||0)+Number(m.peso||0)});
   const plataforma={},tolva={};for(const t of tickets.values()){const ob=t.kind==='Plataforma'?plataforma:tolva;ob[t.date]=(ob[t.date]||0)+1}
   let occupied='—';try{const o=calculateOcupabilidad(),a=o.reduce((s,x)=>s+x.occupiedM2,0),b=o.reduce((s,x)=>s+x.totalM2,0);occupied=b?(100*a/b).toFixed(1)+'%':'—';seamxOpsChart('ops-occupancy','doughnut',o.map(x=>x.name),[{data:o.map(x=>Math.max(0,x.occupiedM2)),backgroundColor:['#1a5c2a','#00897b','#69f0ae','#d3ac38','#5f8769','#a8ceae','#f2c35a','#7f9586'] }])}catch(e){console.warn(e)}
+  // Periodo valorizable: día 20 del mes seleccionado al día 21 del mes siguiente, inclusive.
+  // No reutilizar el acumulado mensual: cada indicador tiene su propio rango.
+  const valorInicio=month+'-20';
+  const valorFin=new Date(Number(month.slice(0,4)),Number(month.slice(5)),21).toLocaleDateString('en-CA');
+  const valorRes=await db.from('evacuaciones_excel').select('fecha,peso_tn,peso_4388').gte('fecha',valorInicio).lte('fecha',valorFin);
+  const valorReal=valorRes.error?null:(valorRes.data||[]).reduce((s,x)=>s+(Number(x.peso_tn??x.peso_4388??0)||0),0);
+  if(valorRes.error)console.warn('No se pudo calcular el periodo valorizable:',valorRes.error);
+  const valorMeta=850;
   const target=guardia?425:850;
-  document.getElementById('ops-metrics').innerHTML=[['Meta mensual',target.toFixed(0)+' tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Tickets únicos',tickets.size],['Ocupabilidad 4388',occupied]].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+  document.getElementById('ops-metrics').innerHTML=[['Meta mensual',target.toFixed(0)+' tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Tickets únicos',tickets.size],['Ocupabilidad 4388',occupied],['Meta valorizable',valorMeta+' tn'],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%'],['Corte valorizable',valorInicio+' al '+valorFin]].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
   seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
