@@ -1816,7 +1816,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           </div>
         </div>
         <div class="card" style="margin-bottom:20px">
-          <div class="card-header"><div><div class="card-title">Clasificación del material</div><div class="card-subtitle">Balance de toneladas por tipo de residuo y subclase metálica / no metálica</div></div></div>
+          <div class="card-header"><div><div class="card-title">Clasificación del material</div><div class="card-subtitle">Balance por subclase del Excel de origen (sin reclasificación automática)</div></div></div>
           <div id="patio-mix-board" class="patio-class-board"></div>
         </div>
 
@@ -4703,7 +4703,7 @@ async function saveMovimiento(){
   const query=id?db.from('movimientos_material').update(appMovimientoToDb(m)).eq('id',id):db.from('movimientos_material').insert([appMovimientoToDb(m)]);
   const {error}=await query;
   if(error){console.error(error);showToast('Error al guardar: '+(error.message||'revisa columnas y políticas de Supabase'),'error');return;}
-  closeModal('modal-movimiento'); await loadAllData(); showToast(id?'Ingreso actualizado':'Ingreso registrado. Cuando el vehículo se retire, pulsa “Marcar salida”.','success'); syncMovimientosToDrive({silent:true});
+  closeModal('modal-movimiento'); await loadAllData(); showToast(id?'Ingreso actualizado':'Ingreso registrado. Cuando el vehículo se retire, pulsa “Marcar salida”.','success'); /* Escritura automática deshabilitada para proteger las subclases del Excel original. */
 }
 
 async function marcarSalidaVehiculo(id){
@@ -4718,14 +4718,14 @@ async function marcarSalidaVehiculo(id){
   if(error){console.error(error);showToast('No se pudo registrar la salida','error');return;}
   await loadAllData();
   showToast(`Salida registrada a las ${hora}`,'success');
-  syncMovimientosToDrive({silent:true});
+  /* Escritura automática deshabilitada para proteger las subclases del Excel original. */
 }
 
 async function deleteMovimiento(id){
   if(APP.user?.role!=='admin'){showToast('Solo administración puede eliminar registros','warning');return;}
   if(!confirm('¿Eliminar este ingreso?'))return;
   const {error}=await db.from('movimientos_material').delete().eq('id',id);
-  if(error){console.error(error);showToast('Error al eliminar','error');return;} await loadAllData(); showToast('Ingreso eliminado','warning'); syncMovimientosToDrive({silent:true});
+  if(error){console.error(error);showToast('Error al eliminar','error');return;} await loadAllData(); showToast('Ingreso eliminado','warning'); /* Escritura automática deshabilitada para proteger las subclases del Excel original. */
 }
 function getPatioFilteredData(){
   const d=document.getElementById('patio-desde')?.value||'', h=document.getElementById('patio-hasta')?.value||'', t=document.getElementById('patio-tipo-mov')?.value||'', s=document.getElementById('patio-subclase')?.value||'', g=document.getElementById('patio-gerencia')?.value||'', p=document.getElementById('patio-recepcion-filtro')?.value||'';
@@ -4810,21 +4810,24 @@ function occNormalizeText(value){return String(value||'').normalize('NFD').repla
 function getOccAreaById(id){return OCC_AREAS.find(a=>a.id===id)||null;}
 function occMaterialText(m){return occNormalizeText(`${m?.descripcion||''} ${m?.tipoResiduo||''} ${m?.subclase||''} ${m?.clase||''}`);}
 function inferOccProfileFromIngreso(m){
-  const t=occMaterialText(m);
+  // La subclase Metálico / No metálico es un dato original: NO se modifica
+  // ni se utiliza para decidir el área de ocupabilidad.
+  const descripcion=occNormalizeText(m?.descripcion||'');
+  const tipo=occNormalizeText(m?.tipoResiduo||'');
+  const t=occNormalizeText(`${m?.descripcion||''} ${m?.tipoResiduo||''}`);
+  const heavy=/pesad/.test(tipo)||(!/livian/.test(tipo)&&/pesad|rrmm|mmv/.test(descripcion));
+  // La categoría física Chatarra liviana admite material pesado O liviano.
+  // Clasificar el destino por la descripción, nunca por la subclase.
+  if(/baranda|plancha|polea|caja(?:s)?\b|alambre|fierro|residuo(?:s)?\s*(?:varios|livianos|metalicos)?|chatarra|escalera|perfil|viga|estructura|perno|valvula|clavo|mesa|locker|rodillo/.test(descripcion)){
+    return {area:getOccAreaById('chatarra_liviana'),factor:heavy?0.75:0.20,reason:'Chatarra liviana (sector físico)'};
+  }
   if(/hdpe|polietileno|tuberia\s*pe|tubo\s*pe/.test(t))return{area:getOccAreaById('tuberias_hdpe'),factor:0.20,reason:'HDPE'};
   if(/jebe|caucho|manguera|cono\s*ciclon|goma/.test(t))return{area:getOccAreaById('jebes'),factor:0.30,reason:'Jebes'};
   if(/faja|correa\s*transportadora|belt/.test(t))return{area:getOccAreaById('fajas'),factor:0.50,reason:'Fajas'};
   if(/coproduct|cobre|bronce|aluminio|inoxidable/.test(t))return{area:getOccAreaById('coproductos'),factor:0.50,reason:'Coproductos'};
   if(/chancad|crusher|mantle|concav|bowl|spider|mainshaft|main\s*shaft/.test(t))return{area:getOccAreaById('comp_chancadora'),factor:0.60,reason:'Comp. chancadora'};
   if(/liner|linner|revestimiento/.test(t))return{area:getOccAreaById('linners'),factor:1.00,reason:'Linners'};
-  /* Todo metálico restante se concentra visualmente en Chatarra liviana.
-     Para no distorsionar m², materiales descritos como pesados/estructurales
-     mantienen el factor histórico 0.75; livianos usan 0.20. */
-  const residue=occNormalizeText(m?.tipoResiduo||'');
-  const heavy=/pesad/.test(residue)||(!/livian/.test(residue)&&/pesad|estructura\s*(?:pesad|grande)|viga\s*(?:pesad|grande)|motor\s*(?:pesad|grande)|reductor|fierro\s*macizo|rrmm|mmv/.test(occNormalizeText(m?.descripcion||'')));
-  /* Barandas, planchas, poleas, cajas, alambres, fierros y residuos varios
-     se asignan a Chatarra liviana, sin tratarlos como pesados por su nombre. */
-  return{area:getOccAreaById('chatarra_liviana'),factor:heavy?0.75:0.20,reason:heavy?'Chatarra / material pesado':'Chatarra liviana / materiales varios'};
+  return{area:getOccAreaById('chatarra_liviana'),factor:heavy?0.75:0.20,reason:'Materiales varios - Chatarra liviana'};
 }
 function inferOccAreaFromIngreso(m){return inferOccProfileFromIngreso(m).area;}
 function inferOccProfileFromEvacuacion(e){
@@ -6343,7 +6346,12 @@ async function syncActividadesFromGoogleSheets(options={}){
 
 
 function normalizeSheetSubclase(value){
-  const t=sheetKey(value);if(t.includes('nometal'))return 'No metálico';if(t.includes('metal'))return 'Metálico';return String(value||'').trim();
+  // La hoja de Drive es la fuente de verdad; normalizar solamente ortografía inequívoca.
+  const raw=String(value??'').trim();
+  const t=sheetKey(raw);
+  if(t==='metalico'||t==='metal')return 'Metálico';
+  if(t==='nometalico'||t==='nometal')return 'No metálico';
+  return raw;
 }
 function normalizeSheetClase(value){
   const t=sheetKey(value);if(t.includes('nopelig'))return 'No peligroso';if(t.includes('pelig'))return 'Peligroso';return String(value||'').trim();
@@ -6466,29 +6474,14 @@ document.addEventListener('visibilitychange',()=>{
 async function syncPatiosBidireccional(){
   showToast('Sincronizando Control de patios con Google Sheets...','success');
   const imported=await syncMovimientosFromGoogleSheets({silent:true});
-  const exported=await syncMovimientosToDrive({silent:true});
-  if(imported||exported)showToast('Control de patios sincronizado con Google Sheets','success');
-  else showToast('No se pudo completar la sincronización','warning');
+  if(imported)showToast('Control de patios actualizado desde Google Sheets (sin escribir en Drive)','success');
+  else showToast('No se pudo importar Control de patios desde Google Sheets','warning');
 }
 
 async function syncMovimientosToDrive(options={}){
-  const silent=Boolean(options.silent);
-  const cfg=getGoogleSheetsSettings();
-  if(!cfg.url){
-    if(!silent) showToast('Configura GOOGLE_SHEETS_SYNC_URL para sincronizar con Drive','warning');
-    return false;
-  }
-  const rows=[...APP.data.movimientos].sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))||Number(a.id)-Number(b.id));
-  const payload={token:cfg.token,accion:'sincronizar',hoja:cfg.movementSheet,actualizado_en:new Date().toISOString(),filas:rows.map(m=>({
-    id:m.id,external_id:m.externalId||`SEAMX-${m.id}`,fecha:m.fecha,movimiento:m.movimiento,subclase:m.subclase,clase:m.clase,tipo_residuo:m.tipoResiduo,
-    descripcion:m.descripcion,tipo_vehiculo:m.vehiculo,placa:m.placa,patio_recepcion:m.patioRecepcion,empresa:m.empresa,peso_tn:m.peso,procedencia:m.procedencia,
-    gerencia:m.gerencia,hora_inicio:m.inicio,hora_fin:m.fin,registrado_por:m.registradoPor
-  }))};
-  try{
-    await fetch(cfg.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-    if(!silent) showToast(`Sincronización enviada a Google Sheets: ${rows.length} registros`,'success');
-    return true;
-  }catch(err){console.error(err);if(!silent)showToast('No se pudo sincronizar con Google Sheets','error');return false;}
+  // Protección: SEAMX no sobrescribe la hoja fuente con valores previamente importados.
+  if(!options.silent)showToast('Exportación hacia Google Sheets deshabilitada para proteger las subclases del archivo fuente','warning');
+  return false;
 }
 
 async function saveCoproducto(){
