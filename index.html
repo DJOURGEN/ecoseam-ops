@@ -2763,7 +2763,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <option value="mantenimiento">🔧 Mantenimiento</option>
           <option value="supervisor">🔍 Supervisor</option>
           <option value="supervisor_hse">🦺 Supervisor HSE</option>
-          <option value="gerencia">📊 Gerencia</option>
+          <option value="gerencia">Gerencia</option><option value="jefatura">Jefatura</option><option value="antamina">Antamina · Visualización</option>
           <option value="admin">⚙️ Administrador</option>
         </select>
       </div>
@@ -4056,21 +4056,23 @@ async function restoreSession(){
 const NAV_CONFIG = {
   all: [
     {id:'comando',label:'Centro de Comando',icon:'grid'},
-    {id:'actividades',label:'Actividades',icon:'list'},
-    {id:'patios',label:'Control de patios',icon:'truck'},
     {id:'opsdashboard',label:'Dashboard',icon:'grid'},
-    {id:'habilitado',label:'Habilitado',icon:'wrench'},
-    {id:'liderazgo',label:'Liderazgo preventivo',icon:'list'},
-    {id:'ocupabilidad',label:'Ocupabilidad',icon:'map'},
-    {id:'coproductos',label:'Coproductos 3D',icon:'cube'},
+    {id:'actividades',label:'Actividades',icon:'list'},
     {id:'programacion',label:'Programación diaria',icon:'calendar'},
+    {id:'patios',label:'Control de patios',icon:'truck'},
+    {id:'ocupabilidad',label:'Ocupabilidad',icon:'map'},
+    {id:'habilitado',label:'Habilitado',icon:'wrench'},
+    {id:'coproductos',label:'Coproductos 3D',icon:'cube'},
+    {id:'liderazgo',label:'Liderazgo preventivo',icon:'list'},
     {id:'entrega',label:'Entrega de guardia',icon:'transfer'},
     {id:'mantenimiento',label:'Gestión de mantenimiento',icon:'wrench'},
     {id:'admin',label:'Administración',icon:'user'},
   ],
   operador: ['actividades'],
   controlador: ['comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','entrega'],
-  supervisor: ['comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
+  supervisor: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
+  jefatura: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
+  antamina: [],
   gerencia: ['liderazgo','comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   admin: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento','admin'],
   mantenimiento: ['actividades','mantenimiento'],
@@ -4105,6 +4107,7 @@ const VIEW_TITLES = {
   restricciones:'Restricciones operativas',
   programacion:'Programación diaria',
   mantenimiento:'Gestión de mantenimiento',
+  antamina:'Antamina',
   resumen:'Reporte de actividades',
   admin:'Administración',
 };
@@ -4272,7 +4275,7 @@ function navigateTo(view) {
 
 function getDefaultViewForRole(){
   if(!APP.user)return 'actividades';
-  if(['admin','supervisor','gerencia'].includes(APP.user.role))return 'comando';
+  if(['admin','supervisor','gerencia','jefatura'].includes(APP.user.role))return 'comando';
   if(APP.user.role==='controlador')return 'comando';
   if(APP.user.role==='mantenimiento')return 'actividades';
   return 'actividades';
@@ -5260,7 +5263,7 @@ async function saveUsuario() {
 
 function renderUsuarios() {
   const tbody=document.getElementById('tbody-usuarios');
-  const rolColors={supervisor_hse:'background:#fff8e1;color:#8a5a00',operador:'background:#e3f0e5;color:#1a5c2a',supervisor:'background:#e3f2fd;color:#0d47a1',controlador:'background:#e8f5e9;color:#1b5e20',mantenimiento:'background:#fff8e1;color:#8a5a00',gerencia:'background:#f3e5f5;color:#6a1b9a',admin:'background:#fff3e0;color:#e65100'};
+  const rolColors={jefatura:'background:#e4ebe2;color:#234f31',antamina:'background:#e9edee;color:#475c62',supervisor_hse:'background:#fff8e1;color:#8a5a00',operador:'background:#e3f0e5;color:#1a5c2a',supervisor:'background:#e3f2fd;color:#0d47a1',controlador:'background:#e8f5e9;color:#1b5e20',mantenimiento:'background:#fff8e1;color:#8a5a00',gerencia:'background:#f3e5f5;color:#6a1b9a',admin:'background:#fff3e0;color:#e65100'};
   const thead=tbody.closest('table').querySelector('thead tr');
   if(thead)thead.innerHTML='<th>Usuario</th><th>Nombre completo</th><th>Contraseña</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th>';
   tbody.innerHTML=APP.data.usuarios.map(u=>`
@@ -7155,7 +7158,7 @@ async function seamxRenderOpsDashboard(){
   const valorMeta=850;
   const target=guardia?425:850;
   document.getElementById('ops-metrics').innerHTML=[['Meta mensual',target.toFixed(0)+' tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Tickets únicos',tickets.size],['Ocupabilidad 4388',occupied],['Meta valorizable',valorMeta+' tn'],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%'],['Corte valorizable',valorInicio+' al '+valorFin]].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
-  if(['admin','gerencia'].includes(APP.user?.role)){
+  if(['admin','gerencia','jefatura'].includes(APP.user?.role)){
     const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='';
     try{const evaluations=JSON.parse(localStorage.getItem('seamx_liderazgo_borradores_v1')||'[]');const avg=evaluations.length?evaluations.reduce((s,x)=>s+Number(x.pct||0),0)/evaluations.length:0;
       document.getElementById('lead-dashboard-values').innerHTML=[['Evaluaciones locales',evaluations.length],['Promedio',evaluations.length?avg.toFixed(1)+'%':'—'],['Compromisos pendientes',evaluations.filter(x=>x.commitment&&!x.verified).length],['Críticas sin verificar',evaluations.filter(x=>x.crit&&!x.verified).length]].map(x=>'<div class="lead-kpi"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('');
@@ -7190,5 +7193,20 @@ function seamxGuardarHabilitado(){if(!['admin','supervisor'].includes(APP.user?.
 @media(max-width:750px){.lead-bar,.lead-fields{grid-template-columns:1fr 1fr}.lead-kpis{grid-template-columns:1fr 1fr}.lead-head,.lead-criterion{grid-template-columns:1fr}.lead-options{justify-content:start;gap:15px}}
 </style>
 <script src="liderazgo.js"></script>
-</body>
+<style>
+/* ECOSEAM | jerarquía de información, sin animación decorativa */
+#view-liderazgo .lead-criterion{grid-template-columns:minmax(0,1fr) 210px;gap:5px;padding:6px 8px}
+#view-liderazgo .lead-criterion-label{font-size:12px}
+#view-liderazgo .lead-head{background:#dce8d0;border:1px solid #96ac91}
+#view-liderazgo .lead-note{background:#fcfdfb;border-bottom:1px solid #cad4c5}
+#view-liderazgo .lead-options label{font-weight:600;padding:4px}
+#view-liderazgo .lead-summary{background:#e4ece1;border-left:3px solid #315d36}
+#view-liderazgo .lead-criterion:nth-child(even){background:#f4f7f2}
+#view-liderazgo .lead-critical-label{font-weight:500}
+#view-opsdashboard .seamx-ops-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}
+#view-opsdashboard .seamx-ops-panel{border-radius:2px}
+#view-opsdashboard .seamx-ops-metric{border-radius:2px}
+#view-habilitado .seamx-ops-panel{border-radius:2px}
+@media(max-width:900px){#view-opsdashboard .seamx-ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></body>
 </html>
