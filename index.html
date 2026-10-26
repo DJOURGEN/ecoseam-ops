@@ -1927,13 +1927,13 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
     <label>Guardia a programar <select id="ops-guardia-edit"><option value="A">A</option><option value="B">B</option></select></label>
     <button class="btn btn-primary" onclick="seamxGuardarPrograma()">Guardar programación</button>
   </div>
-  <p class="form-hint">Meta mensual 850 tn · Guardia A/B: 425 tn cada una · Periodo valorizable: 850 tn (20 al 21 del siguiente mes). Programación guardada localmente.</p>
+  <p class="form-hint">Meta mensual y valorizable: 850 tn · Guardia A/B: 425 tn cada una · Valorización: 21 al 20 del mes siguiente. Programación guardada localmente.</p>
   <div id="ops-metrics" class="seamx-ops-metrics"></div>
 <section class="seamx-ops-panel" id="lead-dashboard-summary" style="margin:0 0 12px"><h3>Seguimiento de liderazgo preventivo</h3><div id="lead-dashboard-values" class="lead-kpis"><p class="lead-muted">Sin evaluaciones en este navegador.</p></div><button class="lead-btn-alt" onclick="navigateTo('liderazgo')" id="lead-go">Abrir evaluaciones</button><p class="lead-muted">Datos locales provisionales; no consolidados entre dispositivos.</p></section>
   <div class="seamx-ops-charts">
     <div class="seamx-ops-panel"><h3>Curva S · Programado vs evacuado (tn)</h3><canvas id="ops-curve"></canvas></div>
     <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
-    <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div><div class="seamx-ops-panel"><h3>Evacuaciones por día (tn)</h3><canvas id="ops-outbound"></canvas></div>
+    <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div><div class="seamx-ops-panel"><h3>Evacuaciones por día (tn)</h3><canvas id="ops-outbound"></canvas></div><div class="seamx-ops-panel"><h3>Meta mensual · evacuado y pendiente</h3><canvas id="ops-month-share"></canvas></div><div class="seamx-ops-panel"><h3>Meta valorizable · evacuado y pendiente</h3><canvas id="ops-value-share"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ocupabilidad del Patio 4388</h3><canvas id="ops-occupancy"></canvas></div>
   </div>
 </div>
@@ -1945,8 +1945,8 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
       <label>Tipo <input id="hab-tipo" placeholder="Estructura / equipo"></label>
       <label>Código <input id="hab-codigo" placeholder="Tag o código"></label>
       <label>Estado <select id="hab-estado"><option>Programado</option><option>En proceso</option><option>Finalizado</option></select></label>
-      <label>Plan de corte (URL) <input id="hab-plan" type="url" placeholder="Enlace al PDF"></label><label>Seleccionar PDF <input id="hab-plan-file" type="file" accept="application/pdf,.pdf"></label>
-      <label>Modelo 3D (URL .glb/.gltf) <input id="hab-modelo" type="url" placeholder="Enlace al modelo"></label><label>Seleccionar modelo 3D <input id="hab-modelo-file" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json"></label><input id="hab-edit-id" type="hidden">
+      <label>Seleccionar PDF <input id="hab-plan-file" type="file" accept="application/pdf,.pdf"></label>
+      <label>Seleccionar modelo 3D <input id="hab-modelo-file" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json"></label><input id="hab-edit-id" type="hidden">
       <button class="btn btn-primary" onclick="seamxGuardarHabilitado()">Registrar habilitado</button>
     </div>
     <p class="form-hint">Registros locales. El visor admite enlaces a modelos 3D GLB/GLTF; para compartir archivos se requiere almacenamiento en Supabase.</p>
@@ -2764,7 +2764,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <option value="mantenimiento">🔧 Mantenimiento</option>
           <option value="supervisor">🔍 Supervisor</option>
           <option value="supervisor_hse">🦺 Supervisor HSE</option>
-          <option value="gerencia">Gerencia</option><option value="jefatura">Jefatura</option><option value="antamina">Antamina · Visualización</option>
+          <option value="gerencia">Gerencia</option><option value="jefatura">🏢 Jefatura</option><option value="antamina">🏭 Antamina</option>
           <option value="admin">⚙️ Administrador</option>
         </select>
       </div>
@@ -7153,43 +7153,73 @@ async function seamxRenderOpsDashboard(){
   let occupied='—';try{const o=calculateOcupabilidad(),a=o.reduce((s,x)=>s+x.occupiedM2,0),b=o.reduce((s,x)=>s+x.totalM2,0);occupied=b?(100*a/b).toFixed(1)+'%':'—';seamxOpsChart('ops-occupancy','doughnut',o.map(x=>x.name),[{data:o.map(x=>Math.max(0,x.occupiedM2)),backgroundColor:['#1a5c2a','#00897b','#69f0ae','#d3ac38','#5f8769','#a8ceae','#f2c35a','#7f9586'] }])}catch(e){console.warn(e)}
   // Periodo valorizable: día 20 del mes seleccionado al día 21 del mes siguiente, inclusive.
   // No reutilizar el acumulado mensual: cada indicador tiene su propio rango.
-  const valorInicio=month+'-20';
-  const valorFin=new Date(Number(month.slice(0,4)),Number(month.slice(5)),21).toLocaleDateString('en-CA');
-  const valorRes=await db.from('evacuaciones_excel').select('fecha,peso_tn,peso_4388').gte('fecha',valorInicio).lte('fecha',valorFin);
+  const valorInicio=month+'-21';
+  const valorFin=new Date(Number(month.slice(0,4)),Number(month.slice(5)),20).toLocaleDateString('en-CA');
+  const valorFinExclusivo=new Date(Number(month.slice(0,4)),Number(month.slice(5)),21).toLocaleDateString('en-CA');
+  const valorRes=await db.from('evacuaciones_excel').select('fecha,peso_tn,peso_4388').gte('fecha',valorInicio).lt('fecha',valorFinExclusivo);
   const valorReal=valorRes.error?null:(valorRes.data||[]).reduce((s,x)=>s+(Number(x.peso_tn??x.peso_4388??0)||0),0);
   if(valorRes.error)console.warn('No se pudo calcular el periodo valorizable:',valorRes.error);
   const valorMeta=850;
   const target=guardia?425:850;
-  document.getElementById('ops-metrics').innerHTML=[['Meta mensual',target.toFixed(0)+' tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Tickets únicos',tickets.size],['Ocupabilidad 4388',occupied],['Meta valorizable',valorMeta+' tn'],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%'],['Corte valorizable',valorInicio+' al '+valorFin]].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+  document.getElementById('ops-metrics').innerHTML=[['Meta mensual/valorizable','850 tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Ocupabilidad 4388',occupied],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%']].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
   if(['admin','gerencia','jefatura'].includes(APP.user?.role)){
     const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='';
     try{const evaluations=JSON.parse(localStorage.getItem('seamx_liderazgo_borradores_v1')||'[]');const avg=evaluations.length?evaluations.reduce((s,x)=>s+Number(x.pct||0),0)/evaluations.length:0;
       document.getElementById('lead-dashboard-values').innerHTML=[['Evaluaciones locales',evaluations.length],['Promedio',evaluations.length?avg.toFixed(1)+'%':'—'],['Compromisos pendientes',evaluations.filter(x=>x.commitment&&!x.verified).length],['Críticas sin verificar',evaluations.filter(x=>x.crit&&!x.verified).length]].map(x=>'<div class="lead-kpi"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('');
     }catch(e){console.warn(e)}
   }else{const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='none'}
+  const mensualPendiente=Math.max(0,850-evacuadas),valorPendiente=Math.max(0,850-(valorReal||0));
+  seamxOpsChart('ops-month-share','doughnut',['Evacuado','Pendiente'],[{data:[evacuadas,mensualPendiente],backgroundColor:['#1d673e','#d9e2d8']}]);
+  seamxOpsChart('ops-value-share','doughnut',['Evacuado','Pendiente'],[{data:[valorReal||0,valorPendiente],backgroundColor:['#376f91','#d9e2d8']}]);
   seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
   seamxOpsChart('ops-outbound','bar',dates.map(d=>d.slice(8)),[{label:'Evacuado (tn)',data:dates.map(d=>daily[d]||0),backgroundColor:'#17643a'}]);
 }
 function seamxGuardarPrograma(){if(!['admin','supervisor'].includes(APP.user?.role))return showToast('Solo supervisión y administración','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
-function seamxRenderHabilitado(){const data=seamxOpsLocal('seamx_habilitado_v1');document.getElementById('habilitado-items').innerHTML=data.map(x=>'<div class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo)+' · '+seamxOpsSafe(x.codigo)+' · '+seamxOpsSafe(x.estado)+'</p>'+(x.modelo?'<model-viewer src="'+seamxOpsSafe(x.modelo)+'" camera-controls auto-rotate></model-viewer>':'<p class="form-hint">Sin modelo 3D</p>')+(x.plan?'<a href="'+seamxOpsSafe(x.plan)+'" target="_blank" rel="noopener noreferrer">Ver plan de corte</a>':'')+' <button class="lead-btn-alt" onclick="seamxEditarHabilitado(\''+seamxOpsSafe(x.id||'')+'\')">Editar</button></div>').join('')||'<p class="form-hint">Aún no hay estructuras registradas.</p>'}
+let seamxHabCache=[];
+async function seamxRenderHabilitado(){
+ const grid=document.getElementById('habilitado-items');if(!grid)return;
+ const {data,error}=await db.from('habilitado_intervenciones').select('*').order('id',{ascending:false});
+ if(error){grid.textContent='No se pudieron consultar las intervenciones: '+error.message;return}
+ seamxHabCache=data||[];
+ grid.innerHTML=seamxHabCache.map(x=>'<article class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo_estructura||'')+' · '+seamxOpsSafe(x.codigo_equipo||'')+' · '+seamxOpsSafe(x.estado)+'</p>'+(x.modelo_3d_url?'<model-viewer src="'+seamxOpsSafe(x.modelo_3d_url)+'" camera-controls auto-rotate></model-viewer>':'<p>Sin modelo 3D</p>')+(x.plan_corte_url?'<p><a href="'+seamxOpsSafe(x.plan_corte_url)+'" target="_blank" rel="noopener noreferrer">Abrir plan de corte (PDF)</a></p>':'')+'<button class="lead-btn-alt" onclick="seamxEditarHabilitado('+Number(x.id)+')">Editar</button></article>').join('')||'<p>No hay estructuras registradas.</p>';
+}
 function seamxEditarHabilitado(id){
- const x=seamxOpsLocal('seamx_habilitado_v1').find(v=>String(v.id)===String(id));if(!x)return;
- const values={'hab-edit-id':x.id,'hab-nombre':x.nombre,'hab-tipo':x.tipo,'hab-codigo':x.codigo,'hab-estado':x.estado,'hab-plan':x.plan,'hab-modelo':x.modelo};
+ const x=seamxHabCache.find(r=>Number(r.id)===Number(id));if(!x)return;
+ const values={'hab-edit-id':x.id,'hab-nombre':x.nombre,'hab-tipo':x.tipo_estructura,'hab-codigo':x.codigo_equipo,'hab-estado':x.estado};
  Object.entries(values).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v||''});
+ const btn=document.querySelector('#view-habilitado .seamx-ops-controls button');if(btn)btn.textContent='Guardar cambios';
  document.getElementById('hab-nombre').focus();
 }
-function seamxGuardarHabilitado(){
- if(!['admin','supervisor','jefatura'].includes(APP.user?.role))return showToast('Solo supervisión o jefatura','warning');
- const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Ingresa la estructura','warning');
- const planFile=document.getElementById('hab-plan-file').files[0],modelFile=document.getElementById('hab-modelo-file').files[0];
- if(planFile||modelFile){showToast('Seleccionaste archivos. Para conservarlos entre equipos deben subirse al almacenamiento autorizado; utiliza los enlaces mientras tanto.','warning');return;}
- const rows=seamxOpsLocal('seamx_habilitado_v1'),id=val('hab-edit-id')||Date.now().toString(36);
- const record={id,nombre,tipo:val('hab-tipo'),codigo:val('hab-codigo'),estado:val('hab-estado'),plan:val('hab-plan'),modelo:val('hab-modelo')};
- const pos=rows.findIndex(x=>String(x.id)===String(id));if(pos>=0)rows[pos]=record;else rows.push(record);
- seamxOpsSave('seamx_habilitado_v1',rows);seamxRenderHabilitado();document.getElementById('hab-edit-id').value='';
- showToast('Registro actualizado en este navegador','success');
+async function seamxHabUpload(file,kind,id){
+ if(!file)return null;
+ const extension=file.name.split('.').pop().toLowerCase();
+ const accepted=kind==='pdf'?['pdf']:['glb','gltf'];
+ if(!accepted.includes(extension))throw new Error('Formato no permitido');
+ if(file.size>30*1024*1024)throw new Error('Archivo demasiado grande (máximo 30 MB)');
+ const bucket='coproductos-3d',path='habilitado/'+id+'/'+kind+'-'+Date.now()+'.'+extension;
+ const {error}=await db.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type||undefined});
+ if(error)throw error;
+ return db.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
+async function seamxGuardarHabilitado(){
+ if(!['admin','supervisor','jefatura'].includes(APP.user?.role))return showToast('No tienes permiso','warning');
+ const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Indica la estructura','warning');
+ const id=val('hab-edit-id'),existing=seamxHabCache.find(x=>String(x.id)===id);
+ const values={nombre,tipo_estructura:val('hab-tipo')||'Estructura',codigo_equipo:val('hab-codigo'),estado:val('hab-estado')};
+ try{
+  const {data:saved,error}=id?await db.from('habilitado_intervenciones').update(values).eq('id',Number(id)).select().single():await db.from('habilitado_intervenciones').insert(values).select().single();
+  if(error)throw error;
+  const pdf=document.getElementById('hab-plan-file').files[0],model=document.getElementById('hab-modelo-file').files[0],uploads={};
+  if(pdf)uploads.plan_corte_url=await seamxHabUpload(pdf,'pdf',saved.id);
+  if(model)uploads.modelo_3d_url=await seamxHabUpload(model,'modelo',saved.id);
+  if(Object.keys(uploads).length){const {error:upErr}=await db.from('habilitado_intervenciones').update(uploads).eq('id',saved.id);if(upErr)throw upErr}
+  ['hab-edit-id','hab-nombre','hab-tipo','hab-codigo'].forEach(k=>document.getElementById(k).value='');
+  document.getElementById('hab-plan-file').value='';document.getElementById('hab-modelo-file').value='';
+  const btn=document.querySelector('#view-habilitado .seamx-ops-controls button');if(btn)btn.textContent='Registrar habilitado';
+  await seamxRenderHabilitado();showToast('Habilitado guardado','success');
+ }catch(e){console.error(e);showToast('No se pudo guardar: '+e.message,'error')}
 }
 </script>
 <style>
