@@ -7358,5 +7358,73 @@ async function seamxSafeAnalyze(){
 #view-liderazgo button,#view-habilitado button{border-radius:2px}
 #view-opsdashboard .seamx-ops-controls input,#view-opsdashboard .seamx-ops-controls select{border-radius:2px}
 </style>
-</body>
+
+<style id="seamx-editorial-dynamic-2026">
+/* Diseño operativo ECOSEAM: jerarquía editorial, dinamismo funcional, sin tarjetas infladas */
+:root{--radius:3px;--radius-s:2px;--radius-lg:4px;--shadow:none;--shadow-l:0 10px 22px rgba(15,37,24,.12)}
+html,body{max-width:100%;overflow-x:hidden}
+.main{min-width:0;width:100%}
+.content{min-width:0;width:100%;padding:20px 24px;background:#f5f7f5}
+.content>[id^="view-"]{min-width:0;max-width:100%;box-sizing:border-box}
+.topbar{padding:0 20px;gap:12px;min-width:0;background:#fff;border-bottom:1px solid #d4dfd5}
+.topbar-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.025em;font-weight:660}
+.topbar-actions{margin-left:auto;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end}
+#btn-logout{margin-left:auto!important;border-radius:2px!important;padding:7px 12px!important;white-space:nowrap}
+.card,.stat-card,.seamx-ops-panel,.seamx-ops-metric,.seamx-habilitado-item,
+#view-liderazgo .lead-bar,#view-liderazgo .lead-head,#view-liderazgo .lead-summary,
+.modal,.form-control,.btn,.nav-item,.lead-btn-alt,.lead-tabs button,
+.seamx-safe-panel,.seamx-safe-result,.seamx-safe-warning{
+ border-radius:3px!important;box-shadow:none!important
+}
+.card,.stat-card,.seamx-ops-panel,.seamx-ops-metric,.seamx-habilitado-item{border:1px solid #d8e0d9!important;background:#fff}
+.btn:hover,.btn-primary:hover,.card:hover,.stat-card:hover{transform:none!important;box-shadow:none!important}
+.btn,.lead-btn-alt,.lead-tabs button{font-weight:600;letter-spacing:0}
+.form-control,input,select,textarea{max-width:100%;box-sizing:border-box}
+.page-header{margin:0 0 16px!important;padding:0 0 12px!important;border-bottom:1px solid #dce4dd}
+.page-title{font-size:20px!important;font-weight:660!important;letter-spacing:-.018em;line-height:1.35}
+.page-subtitle{font-size:12px!important;color:#56655b;line-height:1.4}
+.card-title,.seamx-ops-panel h3{font-size:14px!important;font-weight:650}
+.seamx-ops-metrics,.stat-grid{gap:10px!important}
+.seamx-ops-metric{padding:12px 14px!important;border-left:2px solid #256b41!important}
+.seamx-ops-panel{padding:14px!important}
+.seamx-ops-charts{gap:12px!important}
+table{border-collapse:collapse;max-width:100%}
+th{background:#eaf0eb;color:#244831;font-size:11px}
+td,th{vertical-align:middle}
+.table-responsive,.table-wrap,.table-container{max-width:100%;overflow-x:auto}
+#view-liderazgo .lead-criterion{border-bottom:1px solid #d7dfd7;background:#fff;padding:8px}
+#view-liderazgo .lead-criterion:nth-child(even){background:#f7f9f7}
+#view-liderazgo .lead-tabs button{background:#fff;border:1px solid #c8d6ca}
+#view-liderazgo .lead-bar{background:#fff!important;border:1px solid #d1dad2!important}
+.sidebar .nav-item{border-radius:2px!important}
+.user-avatar{border-radius:3px!important}
+/* Movimiento discreto al cambiar de modulo, resaltado activo y retroalimentacion tactil */
+.content>[id^="view-"][style*="display: block"],.content>[id^="view-"][style*="display:block"]{animation:seamx-page-enter .23s cubic-bezier(.2,.7,.3,1) both}
+@keyframes seamx-page-enter{from{opacity:.7;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.nav-item,.mobile-nav-item{transition:background-color .17s ease,color .17s ease,border-color .17s ease!important}
+.nav-item.active{border-left:3px solid #55b47b!important}
+.btn,.lead-btn-alt,.lead-tabs button{transition:background-color .17s ease,border-color .17s ease,color .17s ease!important}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid #28754a!important;outline-offset:2px}
+.seamx-ops-metric strong{font-variant-numeric:tabular-nums}
+@media(min-width:769px){.seamx-ops-charts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.content{padding:14px 12px}.seamx-ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.seamx-ops-charts{grid-template-columns:1fr!important}}
+@media(max-width:640px){
+ .content{padding:12px 10px!important}.topbar{padding:0 8px!important;gap:5px!important}
+ .topbar-actions{gap:4px!important;margin-left:auto!important}
+ #btn-logout{padding:7px!important;min-width:34px!important;flex-shrink:0!important}
+ .page-title{font-size:17px!important}
+ .seamx-ops-panel{padding:11px!important}.seamx-ops-metrics{gap:8px!important}
+ .seamx-ops-metric{padding:10px!important}.seamx-ops-metric strong{font-size:17px!important}
+ .modal{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;margin:auto!important;padding:15px!important}
+ #view-liderazgo .lead-bar,#view-liderazgo .lead-criterion{grid-template-columns:1fr!important}
+ #view-liderazgo .lead-options{justify-content:flex-start;flex-wrap:wrap}
+ .seamx-ops-controls{grid-template-columns:1fr 1fr!important}
+ .seamx-ops-controls>button{grid-column:1/-1}
+}
+@media(max-width:390px){.seamx-ops-controls{grid-template-columns:1fr!important}#seamx-network-badge{display:none!important}}
+@media(prefers-reduced-motion:reduce){
+ .content>[id^="view-"][style*="display: block"],.content>[id^="view-"][style*="display:block"]{animation:none!important}
+ .nav-item,.mobile-nav-item,.btn,.lead-btn-alt,.lead-tabs button{transition:none!important}
+}
+</style></body>
 </html>
