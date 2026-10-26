@@ -1929,6 +1929,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
   </div>
   <p class="form-hint">Meta mensual 850 tn · Guardia A/B: 425 tn cada una · Periodo valorizable: 850 tn (20 al 21 del siguiente mes). Programación guardada localmente.</p>
   <div id="ops-metrics" class="seamx-ops-metrics"></div>
+<section class="seamx-ops-panel" id="lead-dashboard-summary" style="margin:0 0 12px"><h3>Seguimiento de liderazgo preventivo</h3><div id="lead-dashboard-values" class="lead-kpis"><p class="lead-muted">Sin evaluaciones en este navegador.</p></div><button class="lead-btn-alt" onclick="navigateTo('liderazgo')" id="lead-go">Abrir evaluaciones</button><p class="lead-muted">Datos locales provisionales; no consolidados entre dispositivos.</p></section>
   <div class="seamx-ops-charts">
     <div class="seamx-ops-panel"><h3>Curva S · Programado vs evacuado (tn)</h3><canvas id="ops-curve"></canvas></div>
     <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
@@ -7154,6 +7155,12 @@ async function seamxRenderOpsDashboard(){
   const valorMeta=850;
   const target=guardia?425:850;
   document.getElementById('ops-metrics').innerHTML=[['Meta mensual',target.toFixed(0)+' tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Tickets únicos',tickets.size],['Ocupabilidad 4388',occupied],['Meta valorizable',valorMeta+' tn'],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%'],['Corte valorizable',valorInicio+' al '+valorFin]].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+  if(['admin','gerencia'].includes(APP.user?.role)){
+    const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='';
+    try{const evaluations=JSON.parse(localStorage.getItem('seamx_liderazgo_borradores_v1')||'[]');const avg=evaluations.length?evaluations.reduce((s,x)=>s+Number(x.pct||0),0)/evaluations.length:0;
+      document.getElementById('lead-dashboard-values').innerHTML=[['Evaluaciones locales',evaluations.length],['Promedio',evaluations.length?avg.toFixed(1)+'%':'—'],['Compromisos pendientes',evaluations.filter(x=>x.commitment&&!x.verified).length],['Críticas sin verificar',evaluations.filter(x=>x.crit&&!x.verified).length]].map(x=>'<div class="lead-kpi"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('');
+    }catch(e){console.warn(e)}
+  }else{const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='none'}
   seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
