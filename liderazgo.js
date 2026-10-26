@@ -28,16 +28,18 @@ function persist(){try{localStorage.setItem(LS,JSON.stringify(records));return t
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','&#39;'}[c]}))}
 function read(id){return document.getElementById(id)}
 function val(id){return read(id)?.value?.trim()||''}
-function isEvaluator(){return ['admin','gerencia'].includes(APP.user?.role)}
+function isEvaluator(){return ['admin','gerencia','jefatura'].includes(APP.user?.role)}
 function date(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function supervisorOptions(){const users=(APP.data?.usuarios||[]).filter(u=>String(u.rol||u.role||'').toLowerCase().includes('supervisor'));return users.map(u=>{const name=[u.nombre,u.apellido].filter(Boolean).join(' ')||u.name||u.login;return '<option value="'+esc(u.id)+'" data-name="'+esc(name)+'">'+esc(name)+'</option>'}).join('')}
-function setup(){
+function supervisorOptions(users){users=users||APP.data?.usuarios||[];users=users.filter(u=>['supervisor','supervisor_hse'].includes(String(u.rol||u.role||'').toLowerCase())&&u.activo!==false);return users.map(u=>{const name=[u.nombre,u.apellido].filter(Boolean).join(' ')||u.name||u.login;return '<option value="'+esc(u.id)+'" data-name="'+esc(name)+'">'+esc(name)+'</option>'}).join('')}
+async function setup(){
  const select=read('lead-supervisor');if(!select)return;
- if(!select.dataset.loaded){select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions();select.dataset.loaded='1'}
+ if(!select.dataset.loaded){let users=APP.data?.usuarios||[];try{const r=await db.from('usuarios').select('id,login,nombre,apellido,rol,activo').in('rol',['supervisor','supervisor_hse']).eq('activo',true);if(!r.error&&r.data?.length)users=r.data}catch(e){console.warn('Lista de supervisores:',e)}select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions(users);select.dataset.loaded='1'}
  if(!val('lead-date'))read('lead-date').value=date();
  read('lead-evaluator').textContent=APP.user?.name||APP.user?.nombre||APP.user?.login||'';
  read('lead-form').style.display=isEvaluator()?'block':'none';
- read('lead-access').style.display=isEvaluator()?'none':'block';
+ const tabs=document.querySelector('.lead-tabs');if(tabs)tabs.style.display=isEvaluator()?'flex':'none';
+ const report=read('lead-report-tab');if(report&&!isEvaluator()){read('lead-eval-tab').hidden=true;report.hidden=false}
+ read('lead-access').style.display=isEvaluator()?'none':'block';if(!isEvaluator())read('lead-access').textContent='Resultados y retroalimentación de tu evaluación. Solo se muestran registros disponibles para este usuario en este dispositivo.';
  if(!read('lead-criteria').children.length)read('lead-criteria').innerHTML=CRITERIOS.map((x,i)=>'<div class="lead-criterion"><div class="lead-criterion-label"><span class="lead-n">'+(i+1)+'</span>'+esc(x)+(PRIORITARIOS.includes(i+1)?'<span class="lead-critical-label">Criterio de control</span>':'')+'</div><div class="lead-options"><label><input type="radio" name="lead-q'+i+'" value="2" onchange="seamxLeadScore()">2</label><label><input type="radio" name="lead-q'+i+'" value="1" onchange="seamxLeadScore()">1</label><label><input type="radio" name="lead-q'+i+'" value="0" onchange="seamxLeadScore()">0</label><label><input type="radio" name="lead-q'+i+'" value="NA" onchange="seamxLeadScore()">N/A</label></div><input class="lead-note" id="lead-note-'+i+'" placeholder="Observación o evidencia (obligatoria para 0, 1 o N/A)"></div>').join('');
  seamxLeadScore();seamxLeadRender();
 }
@@ -70,11 +72,14 @@ function grouped(){const map={};records.forEach(r=>{const n=r.supervisor||'Sin i
 window.seamxLeadRender=function(){
  records=get();
  const tbl=read('lead-supervisors');if(!tbl)return;
+ const visible=isEvaluator()?records:records.filter(r=>String(r.supervisor_id)===String(APP.user?.id));
+ const source=records;records=visible;
  const n=records.length,pending=records.filter(r=>r.commitment&&!r.verified).length,critical=records.filter(r=>r.crit&&!r.verified).length,avg=n?records.reduce((t,r)=>t+Number(r.pct||0),0)/n:null;
  read('lead-kpis').innerHTML=[['Evaluaciones',n],['Promedio',avg===null?'—':avg.toFixed(1)+'%'],['Compromisos pendientes',pending],['Críticos sin verificar',critical]].map(([l,v])=>'<div class="lead-kpi"><small>'+l+'</small><b>'+v+'</b></div>').join('');
  tbl.innerHTML=grouped().map(([name,a])=>{a.sort((x,y)=>x.fecha.localeCompare(y.fecha));const first=a[0],last=a[a.length-1],improvement=last.pct-first.pct,pending=a.filter(x=>x.commitment&&!x.verified).length,cr=a.filter(x=>x.crit&&!x.verified).length;return '<tr><td>'+esc(name)+'</td><td>'+a.length+'</td><td>'+last.pct.toFixed(1)+'%</td><td>'+(a.length>1?(improvement>=0?'+':'')+improvement.toFixed(1)+' pp':'—')+'</td><td>'+pending+'</td><td>'+cr+'</td></tr>'}).join('')||'<tr><td colspan="6">No existen evaluaciones registradas en este navegador.</td></tr>';
  read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>'+esc(r.fase)+'</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+'</td></tr>').join('')||'<tr><td colspan="6">Sin registros</td></tr>';
+ records=source;
 };
 window.seamxLeadInit=setup;
-window.seamxLeadExport=function(){const payload=JSON.stringify(get(),null,2),blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='seamx_evaluaciones_liderazgo_'+date()+'.json';a.click();URL.revokeObjectURL(url)};
+window.seamxLeadExport=function(){if(!isEvaluator())return;const payload=JSON.stringify(get(),null,2),blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='seamx_evaluaciones_liderazgo_'+date()+'.json';a.click();URL.revokeObjectURL(url)};
 })();
