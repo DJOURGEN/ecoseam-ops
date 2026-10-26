@@ -61,7 +61,7 @@ window.seamxLeadSave=function(){
  const newRec={id:editing||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),supervisor_id:id,supervisor:name,evaluator:read('lead-evaluator').textContent,fecha:val('lead-date'),area:val('lead-area'),actividad:val('lead-activity'),guardia:val('lead-shift'),fase:val('lead-phase'),answers:p.answers,points:p.points,max:p.max,pct:p.pct,crit:read('lead-critical').checked,action:val('lead-action'),strengths:val('lead-strengths'),improve:val('lead-improve'),commitment:val('lead-commitment'),owner:val('lead-owner'),due:val('lead-due'),next:val('lead-next'),verified:false,created:new Date().toISOString()};
  records=records.filter(r=>r.id!==newRec.id);records.push(newRec);
  if(!persist())return;
- editing=null;read('lead-form').reset();read('lead-criteria').querySelectorAll('.lead-note').forEach(n=>n.value='');
+ editing=null;read('lead-form').querySelectorAll('input:not([type=radio]):not([type=checkbox]), textarea').forEach(el=>{if(el.id!=='lead-evaluator')el.value=''});read('lead-form').querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el=>el.checked=false);read('lead-criteria').querySelectorAll('.lead-note').forEach(n=>n.value='');
  read('lead-date').value=date();read('lead-supervisor').value='';seamxLeadScore();seamxLeadRender();
  alert('Evaluación guardada como registro local. Aún no está sincronizada entre dispositivos.');
 };
