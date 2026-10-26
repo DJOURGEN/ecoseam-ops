@@ -2414,6 +2414,17 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
       <div class="evidence-box"><label>Foto durante</label><div class="evidence-preview" id="evidence-preview-during">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="evidence-during" type="file" accept="image/*" onchange="previewActivityEvidence(this,'evidence-preview-during','evidence-during-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="evidence-during-camera" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-during','evidence-during')"></label></div></div>
       <div class="evidence-box"><label>Foto después</label><div class="evidence-preview" id="evidence-preview-after">Sin imagen</div><div class="evidence-file-actions"><label class="evidence-file-btn">▣ Adjuntar<input id="evidence-after" type="file" accept="image/*" onchange="previewActivityEvidence(this,'evidence-preview-after','evidence-after-camera')"></label><label class="evidence-file-btn camera">📷 Cámara<input id="evidence-after-camera" type="file" accept="image/*" capture="environment" onchange="previewActivityEvidence(this,'evidence-preview-after','evidence-after')"></label></div></div>
     </div>
+    <section id="seamx-safe-panel" class="seamx-safe-panel" aria-label="Análisis de riesgos con IA">
+      <h3>SEAMX SAFE · Análisis de riesgos con IA</h3>
+      <p class="seamx-safe-note">Complemento del IPERC físico, PETS y supervisión. Las fotografías por sí solas no certifican la ausencia de riesgos.</p>
+      <div class="seamx-safe-iperc">
+        <label class="evidence-file-btn">▣ Adjuntar IPERC<input type="file" id="seamx-safe-iperc-file" accept="image/*" onchange="seamxSafePreviewIperc(this)"></label>
+        <label class="evidence-file-btn camera">📷 Cámara<input type="file" id="seamx-safe-iperc-camera" accept="image/*" capture="environment" onchange="seamxSafePreviewIperc(this)"></label>
+        <span id="seamx-safe-iperc-info" aria-live="polite">Sin IPERC adjunto</span>
+      </div>
+      <div class="seamx-safe-actions"><button type="button" class="btn btn-outline" onclick="seamxSafeAnalyze()">Analizar riesgos</button><button type="button" class="btn btn-outline" onclick="seamxSafeClear()">Limpiar análisis</button></div>
+      <div id="seamx-safe-output" role="status" aria-live="polite"><p>Sin análisis realizado. Solo se mostrarán hallazgos obtenidos de un servicio de IA verificado, nunca resultados de ejemplo.</p></div>
+    </section>
     <div class="form-hint" id="evidence-upload-hint" style="margin-top:10px">Puedes tomar la foto con la cámara o adjuntarla desde la galería/archivos. Las imágenes se comprimen automáticamente para Android, iPhone y escritorio.</div>
     <div id="activity-detail-review" class="activity-detail-review" style="display:none"></div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-actividad-evidencias')">Cerrar</button><button class="btn btn-primary" id="btn-save-evidence" onclick="saveActivityEvidence()">✓ Finalizar actividad</button></div>
@@ -6789,6 +6800,7 @@ function openActivityEvidence(id){
   ['evidence-before','evidence-before-camera','evidence-during','evidence-during-camera','evidence-after','evidence-after-camera'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='';});
   const reviewBox=document.getElementById('activity-detail-review');if(reviewBox){reviewBox.style.display='none';reviewBox.innerHTML='';}
   const hint=document.getElementById('evidence-upload-hint');if(hint)hint.textContent='Puedes tomar la foto con la cámara o adjuntarla desde la galería/archivos. Las imágenes se comprimen automáticamente para Android, iPhone y escritorio.';
+  if(typeof seamxSafeClear==='function')seamxSafeClear();
   const a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;if(activityIsFieldUser()&&!activityUserMatch(a)){showToast('Esta actividad no está asignada a tu usuario','error');return;}
   const members=activityGroupMembers(a),shared=activityGroupEvidence(members)||a;
   document.getElementById('evidence-activity-id').value=id;document.getElementById('evidence-activity-title').textContent=`${a.actividad} · ${a.area} · ${members.length} integrante${members.length===1?'':'s'}`;document.getElementById('evidence-description').value=shared.descripcionCierre||'';
@@ -7238,6 +7250,78 @@ async function seamxGuardarHabilitado(){
 .lead-kpi{border-left:3px solid #17642e;background:white;padding:12px}.lead-kpi small{display:block;color:#54715c}.lead-kpi b{font-size:20px}
 @media(max-width:750px){.lead-bar,.lead-fields{grid-template-columns:1fr 1fr}.lead-kpis{grid-template-columns:1fr 1fr}.lead-head,.lead-criterion{grid-template-columns:1fr}.lead-options{justify-content:start;gap:15px}}
 </style>
+<style>
+.seamx-safe-panel{margin:14px 0;padding:14px;border:1px solid #bfd3c3;border-left:4px solid #277449;border-radius:10px;background:#f8fbf8}
+.seamx-safe-panel h3{font-size:15px;color:#164c30;margin:0 0 7px}.seamx-safe-note{font-size:12px;color:#51685a;line-height:1.5;margin-bottom:10px}
+.seamx-safe-iperc,.seamx-safe-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:9px 0}
+#seamx-safe-iperc-info{font-size:12px;overflow-wrap:anywhere}
+#seamx-safe-output{font-size:12px;line-height:1.6;margin-top:12px}
+.seamx-safe-result{padding:10px;margin:7px 0;border:1px solid #c6d6c7;border-radius:8px;background:#fff}
+.seamx-safe-result strong{color:#1b5835}
+.seamx-safe-warning{padding:10px;background:#fff3dc;border:1px solid #d9aa58;border-radius:8px}
+</style>
+<script>
+/* SEAMX SAFE - UI integrada. El análisis requiere backend autenticado.
+   No introducir claves secretas en el navegador ni inventar hallazgos. */
+const seamxSafe={iperc:null,analysis:null,activityId:null,busy:false};
+function seamxSafeOutput(message,warning=false){
+ const el=document.getElementById('seamx-safe-output');if(!el)return;
+ el.replaceChildren();const p=document.createElement('p');p.textContent=message;if(warning)p.className='seamx-safe-warning';el.appendChild(p);
+}
+function seamxSafePreviewIperc(input){
+ const file=input.files?.[0];if(!file)return;
+ if(!file.type.startsWith('image/'))return seamxSafeOutput('Solo se admiten fotografías del IPERC.',true);
+ if(file.size>12*1024*1024)return seamxSafeOutput('El archivo supera el máximo de 12 MB.',true);
+ seamxSafe.iperc=file;seamxSafe.analysis=null;
+ ['seamx-safe-iperc-file','seamx-safe-iperc-camera'].forEach(id=>{const el=document.getElementById(id);if(el&&el!==input)el.value=''});
+ document.getElementById('seamx-safe-iperc-info').textContent='IPERC seleccionado: '+file.name+' (pendiente de análisis)';
+ seamxSafeOutput('IPERC seleccionado. El documento físico sigue siendo la referencia. No se han identificado peligros todavía.');
+}
+function seamxSafeClear(){
+ seamxSafe.iperc=null;seamxSafe.analysis=null;
+ ['seamx-safe-iperc-file','seamx-safe-iperc-camera'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+ const info=document.getElementById('seamx-safe-iperc-info');if(info)info.textContent='Sin IPERC adjunto';
+ seamxSafeOutput('Sin análisis realizado.');
+}
+function seamxSafeAsImage(file){
+ return new Promise((resolve,reject)=>{if(!file)return resolve(null);const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('No se pudo leer la imagen'));reader.readAsDataURL(file)});
+}
+function seamxSafeEvidenceFile(stage){
+ return typeof selectedActivityEvidenceFile==='function'?selectedActivityEvidenceFile(stage):null;
+}
+async function seamxSafeAnalyze(){
+ if(seamxSafe.busy)return;
+ const id=document.getElementById('evidence-activity-id')?.value;
+ const a=APP.data.actividades.find(x=>String(x.id)===String(id));
+ if(!a)return seamxSafeOutput('Selecciona una actividad válida.',true);
+ if(typeof activityIsFieldUser==='function'&&activityIsFieldUser()&&!activityUserMatch(a))return seamxSafeOutput('Actividad no asignada.',true);
+ if(!navigator.onLine)return seamxSafeOutput('Sin conexión. Se conservan las funciones de registro de la actividad; el análisis con IA requiere conexión.',true);
+ if(!db?.auth?.getSession)return seamxSafeOutput('El análisis no está habilitado: se requiere autenticación segura en Supabase antes de enviar fotografías del IPERC.',true);
+ seamxSafe.busy=true;seamxSafeOutput('Comprobando autorización para el análisis…');
+ try{
+   const sessionResult=await db.auth.getSession();
+   if(sessionResult.error||!sessionResult.data?.session)return seamxSafeOutput('SEAMX SAFE pendiente de configuración segura: inicia sesión mediante Supabase Auth. No se enviaron imágenes.',true);
+   const files=await Promise.all([seamxSafeAsImage(seamxSafe.iperc),...['before','during','after'].map(x=>seamxSafeAsImage(seamxSafeEvidenceFile(x)))]);
+   const payload={activity_id:id,description:a.actividad,area:a.area,stage:'evaluacion',iperc:files[0],before:files[1],during:files[2],after:files[3]};
+   const response=await db.functions.invoke('seamx-safe-analyze',{body:payload});
+   if(response.error)throw response.error;
+   const data=response.data;
+   if(!data||!Array.isArray(data.findings)||!data.reviewed_context)throw Error('Respuesta del servicio sin estructura válida');
+   seamxSafe.analysis=data;const output=document.getElementById('seamx-safe-output');output.replaceChildren();
+   const caption=document.createElement('p');caption.textContent='Análisis de apoyo: '+(data.summary||'Revisar los hallazgos con supervisión.');output.appendChild(caption);
+   for(const f of data.findings){
+      const card=document.createElement('div');card.className='seamx-safe-result';
+      const header=document.createElement('strong');header.textContent=String(f.id||'Hallazgo')+' · '+String(f.attention||'Atención por determinar');card.appendChild(header);
+      for(const [name,key] of [['Peligro observado','hazard'],['Riesgo asociado','risk'],['Control IPERC','iperc_control'],['Condición visual','visual_status'],['Acción requerida','action'],['Estado','status']]){
+        const p=document.createElement('p');p.textContent=name+': '+String(f[key]||'No verificable');card.appendChild(p);
+      }
+      output.appendChild(card);
+   }
+   if(!data.findings.length){const p=document.createElement('p');p.textContent='No se identificaron hallazgos verificables con las evidencias disponibles. Esto no significa ausencia de riesgos.';output.appendChild(p)}
+ }catch(e){seamxSafeOutput('No se pudo completar el análisis seguro: '+String(e.message||e)+'. El registro normal de actividades sigue disponible.',true)}
+ finally{seamxSafe.busy=false}
+}
+</script>
 <script src="liderazgo.js"></script>
 <style>
 /* ECOSEAM | jerarquía de información, sin animación decorativa */
