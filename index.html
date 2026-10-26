@@ -1919,19 +1919,23 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
       <!-- DASHBOARD / HABILITADO -->
 <div id="view-opsdashboard" style="display:none">
   <div class="page-header"><div><h2 class="page-title">Dashboard operacional</h2><p class="page-subtitle">Evacuación · Curva S · Transporte · Ocupabilidad</p></div></div>
-  <div class="seamx-ops-controls">
-    <label>Mes <input type="month" id="ops-mes" onchange="seamxRenderOpsDashboard()"></label>
-    <label>Guardia <select id="ops-guardia" onchange="seamxRenderOpsDashboard()"><option value="">Ambas</option><option value="A">A</option><option value="B">B</option></select></label>
-    <label>Programación (tn) <input id="ops-toneladas" type="number" min="0" step=".01" placeholder="Toneladas"></label>
-    <label>Fecha <input id="ops-fecha" type="date"></label>
-    <label>Guardia a programar <select id="ops-guardia-edit"><option value="A">A</option><option value="B">B</option></select></label>
-    <button class="btn btn-primary" onclick="seamxGuardarPrograma()">Guardar programación</button>
+  <div class="seamx-ops-controls seamx-ops-period">
+    <label>Mes valorizable <input type="month" id="ops-mes" onchange="seamxRenderOpsDashboard()" aria-label="Mes del periodo valorizable"></label>
+    <label>Guardia de programación <select id="ops-guardia" onchange="seamxRenderOpsDashboard()"><option value="">Ambas</option><option value="A">A</option><option value="B">B</option></select></label>
   </div>
   <p class="form-hint">Meta mensual y valorizable: 850 tn · Guardia A/B: 425 tn cada una · Valorización: 21 al 20 del mes siguiente. Programación guardada localmente.</p>
   <div id="ops-metrics" class="seamx-ops-metrics"></div>
 <section class="seamx-ops-panel" id="lead-dashboard-summary" style="margin:0 0 12px"><h3>Seguimiento de liderazgo preventivo</h3><div id="lead-dashboard-values" class="lead-kpis"><p class="lead-muted">Sin evaluaciones en este navegador.</p></div><button class="lead-btn-alt" onclick="navigateTo('liderazgo')" id="lead-go">Abrir evaluaciones</button><p class="lead-muted">Datos locales provisionales; no consolidados entre dispositivos.</p></section>
   <div class="seamx-ops-charts">
-    <div class="seamx-ops-panel"><h3>Curva S · Programado vs evacuado (tn)</h3><canvas id="ops-curve"></canvas></div>
+    <div class="seamx-ops-panel seamx-curve-panel"><h3>Curva S · Programado vs evacuado (tn)</h3>
+    <p class="form-hint">Vista de mes calendario actual. La selección del periodo valorizable no modifica esta curva.</p>
+    <div class="seamx-curve-programming">
+      <label>Fecha <input id="ops-fecha" type="date"></label>
+      <label>Guardia <select id="ops-guardia-edit"><option value="A">A</option><option value="B">B</option></select></label>
+      <label>Programación (tn) <input id="ops-toneladas" type="number" min="0" step=".01" placeholder="Toneladas"></label>
+      <button class="btn btn-primary" onclick="seamxGuardarPrograma()">Guardar programación</button>
+    </div>
+    <canvas id="ops-curve"></canvas></div>
     <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div><div class="seamx-ops-panel"><h3>Evacuaciones por día (tn)</h3><canvas id="ops-outbound"></canvas></div><div class="seamx-ops-panel"><h3>Meta mensual · evacuado y faltante</h3><canvas id="ops-month-share"></canvas></div><div class="seamx-ops-panel"><h3>Meta valorizable · evacuado y faltante</h3><canvas id="ops-value-share"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ocupabilidad del Patio 4388</h3><canvas id="ops-occupancy"></canvas></div>
@@ -7143,14 +7147,15 @@ window.addEventListener('load',async()=>{
 <script>
 const seamxOpsCharts={};
 function seamxOpsSafe(t){return String(t??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
-function seamxOpsMonth(){return document.getElementById('ops-mes')?.value||new Date().toISOString().slice(0,7)}
+function seamxOpsMonth(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function seamxValorizableMonth(){return document.getElementById('ops-mes')?.value||seamxOpsMonth()}
 function seamxOpsLocal(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
 function seamxOpsSave(key,v){localStorage.setItem(key,JSON.stringify(v))}
 function seamxOpsChart(id,type,labels,datasets){if(typeof Chart==='undefined')return;seamxOpsCharts[id]?.destroy();seamxOpsCharts[id]=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}})}
 function seamxOpsPeso(r){const n=v=>v==null||v===''?NaN:Number(String(v).replace(',','.'));const p=n(r.peso_tn),q=n(r.peso_4388);return Number.isFinite(p)?p:(Number.isFinite(q)?q:0)}
 function seamxOpsMaterialTipo(r){const d=String(r.descripcion||r.tipo_residuo||'').toLowerCase();return /liner|linners|hdpe|tuber[ií]a|faja/.test(d)?'Plataforma':'Tolva'}
 async function seamxRenderOpsDashboard(){
-  if(!document.getElementById('ops-mes').value)document.getElementById('ops-mes').value=new Date().toLocaleDateString('en-CA').slice(0,7);
+  if(!document.getElementById('ops-mes').value)document.getElementById('ops-mes').value=seamxOpsMonth();
   if(!document.getElementById('ops-fecha').value)document.getElementById('ops-fecha').value=new Date().toLocaleDateString('en-CA');
   const month=seamxOpsMonth(),guardia=document.getElementById('ops-guardia').value;
   let res=await db.from('evacuaciones_excel').select('fecha,ticket_balanza,peso_tn,peso_4388,descripcion,tipo_residuo').gte('fecha',month+'-01').lt('fecha',new Date(Number(month.slice(0,4)),Number(month.slice(5)),1).toLocaleDateString('en-CA'));
@@ -7164,11 +7169,12 @@ async function seamxRenderOpsDashboard(){
   const inDaily={};(APP.data.movimientos||[]).forEach(m=>{if(String(m.fecha||'').startsWith(month)&&m.movimiento==='ingreso')inDaily[m.fecha]=(inDaily[m.fecha]||0)+Number(m.peso||0)});
   const plataforma={},tolva={};for(const t of tickets.values()){const ob=t.kind==='Plataforma'?plataforma:tolva;ob[t.date]=(ob[t.date]||0)+1}
   let occupied='—';try{const o=calculateOcupabilidad(),a=o.reduce((s,x)=>s+x.occupiedM2,0),b=o.reduce((s,x)=>s+x.totalM2,0);occupied=b?(100*a/b).toFixed(1)+'%':'—';seamxOpsChart('ops-occupancy','doughnut',o.map(x=>x.name),[{data:o.map(x=>Math.max(0,x.occupiedM2)),backgroundColor:['#1a5c2a','#00897b','#69f0ae','#d3ac38','#5f8769','#a8ceae','#f2c35a','#7f9586'] }])}catch(e){console.warn(e)}
-  // Periodo valorizable: día 20 del mes seleccionado al día 21 del mes siguiente, inclusive.
+  // Periodo valorizable: del día 21 del mes anterior al 20 del mes seleccionado.
   // No reutilizar el acumulado mensual: cada indicador tiene su propio rango.
-  const valorInicio=new Date(Number(month.slice(0,4)),Number(month.slice(5))-2,21).toLocaleDateString('en-CA');
-  const valorFin=new Date(Number(month.slice(0,4)),Number(month.slice(5))-1,20).toLocaleDateString('en-CA');
-  const valorFinExclusivo=new Date(Number(month.slice(0,4)),Number(month.slice(5))-1,21).toLocaleDateString('en-CA');
+  const valorMonth=seamxValorizableMonth();
+  const valorInicio=new Date(Number(valorMonth.slice(0,4)),Number(valorMonth.slice(5))-2,21).toLocaleDateString('en-CA');
+  const valorFin=new Date(Number(valorMonth.slice(0,4)),Number(valorMonth.slice(5))-1,20).toLocaleDateString('en-CA');
+  const valorFinExclusivo=new Date(Number(valorMonth.slice(0,4)),Number(valorMonth.slice(5))-1,21).toLocaleDateString('en-CA');
   const valorRes=await db.from('evacuaciones_excel').select('fecha,peso_tn,peso_4388').gte('fecha',valorInicio).lt('fecha',valorFinExclusivo);
   const valorReal=valorRes.error?null:(valorRes.data||[]).reduce((s,x)=>s+seamxOpsPeso(x),0);
   if(valorRes.error)console.warn('No se pudo calcular el periodo valorizable:',valorRes.error);
@@ -7183,6 +7189,7 @@ async function seamxRenderOpsDashboard(){
   }else{const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='none'}
   const mensualPendiente=Math.max(0,850-evacuadas),valorPendiente=Math.max(0,850-(valorReal||0));
   seamxOpsChart('ops-month-share','doughnut',['Evacuado','Pendiente'],[{data:[evacuadas,mensualPendiente],backgroundColor:['#1d673e','#d9e2d8']}]);
+  const valorTitle=document.querySelector('#ops-value-share')?.closest('.seamx-ops-panel')?.querySelector('h3');if(valorTitle)valorTitle.textContent='Meta valorizable · '+valorInicio+' al '+valorFin;
   seamxOpsChart('ops-value-share','doughnut',['Evacuado','Pendiente'],[{data:[valorReal||0,valorPendiente],backgroundColor:['#376f91','#d9e2d8']}]);
   seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
@@ -7426,5 +7433,14 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
  .content>[id^="view-"][style*="display: block"],.content>[id^="view-"][style*="display:block"]{animation:none!important}
  .nav-item,.mobile-nav-item,.btn,.lead-btn-alt,.lead-tabs button{transition:none!important}
 }
+</style><style id="seamx-ops-layout-fix">
+.seamx-ops-period{display:flex!important;align-items:end;gap:12px;flex-wrap:wrap}
+.seamx-ops-period label{min-width:180px}
+.seamx-curve-panel{grid-column:1/-1}
+.seamx-curve-programming{display:flex;flex-wrap:wrap;align-items:end;gap:10px;padding:12px 0;margin-bottom:12px;border-bottom:1px solid #d5dfd6}
+.seamx-curve-programming label{display:flex;flex-direction:column;gap:5px;min-width:145px;font-size:12px}
+.seamx-curve-programming button{height:38px}
+#ops-curve{max-height:350px}
+@media(max-width:650px){.seamx-curve-programming{display:grid;grid-template-columns:1fr 1fr}.seamx-curve-programming button{grid-column:1/-1}.seamx-curve-panel{grid-column:auto}.seamx-ops-period{display:grid!important;grid-template-columns:1fr 1fr}}
 </style></body>
 </html>
