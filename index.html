@@ -1933,7 +1933,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
   <div class="seamx-ops-charts">
     <div class="seamx-ops-panel"><h3>Curva S · Programado vs evacuado (tn)</h3><canvas id="ops-curve"></canvas></div>
     <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
-    <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div>
+    <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div><div class="seamx-ops-panel"><h3>Evacuaciones por día (tn)</h3><canvas id="ops-outbound"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ocupabilidad del Patio 4388</h3><canvas id="ops-occupancy"></canvas></div>
   </div>
 </div>
@@ -1945,8 +1945,8 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
       <label>Tipo <input id="hab-tipo" placeholder="Estructura / equipo"></label>
       <label>Código <input id="hab-codigo" placeholder="Tag o código"></label>
       <label>Estado <select id="hab-estado"><option>Programado</option><option>En proceso</option><option>Finalizado</option></select></label>
-      <label>Plan de corte (URL) <input id="hab-plan" type="url" placeholder="Enlace a PDF del plan"></label>
-      <label>Modelo 3D (URL .glb/.gltf) <input id="hab-modelo" type="url" placeholder="Enlace al modelo"></label>
+      <label>Plan de corte (URL) <input id="hab-plan" type="url" placeholder="Enlace al PDF"></label><label>Seleccionar PDF <input id="hab-plan-file" type="file" accept="application/pdf,.pdf"></label>
+      <label>Modelo 3D (URL .glb/.gltf) <input id="hab-modelo" type="url" placeholder="Enlace al modelo"></label><label>Seleccionar modelo 3D <input id="hab-modelo-file" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json"></label><input id="hab-edit-id" type="hidden">
       <button class="btn btn-primary" onclick="seamxGuardarHabilitado()">Registrar habilitado</button>
     </div>
     <p class="form-hint">Registros locales. El visor admite enlaces a modelos 3D GLB/GLTF; para compartir archivos se requiere almacenamiento en Supabase.</p>
@@ -7167,10 +7167,27 @@ async function seamxRenderOpsDashboard(){
   seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
+  seamxOpsChart('ops-outbound','bar',dates.map(d=>d.slice(8)),[{label:'Evacuado (tn)',data:dates.map(d=>daily[d]||0),backgroundColor:'#17643a'}]);
 }
 function seamxGuardarPrograma(){if(!['admin','supervisor'].includes(APP.user?.role))return showToast('Solo supervisión y administración','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
-function seamxRenderHabilitado(){const data=seamxOpsLocal('seamx_habilitado_v1');document.getElementById('habilitado-items').innerHTML=data.map(x=>'<div class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo)+' · '+seamxOpsSafe(x.codigo)+' · '+seamxOpsSafe(x.estado)+'</p>'+(x.modelo?'<model-viewer src="'+seamxOpsSafe(x.modelo)+'" camera-controls auto-rotate></model-viewer>':'<p class="form-hint">Sin modelo 3D</p>')+(x.plan?'<a href="'+seamxOpsSafe(x.plan)+'" target="_blank" rel="noopener noreferrer">Ver plan de corte</a>':'')+'</div>').join('')||'<p class="form-hint">Aún no hay estructuras registradas.</p>'}
-function seamxGuardarHabilitado(){if(!['admin','supervisor'].includes(APP.user?.role))return showToast('Solo supervisión y administración','warning');const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Ingresa el nombre de la estructura','warning');const rows=seamxOpsLocal('seamx_habilitado_v1');rows.push({nombre,tipo:val('hab-tipo'),codigo:val('hab-codigo'),estado:val('hab-estado'),plan:val('hab-plan'),modelo:val('hab-modelo')});seamxOpsSave('seamx_habilitado_v1',rows);seamxRenderHabilitado();showToast('Habilitado guardado en este navegador','success')}
+function seamxRenderHabilitado(){const data=seamxOpsLocal('seamx_habilitado_v1');document.getElementById('habilitado-items').innerHTML=data.map(x=>'<div class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo)+' · '+seamxOpsSafe(x.codigo)+' · '+seamxOpsSafe(x.estado)+'</p>'+(x.modelo?'<model-viewer src="'+seamxOpsSafe(x.modelo)+'" camera-controls auto-rotate></model-viewer>':'<p class="form-hint">Sin modelo 3D</p>')+(x.plan?'<a href="'+seamxOpsSafe(x.plan)+'" target="_blank" rel="noopener noreferrer">Ver plan de corte</a>':'')+' <button class="lead-btn-alt" onclick="seamxEditarHabilitado(\''+seamxOpsSafe(x.id||'')+'\')">Editar</button></div>').join('')||'<p class="form-hint">Aún no hay estructuras registradas.</p>'}
+function seamxEditarHabilitado(id){
+ const x=seamxOpsLocal('seamx_habilitado_v1').find(v=>String(v.id)===String(id));if(!x)return;
+ const values={'hab-edit-id':x.id,'hab-nombre':x.nombre,'hab-tipo':x.tipo,'hab-codigo':x.codigo,'hab-estado':x.estado,'hab-plan':x.plan,'hab-modelo':x.modelo};
+ Object.entries(values).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v||''});
+ document.getElementById('hab-nombre').focus();
+}
+function seamxGuardarHabilitado(){
+ if(!['admin','supervisor','jefatura'].includes(APP.user?.role))return showToast('Solo supervisión o jefatura','warning');
+ const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Ingresa la estructura','warning');
+ const planFile=document.getElementById('hab-plan-file').files[0],modelFile=document.getElementById('hab-modelo-file').files[0];
+ if(planFile||modelFile){showToast('Seleccionaste archivos. Para conservarlos entre equipos deben subirse al almacenamiento autorizado; utiliza los enlaces mientras tanto.','warning');return;}
+ const rows=seamxOpsLocal('seamx_habilitado_v1'),id=val('hab-edit-id')||Date.now().toString(36);
+ const record={id,nombre,tipo:val('hab-tipo'),codigo:val('hab-codigo'),estado:val('hab-estado'),plan:val('hab-plan'),modelo:val('hab-modelo')};
+ const pos=rows.findIndex(x=>String(x.id)===String(id));if(pos>=0)rows[pos]=record;else rows.push(record);
+ seamxOpsSave('seamx_habilitado_v1',rows);seamxRenderHabilitado();document.getElementById('hab-edit-id').value='';
+ showToast('Registro actualizado en este navegador','success');
+}
 </script>
 <style>
 #view-liderazgo{font-size:12px;max-width:100%}#view-liderazgo .page-title{font-size:20px}
