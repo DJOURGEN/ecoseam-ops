@@ -1971,6 +1971,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
   <div id="lead-report-tab" hidden><div id="lead-kpis" class="lead-kpis"></div><h3>Indicadores individuales</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Supervisor</th><th>Evaluaciones</th><th>Último resultado</th><th>Evolución</th><th>Compromisos pendientes</th><th>Críticas sin verificar</th></tr></thead><tbody id="lead-supervisors"></tbody></table></div><h3>Historial y compromisos</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Supervisor</th><th>Resultado</th><th>Fase</th><th>Compromiso</th><th>Verificación</th></tr></thead><tbody id="lead-records"></tbody></table></div><p class="lead-muted">Programa: 2 observaciones por semana durante 4 semanas, luego 1 mensual por 3 meses (11 sesiones por supervisor). La evidencia en campo es necesaria para confirmar la eficacia.</p></div>
 </div>
 
+<div id="view-antamina" style="display:none"><div class="page-header"><div><div class="page-title">Antamina</div></div></div><div style="min-height:170px;background:#fff;border:1px solid #cbd8c9"></div></div>
       <!-- PAGE: COPRODUCTOS 3D -->
       <div id="view-coproductos" style="display:none">
         <div class="page-header">
@@ -4067,12 +4068,13 @@ const NAV_CONFIG = {
     {id:'entrega',label:'Entrega de guardia',icon:'transfer'},
     {id:'mantenimiento',label:'Gestión de mantenimiento',icon:'wrench'},
     {id:'admin',label:'Administración',icon:'user'},
+    {id:'antamina',label:'Antamina',icon:'grid'},
   ],
   operador: ['actividades'],
   controlador: ['comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','entrega'],
   supervisor: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   jefatura: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
-  antamina: [],
+  antamina: ['antamina'],
   gerencia: ['liderazgo','comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   admin: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento','admin'],
   mantenimiento: ['actividades','mantenimiento'],
@@ -4277,6 +4279,7 @@ function getDefaultViewForRole(){
   if(!APP.user)return 'actividades';
   if(['admin','supervisor','gerencia','jefatura'].includes(APP.user.role))return 'comando';
   if(APP.user.role==='controlador')return 'comando';
+  if(APP.user.role==='antamina')return 'antamina';
   if(APP.user.role==='mantenimiento')return 'actividades';
   return 'actividades';
 }
