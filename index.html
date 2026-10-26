@@ -1956,16 +1956,16 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
 <!-- LIDERAZGO PREVENTIVO -->
 <div id="view-liderazgo" style="display:none">
-  <div class="page-header"><div><div class="page-title">Liderazgo preventivo</div><div class="page-subtitle">Evaluación en campo y seguimiento de supervisión · HSE.LI.CMA.07</div></div></div>
+  <div class="page-header"><div><div class="page-title">ANEXO 1 · LISTA DE VERIFICACIÓN DE LIDERAZGO Y ACOMPAÑAMIENTO EN CAMPO</div><div class="page-subtitle">HSE.LI.CMA.07 · Versión 01 · ECOSEAM / Compañía Minera Antamina</div></div></div>
   <div class="lead-tabs"><button onclick="document.getElementById('lead-eval-tab').hidden=false;document.getElementById('lead-report-tab').hidden=true">Evaluar en campo</button><button onclick="document.getElementById('lead-eval-tab').hidden=true;document.getElementById('lead-report-tab').hidden=false;seamxLeadRender()">Indicadores y seguimiento</button><button onclick="seamxLeadExport()">Exportar respaldo</button></div>
   <div id="lead-access" style="display:none;padding:16px;background:#fff;border:1px solid #d1dfd3">Los registros de evaluación están reservados para jefatura y gerencia.</div>
   <div id="lead-eval-tab"><div id="lead-form">
     <div class="lead-bar"><label>Supervisor<select id="lead-supervisor"></select></label><label>Fecha<input type="date" id="lead-date"></label><label>Guardia<select id="lead-shift"><option>A</option><option>B</option></select></label><label>Área<input id="lead-area" placeholder="4388 / DEG"></label><label>Actividad observada<input id="lead-activity" placeholder="Actividad"></label><label>Fase<select id="lead-phase"><option>Diagnóstico</option><option>Retroalimentación</option><option>Implementación</option><option>Verificación</option><option>Evaluación final</option><option>Seguimiento mensual</option></select></label></div>
     <div class="lead-summary"><span>Evaluador: <b id="lead-evaluator"></b></span><span id="lead-score">Sin puntuación</span><span id="lead-level">Pendiente</span></div>
-    <div class="lead-head"><span>Criterio de verificación</span><span>Valor: 2 / 1 / 0 / N/A</span></div>
+    <div class="lead-head"><span>N.º · Criterio de verificación</span><span>Puntaje · 2 / 1 / 0 / N/A</span></div>
     <div id="lead-criteria"></div>
     <div class="lead-fields"><label><input type="checkbox" id="lead-critical"> Se identificó una desviación crítica o control crítico ineficaz</label><label>Acción inmediata<textarea id="lead-action" rows="2"></textarea></label><label>Fortalezas observadas<textarea id="lead-strengths" rows="2"></textarea></label><label>Oportunidades de mejora<textarea id="lead-improve" rows="2"></textarea></label><label>Compromiso verificable<textarea id="lead-commitment" rows="2"></textarea></label><label>Responsable<input id="lead-owner"></label><label>Plazo<input id="lead-due" type="date"></label><label>Próxima verificación<input id="lead-next" type="date"></label></div>
-    <button class="btn btn-primary" onclick="seamxLeadSave()">Guardar evaluación</button>
+    <p class="lead-muted"><strong>Escala:</strong> 2 = Cumple · 1 = Cumple parcialmente · 0 = No cumple · N/A = No aplica (justificar). Resultado = puntaje obtenido / puntaje máximo aplicable × 100.</p><button class="btn btn-primary" onclick="seamxLeadSave()">Guardar evaluación</button>
     <p class="lead-muted">Borrador local en este navegador, no compartido ni sincronizado. N/A se excluye del denominador. La puntuación no sustituye el control de desviaciones críticas.</p>
   </div></div>
   <div id="lead-report-tab" hidden><div id="lead-kpis" class="lead-kpis"></div><h3>Indicadores individuales</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Supervisor</th><th>Evaluaciones</th><th>Último resultado</th><th>Evolución</th><th>Compromisos pendientes</th><th>Críticas sin verificar</th></tr></thead><tbody id="lead-supervisors"></tbody></table></div><h3>Historial y compromisos</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Supervisor</th><th>Resultado</th><th>Fase</th><th>Compromiso</th><th>Verificación</th></tr></thead><tbody id="lead-records"></tbody></table></div><p class="lead-muted">Programa: 2 observaciones por semana durante 4 semanas, luego 1 mensual por 3 meses (11 sesiones por supervisor). La evidencia en campo es necesaria para confirmar la eficacia.</p></div>
@@ -7258,5 +7258,25 @@ async function seamxGuardarHabilitado(){
 #view-opsdashboard .seamx-ops-metric{border-radius:2px}
 #view-habilitado .seamx-ops-panel{border-radius:2px}
 @media(max-width:900px){#view-opsdashboard .seamx-ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style></body>
+</style><style>
+/* Formato de evaluación inspirado en el anexo impreso HSE.LI.CMA.07 */
+#view-liderazgo{background:#f7f9f5;padding:10px 14px;color:#202c22}
+#view-liderazgo .page-header{background:white;border:1px solid #77867b;padding:12px;margin-bottom:0}
+#view-liderazgo .page-title{font-family:Arial,sans-serif;font-size:16px;letter-spacing:.01em}
+#view-liderazgo .page-subtitle{font-size:11px;color:#3c4d3f}
+#view-liderazgo .lead-bar{border:1px solid #77867b;border-top:0;border-radius:0}
+#view-liderazgo .lead-head{background:#b2ca98;color:#243322;border-radius:0;border:1px solid #77867b}
+#view-liderazgo .lead-criterion{border-left:1px solid #8c998b;border-right:1px solid #8c998b;border-bottom:1px solid #8c998b;border-radius:0}
+#view-liderazgo .lead-criterion:nth-child(even){background:#f1f4ec}
+#view-liderazgo .lead-criterion:nth-child(odd){background:#fff}
+#view-liderazgo .lead-n{border-right:1px solid #c8d4bf;margin-right:9px}
+#view-liderazgo .lead-note{border:1px solid #d3dbcf;background:transparent;margin-top:3px;padding:6px}
+#view-liderazgo .lead-summary{margin:0 0 10px;border:1px solid #77867b;border-top:0;border-radius:0}
+#view-liderazgo .lead-options input{accent-color:#2b623a}
+#view-liderazgo .lead-fields{background:#fff;border:1px solid #77867b;padding:12px}
+#view-liderazgo .lead-fields textarea{min-height:62px}
+#view-liderazgo button,#view-habilitado button{border-radius:2px}
+#view-opsdashboard .seamx-ops-controls input,#view-opsdashboard .seamx-ops-controls select{border-radius:2px}
+</style>
+</body>
 </html>
