@@ -1934,6 +1934,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
       <label>Guardia <select id="ops-guardia-edit"><option value="A">A</option><option value="B">B</option></select></label>
       <label>Programación (tn) <input id="ops-toneladas" type="number" min="0" step=".01" placeholder="Toneladas"></label>
       <button class="btn btn-primary" onclick="seamxGuardarPrograma()">Guardar programación</button>
+      <button type="button" class="btn btn-outline" onclick="seamxBorrarProgramacion()">Borrar toda la programación</button>
     </div>
     <canvas id="ops-curve"></canvas></div>
     <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
@@ -1963,7 +1964,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
   <div class="lead-tabs"><button onclick="document.getElementById('lead-eval-tab').hidden=false;document.getElementById('lead-report-tab').hidden=true">Evaluar en campo</button><button onclick="document.getElementById('lead-eval-tab').hidden=true;document.getElementById('lead-report-tab').hidden=false;seamxLeadRender()">Indicadores y seguimiento</button><button onclick="seamxLeadPrint()">Imprimir / Guardar PDF</button><button onclick="seamxLeadExport()">Exportar respaldo</button></div>
   <div id="lead-access" style="display:none;padding:16px;background:#fff;border:1px solid #d1dfd3">Los registros de evaluación están reservados para jefatura y gerencia.</div>
   <div id="lead-eval-tab"><div id="lead-form">
-    <div class="lead-bar"><label>Supervisor<select id="lead-supervisor"><option value="">Seleccione un supervisor</option></select><small id="lead-supervisor-status" aria-live="polite">Cargando lista de supervisores</small></label><label>Fecha<input type="date" id="lead-date"></label><label>Guardia<select id="lead-shift"><option>A</option><option>B</option></select></label><label>Área<input id="lead-area" placeholder="4388 / DEG"></label><label>Actividad observada<input id="lead-activity" placeholder="Actividad"></label><label>Fase<select id="lead-phase"><option>Diagnóstico</option><option>Retroalimentación</option><option>Implementación</option><option>Verificación</option><option>Evaluación final</option><option>Seguimiento mensual</option></select></label></div>
+    <div class="lead-bar"><label>Supervisor<select id="lead-supervisor"><option value="">Seleccione un supervisor</option></select><small id="lead-supervisor-status" aria-live="polite">Cargando lista de supervisores</small></label><label>Fecha<input type="date" id="lead-date"></label><label>Guardia<select id="lead-shift"><option>A</option><option>B</option></select></label><label>Área<input id="lead-area" placeholder="4388 / DEG"></label><label>Actividad observada<input id="lead-activity" placeholder="Actividad"></label></div>
     <div class="lead-summary"><span>Evaluador: <b id="lead-evaluator"></b></span><span id="lead-score">Sin puntuación</span><span id="lead-level">Pendiente</span></div>
     <div class="lead-head" role="row"><span>N.º</span><span>Criterio de verificación</span><span>Puntaje · 2 / 1 / 0 / N/A</span><span>Observaciones / evidencia</span></div>
     <div id="lead-criteria"></div>
@@ -1971,7 +1972,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
     <div class="seamx-lead-scale"><strong>Escala de evaluación</strong><div><b>2</b><span>Cumple: requisito implementado y verificado en campo.</span></div><div><b>1</b><span>Cumple parcialmente: existen brechas por corregir.</span></div><div><b>0</b><span>No cumple: requisito no implementado.</span></div><div><b>N/A</b><span>No aplica: justificar en observaciones.</span></div><p>Resultado = puntaje obtenido / puntaje máximo aplicable × 100.</p></div><button class="btn btn-primary" onclick="seamxLeadSave()">Guardar evaluación</button>
     <p class="lead-muted">Borrador local en este navegador, no compartido ni sincronizado. N/A se excluye del denominador. La puntuación no sustituye el control de desviaciones críticas.</p>
   </div></div>
-  <div id="lead-report-tab" hidden><div id="lead-kpis" class="lead-kpis"></div><h3>Indicadores individuales</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Supervisor</th><th>Evaluaciones</th><th>Último resultado</th><th>Evolución</th><th>Compromisos pendientes</th><th>Críticas sin verificar</th></tr></thead><tbody id="lead-supervisors"></tbody></table></div><h3>Historial y compromisos</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Supervisor</th><th>Resultado</th><th>Fase</th><th>Compromiso</th><th>Verificación</th></tr></thead><tbody id="lead-records"></tbody></table></div><p class="lead-muted">Programa: 2 observaciones por semana durante 4 semanas, luego 1 mensual por 3 meses (11 sesiones por supervisor). La evidencia en campo es necesaria para confirmar la eficacia.</p></div>
+  <div id="lead-report-tab" hidden><div id="lead-kpis" class="lead-kpis"></div><h3>Indicadores individuales</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Supervisor</th><th>Evaluaciones</th><th>Último resultado</th><th>Evolución</th><th>Compromisos pendientes</th><th>Críticas sin verificar</th></tr></thead><tbody id="lead-supervisors"></tbody></table></div><h3>Historial y compromisos</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Supervisor</th><th>Resultado</th><th>Compromiso</th><th>Verificación</th></tr></thead><tbody id="lead-records"></tbody></table></div><p class="lead-muted">Programa: 2 observaciones por semana durante 4 semanas, luego 1 mensual por 3 meses (11 sesiones por supervisor). La evidencia en campo es necesaria para confirmar la eficacia.</p></div>
 </div>
 
 <div id="view-antamina" style="display:none"><div class="page-header"><div><div class="page-title">Antamina</div></div></div><div style="min-height:170px;background:#fff;border:1px solid #cbd8c9"></div></div>
@@ -7166,6 +7167,8 @@ function seamxOpsMaterialTipo(r){const d=String(r.descripcion||r.tipo_residuo||'
 async function seamxRenderOpsDashboard(){
   if(!document.getElementById('ops-mes').value)document.getElementById('ops-mes').value=seamxOpsMonth();
   if(!document.getElementById('ops-fecha').value)document.getElementById('ops-fecha').value=new Date().toLocaleDateString('en-CA');
+  const programControls=document.querySelector('.seamx-curve-programming');
+  if(programControls)programControls.style.display=APP.user?.role==='admin'?'':'none';
   const month=seamxOpsMonth(),guardia=document.getElementById('ops-guardia').value;
   let res=await db.from('evacuaciones_excel').select('fecha,ticket_balanza,peso_tn,peso_4388,descripcion,tipo_residuo').gte('fecha',month+'-01').lt('fecha',new Date(Number(month.slice(0,4)),Number(month.slice(5)),1).toLocaleDateString('en-CA'));
   if(res.error){console.error(res.error);showToast('Error al cargar evacuaciones','warning');return}
@@ -7205,7 +7208,14 @@ async function seamxRenderOpsDashboard(){
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
   seamxOpsChart('ops-outbound','bar',dates.map(d=>d.slice(8)),[{label:'Evacuado (tn)',data:dates.map(d=>daily[d]||0),backgroundColor:'#17643a'}]);
 }
-function seamxGuardarPrograma(){if(!['admin','supervisor'].includes(APP.user?.role))return showToast('Solo supervisión y administración','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
+function seamxGuardarPrograma(){if(APP.user?.role!=='admin')return showToast('Solo administración puede modificar la curva S','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
+function seamxBorrarProgramacion(){
+  if(APP.user?.role!=='admin')return showToast('Solo administración puede borrar la programación','warning');
+  if(!confirm('¿Eliminar toda la programación manual de la curva S guardada en este navegador? Esta acción no se puede deshacer.'))return;
+  seamxOpsSave('seamx_ops_programacion_v1',[]);
+  seamxRenderOpsDashboard();
+  showToast('Programación manual eliminada de este navegador','success');
+}
 let seamxHabCache=[];
 async function seamxRenderHabilitado(){
  const grid=document.getElementById('habilitado-items');if(!grid)return;
