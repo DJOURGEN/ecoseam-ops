@@ -33,14 +33,30 @@ function date(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth(
 function supervisorOptions(users){users=users||APP.data?.usuarios||[];users=users.filter(u=>{const role=String(u.rol||u.role||'').toLowerCase();return (role==='supervisor'||role==='supervisor_hse')&&(u.activo===true||u.activo===1||u.activo==='true'||u.activo==='t'||u.activo==null)});return users.map(u=>{const name=[u.nombre,u.apellido].filter(Boolean).join(' ')||u.name||u.login;return '<option value="'+esc(u.id)+'" data-name="'+esc(name)+'">'+esc(name)+'</option>'}).join('')}
 async function setup(){
  const select=read('lead-supervisor');if(!select)return;
- {let users=APP.data?.usuarios||[];try{const r=await db.from('usuarios').select('id,login,nombre,apellido,rol,activo').in('rol',['supervisor','supervisor_hse']).eq('activo',true);if(!r.error&&r.data?.length)users=r.data}catch(e){console.warn('Lista de supervisores:',e)}const current=select.value;const allowed=users.filter(u=>String(u.rol||u.role||'').toLowerCase().includes('supervisor'));select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions(allowed);if(current)select.value=current;if(!select.value&&select.options.length===1){const opt=document.createElement('option');opt.textContent='No se encontraron supervisores activos';opt.disabled=true;select.appendChild(opt)}if(!allowed.length)console.warn('Sin supervisores disponibles en usuarios; revisar rol/activo y permisos de consulta')}
+ const retained=select.value;
+ select.disabled=true;select.innerHTML='<option value="">Consultando supervisores…</option>';
+ let users=(APP.data?.usuarios||[]).filter(u=>['supervisor','supervisor_hse'].includes(String(u.rol||u.role||'').toLowerCase()));
+ try{
+  const {data,error}=await db.from('usuarios').select('id,login,nombre,apellido,rol,activo').in('rol',['supervisor','supervisor_hse']).order('nombre',{ascending:true});
+  if(error)throw error;
+  if(Array.isArray(data))users=data;
+ }catch(error){console.error('SEAMX Liderazgo: no se pudo consultar supervisores',error);}
+ const active=users.filter(u=>u.activo!==false&&u.activo!==0&&u.activo!=='false'&&u.activo!=='f');
+ select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions(active);
+ select.disabled=active.length===0;
+ if(retained&&Array.from(select.options).some(o=>o.value===retained))select.value=retained;
+ if(!active.length){select.innerHTML='<option value="">No hay supervisores disponibles</option>';select.title='Comprueba los permisos de lectura y usuarios activos';}
+ const hint=read('lead-supervisor-status');if(hint)hint.textContent=active.length?active.length+' supervisores activos disponibles':'No se pudieron cargar supervisores activos';
  if(!val('lead-date'))read('lead-date').value=date();
  read('lead-evaluator').textContent=APP.user?.name||APP.user?.nombre||APP.user?.login||'';
  read('lead-form').style.display=isEvaluator()?'block':'none';
  const tabs=document.querySelector('.lead-tabs');if(tabs)tabs.style.display=isEvaluator()?'flex':'none';
  const report=read('lead-report-tab');if(report&&!isEvaluator()){read('lead-eval-tab').hidden=true;report.hidden=false}
  read('lead-access').style.display=isEvaluator()?'none':'block';if(!isEvaluator())read('lead-access').textContent='Resultados y retroalimentación de tu evaluación. Solo se muestran registros disponibles para este usuario en este dispositivo.';
- if(!read('lead-criteria').children.length)read('lead-criteria').innerHTML=CRITERIOS.map((x,i)=>'<div class="lead-criterion"><div class="lead-criterion-label"><span class="lead-n">'+(i+1)+'</span>'+esc(x)+(PRIORITARIOS.includes(i+1)?'<span class="lead-critical-label">Criterio de control</span>':'')+'</div><div class="lead-options"><label><input type="radio" name="lead-q'+i+'" value="2" onchange="seamxLeadScore()">2</label><label><input type="radio" name="lead-q'+i+'" value="1" onchange="seamxLeadScore()">1</label><label><input type="radio" name="lead-q'+i+'" value="0" onchange="seamxLeadScore()">0</label><label><input type="radio" name="lead-q'+i+'" value="NA" onchange="seamxLeadScore()">N/A</label></div><input class="lead-note" id="lead-note-'+i+'" placeholder="Observación o evidencia (obligatoria para 0, 1 o N/A)"></div>').join('');
+ if(!read('lead-criteria').children.length)read('lead-criteria').innerHTML=CRITERIOS.map((x,i)=>{
+ const radios=['2','1','0','NA'].map(v=>'<label title="'+({2:'Cumple',1:'Cumple parcialmente',0:'No cumple',NA:'No aplica'}[v])+'"><input type="radio" name="lead-q'+i+'" value="'+v+'" onchange="seamxLeadScore()">'+(v==='NA'?'N/A':v)+'</label>').join('');
+ return '<div class="lead-criterion" role="row"><span class="lead-n" role="cell">'+(i+1)+'</span><div class="lead-criterion-label" role="cell">'+esc(x)+(PRIORITARIOS.includes(i+1)?'<span class="lead-critical-label">Control prioritario</span>':'')+'</div><div class="lead-options" role="cell">'+radios+'</div><div role="cell"><input class="lead-note" id="lead-note-'+i+'" aria-label="Observación o evidencia del criterio '+(i+1)+'" placeholder="Observaciones / evidencia (obligatoria para 0, 1 o N/A)"></div></div>';
+ }).join('');
  seamxLeadScore();seamxLeadRender();
 }
 function scoreInfo(){
@@ -60,7 +76,7 @@ window.seamxLeadSave=function(){
  if(!p.max)return alert('Debe existir al menos un criterio aplicable.');
  if(p.gaps.length)return alert('Justifica cada criterio con 0, 1 o N/A.');
  if(read('lead-critical').checked&&!val('lead-action'))return alert('Describe la acción inmediata ante una desviación crítica.');
- const newRec={id:editing||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),supervisor_id:id,supervisor:name,evaluator:read('lead-evaluator').textContent,fecha:val('lead-date'),area:val('lead-area'),actividad:val('lead-activity'),guardia:val('lead-shift'),fase:val('lead-phase'),answers:p.answers,points:p.points,max:p.max,pct:p.pct,crit:read('lead-critical').checked,action:val('lead-action'),strengths:val('lead-strengths'),improve:val('lead-improve'),commitment:val('lead-commitment'),owner:val('lead-owner'),due:val('lead-due'),next:val('lead-next'),verified:false,created:new Date().toISOString()};
+ const newRec={firma_evaluador:val('lead-evaluator-signature')||read('lead-evaluator').textContent,firma_supervisor:val('lead-supervisor-signature'),id:editing||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),supervisor_id:id,supervisor:name,evaluator:read('lead-evaluator').textContent,fecha:val('lead-date'),area:val('lead-area'),actividad:val('lead-activity'),guardia:val('lead-shift'),fase:val('lead-phase'),answers:p.answers,points:p.points,max:p.max,pct:p.pct,crit:read('lead-critical').checked,action:val('lead-action'),strengths:val('lead-strengths'),improve:val('lead-improve'),commitment:val('lead-commitment'),owner:val('lead-owner'),due:val('lead-due'),next:val('lead-next'),verified:false,created:new Date().toISOString()};
  records=records.filter(r=>r.id!==newRec.id);records.push(newRec);
  if(!persist())return;
  editing=null;read('lead-form').querySelectorAll('input:not([type=radio]):not([type=checkbox]), textarea').forEach(el=>{if(el.id!=='lead-evaluator')el.value=''});read('lead-form').querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el=>el.checked=false);read('lead-criteria').querySelectorAll('.lead-note').forEach(n=>n.value='');
@@ -81,5 +97,6 @@ window.seamxLeadRender=function(){
  records=source;
 };
 window.seamxLeadInit=setup;
+window.seamxLeadPrint=function(){if(!isEvaluator())return;const v=read('lead-eval-tab');if(v)v.hidden=false;const rep=read('lead-report-tab');if(rep)rep.hidden=true;window.print()};
 window.seamxLeadExport=function(){if(!isEvaluator())return;const payload=JSON.stringify(get(),null,2),blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='seamx_evaluaciones_liderazgo_'+date()+'.json';a.click();URL.revokeObjectURL(url)};
 })();
