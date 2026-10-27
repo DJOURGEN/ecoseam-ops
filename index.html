@@ -287,7 +287,7 @@ body.seamx-antamina #view-actividades .activity-hero{border-radius:16px;backgrou
 body.seamx-antamina #view-actividades .card{border-radius:14px}
 body.seamx-antamina #view-actividades .data-table td{padding-top:12px;padding-bottom:12px}
 body.seamx-antamina #view-opsdashboard .seamx-curve-programming,body.seamx-antamina #hab-form-panel{display:none!important}
-.antamina-avatar{display:inline-flex;align-items:center;justify-content:center;background:#f8fffd;color:#176d69;font-size:11px;font-weight:800;padding:4px;border-radius:6px}
+.antamina-logo{display:block;width:39px;height:39px;object-fit:contain;background:#fff;border-radius:8px;padding:2px}body.seamx-antamina #user-avatar-side{background:#fff!important;overflow:hidden}
 @media(max-width:900px){body.seamx-antamina .seamx-ops-charts{grid-template-columns:1fr}}
 /* ===== PAGE: LOGIN ===== */
 .login-page{
@@ -4176,7 +4176,7 @@ function setupUI() {
   const dashboardSlot=document.getElementById('actividades-dashboard-slot');
   if(dashboardSlot)dashboardSlot.style.display=u.role==='antamina'?'block':'none';
   document.getElementById('user-avatar-side').textContent = u.initials;
-  if(u.role==='antamina')document.getElementById('user-avatar-side').innerHTML='<span class="antamina-avatar">ANT</span>'; 
+  if(u.role==='antamina')document.getElementById('user-avatar-side').innerHTML='<img class="antamina-logo" src="https://seeklogo.com/images/A/antamina-logo-57AE88BDBE-seeklogo.com.png" alt="Antamina" loading="lazy">'; 
   document.getElementById('user-name-side').textContent = u.name;
   document.getElementById('user-role-side').textContent = u.role;
   const handDate=document.getElementById('handover-date');if(handDate&&!handDate.value)handDate.value=seamxToday();
@@ -4227,6 +4227,7 @@ function setupUI() {
   // Nueva actividad solo dentro de la página Actividades
   const puedeRegistrarActividad = ['operador','controlador','mantenimiento','admin'].includes(u.role);
   const btnAsignar=document.getElementById('btn-asignar-actividad');if(btnAsignar&&u.role==='antamina')btnAsignar.style.display='none';
+  if(u.role==='antamina')document.querySelectorAll('#view-actividades button[onclick*="openAssign"],#view-actividades button[onclick*="editActividad"],#view-actividades button[onclick*="deleteActividad"]').forEach(b=>b.style.display='none');
   const btnNuevaPage = document.getElementById('btn-nueva-actividad-page');
   if(btnNuevaPage) btnNuevaPage.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
   const btnSyncSheets = document.getElementById('btn-sync-actividades-sheets');
@@ -6914,7 +6915,7 @@ function activityTaskCard(a){
 function renderActivitiesDashboard(data){
   const today=(APP.data.actividades||[]).filter(a=>a.fecha===activityToday()).filter(a=>activityIsFieldUser()?activityUserMatch(a):true),total=today.length,process=today.filter(a=>a.estado==='en proceso').length,paused=today.filter(a=>a.estado==='en pausa').length,done=today.filter(a=>a.estado==='finalizado').length,pending=today.filter(a=>a.estado==='pendiente').length;const pct=total?Math.round(done/total*100):0;
   const vals={assigned:total,process,paused,done,pending,progress:pct+'%'};Object.entries(vals).forEach(([k,v])=>{const el=document.getElementById('act-kpi-'+k);if(el)el.textContent=v;});
-  const operator=activityIsFieldUser();document.getElementById('activity-hero-title').textContent=operator?'Mis actividades de hoy':'Seguimiento operacional de actividades';document.getElementById('activity-hero-sub').textContent=operator?'Revisa lo que tienes asignado, inicia tu trabajo, registra pausas y cierra con evidencias.':'Asigna actividades al personal y monitorea en tiempo real el avance individual hasta el cierre con evidencias.';document.getElementById('activities-page-subtitle').textContent=operator?'Trabajo asignado y ejecución diaria':'Asignación, ejecución y evidencias del trabajo diario';
+  const operator=activityIsFieldUser();document.getElementById('activity-hero-title').textContent=operator?'Mis actividades de hoy':'Seguimiento operacional de actividades';document.getElementById('activity-hero-sub').textContent=APP.user?.role==='antamina'?'Consulta el avance, los indicadores, las evidencias y los reportes de las actividades registradas.':operator?'Revisa lo que tienes asignado, inicia tu trabajo, registra pausas y cierra con evidencias.':'Asigna actividades al personal y monitorea en tiempo real el avance individual hasta el cierre con evidencias.';document.getElementById('activities-page-subtitle').textContent=operator?'Trabajo asignado y ejecución diaria':'Asignación, ejecución y evidencias del trabajo diario';
 }
 function renderActivitiesOperator(data){const section=document.getElementById('activities-operator-section'),box=document.getElementById('my-activity-board');if(!section||!box)return;section.style.display=activityIsFieldUser()?'block':'none';if(!activityIsFieldUser())return;const rows=[...data].sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))||String(a.id).localeCompare(String(b.id)));document.getElementById('my-activity-count').textContent=`${rows.length} ${rows.length===1?'actividad':'actividades'}`;box.innerHTML=rows.length?rows.map(activityTaskCard).join(''):`<div class="activity-empty" style="grid-column:1/-1"><strong>No tienes actividades asignadas</strong>No hay trabajos asignados a tu usuario para los filtros seleccionados.</div>`;}
 function renderActivitiesManagement(data){const section=document.getElementById('activities-management-section'),box=document.getElementById('activity-team-board');if(!section||!box)return;const show=!activityIsFieldUser();section.style.display=show?'block':'none';if(!show)return;document.getElementById('team-activity-count').textContent=`${data.length} ${data.length===1?'registro':'registros'}`;box.innerHTML=data.length?data.slice(0,60).map(a=>{const st=activityStatusInfo(a.estado);return `<div class="activity-team-row"><div class="activity-person"><div class="activity-person-avatar">${escapeHtml(activityInitials(a.operador))}</div><div style="min-width:0"><strong>${escapeHtml(a.operador)}</strong><div style="font-size:9px;color:var(--text-m)">${escapeHtml(a.area)} · ${formatDate(a.fecha)}</div></div></div><div class="activity-team-task" title="${escapeHtml(a.actividad)}">${escapeHtml(a.actividad)}</div><div class="activity-team-time">${a.inicio||'—'} → ${a.fin||'—'}</div><div class="activity-team-state"><span class="activity-status ${st.key}">${st.label}</span></div></div>`;}).join(''):`<div class="activity-empty"><strong>Sin actividades</strong>No existen actividades para los filtros seleccionados.</div>`;}
