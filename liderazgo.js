@@ -41,17 +41,22 @@ async function setup(){
   if(error)throw error;
   if(Array.isArray(data))users=data;
  }catch(error){console.error('SEAMX Liderazgo: no se pudo consultar supervisores',error);}
- const active=users.filter(u=>u.activo!==false&&u.activo!==0&&u.activo!=='false'&&u.activo!=='f');
+ const active=users.filter(u=>u.activo!==false&&u.activo!==0&&u.activo!=='false'&&u.activo!=='f').sort((a,b)=>String(a.nombre||'').localeCompare(String(b.nombre||''),'es'));
  select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions(active);
  select.disabled=active.length===0;
+ const role=APP.user?.role;
+ const userOnly=role==='supervisor'||role==='supervisor_hse';
  if(retained&&Array.from(select.options).some(o=>o.value===retained))select.value=retained;
- if(!active.length){select.innerHTML='<option value="">No hay supervisores disponibles</option>';select.title='Comprueba los permisos de lectura y usuarios activos';}
+ if(!active.length){select.innerHTML='<option value="">No se pudo cargar la lista; pulsa Recargar</option>';select.title='Vuelve a consultar los usuarios registrados';}
  const hint=read('lead-supervisor-status');if(hint)hint.textContent=active.length?active.length+' supervisores activos disponibles':'No se pudieron cargar supervisores activos';
  if(!val('lead-date'))read('lead-date').value=date();
  read('lead-evaluator').textContent=APP.user?.name||APP.user?.nombre||APP.user?.login||'';
  read('lead-form').style.display=isEvaluator()?'block':'none';
  const tabs=document.querySelector('.lead-tabs');if(tabs)tabs.style.display=isEvaluator()?'flex':'none';
  const report=read('lead-report-tab');if(report&&!isEvaluator()){read('lead-eval-tab').hidden=true;report.hidden=false}
+ const sTable=read('lead-supervisors')?.closest('.table-wrap');if(sTable)sTable.style.display=userOnly?'none':'';
+ const recordList=read('lead-records')?.closest('.table-wrap');if(recordList)recordList.style.display=userOnly?'none':'';
+ const privateIndicator=read('lead-private-indicator');if(privateIndicator)privateIndicator.style.display=userOnly?'block':'none';
  read('lead-access').style.display=isEvaluator()?'none':'block';if(!isEvaluator())read('lead-access').textContent='Resultados y retroalimentación de tu evaluación. Solo se muestran registros disponibles para este usuario en este dispositivo.';
  if(!read('lead-criteria').children.length)read('lead-criteria').innerHTML=CRITERIOS.map((x,i)=>{
  const radios=['2','1','0','NA'].map(v=>'<label title="'+({2:'Cumple',1:'Cumple parcialmente',0:'No cumple',NA:'No aplica'}[v])+'"><input type="radio" name="lead-q'+i+'" value="'+v+'" onchange="seamxLeadScore()">'+(v==='NA'?'N/A':v)+'</label>').join('');
@@ -68,7 +73,7 @@ function scoreInfo(){
 }
 window.seamxLeadScore=function(){const p=scoreInfo(),out=read('lead-score');if(out)out.textContent=p.pct===null?'Sin puntuación':p.points+' / '+p.max+' · '+p.pct.toFixed(1)+'%';const state=read('lead-level');if(state)state.textContent=p.pct===null?'Pendiente':p.pct>=90?'Satisfactorio':p.pct>=80?'Con oportunidades de mejora':'Requiere plan de mejora'};
 window.seamxLeadSave=function(){
- if(!isEvaluator())return alert('Evaluación reservada para gerencia y administración.');
+ if(!isEvaluator())return alert('Solo Gerencia, Jefatura y Administración pueden realizar evaluaciones.');
  const supervisor=read('lead-supervisor'),id=supervisor.value,name=supervisor.selectedOptions[0]?.dataset.name||'';
  const p=scoreInfo();
  if(!id||!val('lead-date')||!val('lead-activity')||!val('lead-area'))return alert('Indica supervisor, fecha, actividad y área.');
@@ -76,7 +81,7 @@ window.seamxLeadSave=function(){
  if(!p.max)return alert('Debe existir al menos un criterio aplicable.');
  if(p.gaps.length)return alert('Justifica cada criterio con 0, 1 o N/A.');
  if(read('lead-critical').checked&&!val('lead-action'))return alert('Describe la acción inmediata ante una desviación crítica.');
- const newRec={firma_evaluador:val('lead-evaluator-signature')||read('lead-evaluator').textContent,firma_supervisor:val('lead-supervisor-signature'),id:editing||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),supervisor_id:id,supervisor:name,evaluator:read('lead-evaluator').textContent,fecha:val('lead-date'),area:val('lead-area'),actividad:val('lead-activity'),guardia:val('lead-shift'),fase:val('lead-phase'),answers:p.answers,points:p.points,max:p.max,pct:p.pct,crit:read('lead-critical').checked,action:val('lead-action'),strengths:val('lead-strengths'),improve:val('lead-improve'),commitment:val('lead-commitment'),owner:val('lead-owner'),due:val('lead-due'),next:val('lead-next'),verified:false,created:new Date().toISOString()};
+ const newRec={firma_evaluador:val('lead-evaluator-signature')||read('lead-evaluator').textContent,firma_supervisor:val('lead-supervisor-signature'),id:editing||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),supervisor_id:id,supervisor:name,evaluator:read('lead-evaluator').textContent,fecha:val('lead-date'),area:val('lead-area'),actividad:val('lead-activity'),guardia:val('lead-shift'),fase:'Evaluación de campo',answers:p.answers,points:p.points,max:p.max,pct:p.pct,crit:read('lead-critical').checked,action:val('lead-action'),strengths:val('lead-strengths'),improve:val('lead-improve'),commitment:val('lead-commitment'),owner:val('lead-owner'),due:val('lead-due'),next:val('lead-next'),verified:false,created:new Date().toISOString()};
  records=records.filter(r=>r.id!==newRec.id);records.push(newRec);
  if(!persist())return;
  editing=null;read('lead-form').querySelectorAll('input:not([type=radio]):not([type=checkbox]), textarea').forEach(el=>{if(el.id!=='lead-evaluator')el.value=''});read('lead-form').querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el=>el.checked=false);read('lead-criteria').querySelectorAll('.lead-note').forEach(n=>n.value='');
@@ -93,7 +98,7 @@ window.seamxLeadRender=function(){
  const n=records.length,pending=records.filter(r=>r.commitment&&!r.verified).length,critical=records.filter(r=>r.crit&&!r.verified).length,avg=n?records.reduce((t,r)=>t+Number(r.pct||0),0)/n:null;
  read('lead-kpis').innerHTML=[['Evaluaciones',n],['Promedio',avg===null?'—':avg.toFixed(1)+'%'],['Compromisos pendientes',pending],['Críticos sin verificar',critical]].map(([l,v])=>'<div class="lead-kpi"><small>'+l+'</small><b>'+v+'</b></div>').join('');
  tbl.innerHTML=grouped().map(([name,a])=>{a.sort((x,y)=>x.fecha.localeCompare(y.fecha));const first=a[0],last=a[a.length-1],improvement=last.pct-first.pct,pending=a.filter(x=>x.commitment&&!x.verified).length,cr=a.filter(x=>x.crit&&!x.verified).length;return '<tr><td>'+esc(name)+'</td><td>'+a.length+'</td><td>'+last.pct.toFixed(1)+'%</td><td>'+(a.length>1?(improvement>=0?'+':'')+improvement.toFixed(1)+' pp':'—')+'</td><td>'+pending+'</td><td>'+cr+'</td></tr>'}).join('')||'<tr><td colspan="6">No existen evaluaciones registradas en este navegador.</td></tr>';
- read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>'+esc(r.fase)+'</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+'</td></tr>').join('')||'<tr><td colspan="6">Sin registros</td></tr>';
+ read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>Evaluación de campo</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment&&isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+'</td></tr>').join('')||'<tr><td colspan="6">Sin registros</td></tr>';
  records=source;
 };
 window.seamxLeadInit=setup;
