@@ -1346,6 +1346,10 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 #view-opsdashboard .seamx-curve-panel canvas{position:relative!important;min-height:100px!important;height:100%!important}
 @media(max-width:1099px){#view-opsdashboard .seamx-ops-charts{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:auto!important}}
 @media(max-width:650px){#view-opsdashboard .seamx-ops-charts{grid-template-columns:1fr!important}}
+</style><style id="seamx-antamina-results-only">
+body.seamx-antamina #seamx-safe-panel,body.seamx-antamina #activity-evidence-upload,body.seamx-antamina .activity-shared-control-note,body.seamx-antamina #btn-save-evidence,body.seamx-antamina #btn-asignar-actividad,body.seamx-antamina #btn-nueva-actividad-page{display:none!important}
+body.seamx-antamina #view-actividades .activity-hero{background:linear-gradient(125deg,#0b5851,#169078)!important}
+body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;border-left:3px solid #3dbb95}
 </style></head>
 <body>
 
@@ -6901,6 +6905,7 @@ async function updateAssignedActivity(id,action){
   }catch(err){console.error(err);showToast('No se pudo actualizar la actividad del equipo','error');}
 }
 function openActivityRisk(id){
+ if(APP.user?.role==='antamina')return showToast('Antamina tiene acceso solo a resultados de actividades','warning');
  openActivityEvidence(id);
  const modal=document.getElementById('modal-actividad-evidencias');
  const title=modal?.querySelector('.modal-title');if(title)title.textContent='Análisis de riesgos durante la actividad';
@@ -6909,6 +6914,7 @@ function openActivityRisk(id){
  if(panel)requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}));
 }
 function openActivityEvidence(id){
+  if(APP.user?.role==='antamina')return viewActivityEvidence(id);
   const detailTitle=document.querySelector('#modal-actividad-evidencias .modal-title');if(detailTitle)detailTitle.textContent='Finalizar actividad';
   const finishButton=document.getElementById('btn-save-evidence');if(finishButton)finishButton.style.display='';
   const descField=document.getElementById('evidence-description');if(descField)descField.readOnly=false;
