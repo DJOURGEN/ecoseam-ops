@@ -45,9 +45,11 @@ async function setup(){
  select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions(active);
  select.disabled=active.length===0;
  const role=APP.user?.role;
+ // La lista debe permitir seleccionar cualquiera de los supervisores activos a perfiles evaluadores.
+ if(isEvaluator() && active.length)select.disabled=false;
  const userOnly=role==='supervisor'||role==='supervisor_hse';
  if(retained&&Array.from(select.options).some(o=>o.value===retained))select.value=retained;
- if(!active.length){select.innerHTML='<option value="">No se pudo cargar la lista; pulsa Recargar</option>';select.title='Vuelve a consultar los usuarios registrados';}
+ if(!active.length){select.innerHTML='<option value="">No se encontraron supervisores activos</option>';select.disabled=true;select.title='Verifica el acceso al listado de usuarios';}
  const hint=read('lead-supervisor-status');if(hint)hint.textContent=active.length?active.length+' supervisores activos disponibles':'No se pudieron cargar supervisores activos';
  if(!val('lead-date'))read('lead-date').value=date();
  read('lead-evaluator').textContent=APP.user?.name||APP.user?.nombre||APP.user?.login||'';
