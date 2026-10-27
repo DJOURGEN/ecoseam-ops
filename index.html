@@ -7246,12 +7246,22 @@ function seamxReiniciarFiltroCurva(){
 let seamxHabCache=[];
 async function seamxRenderHabilitado(){
  const grid=document.getElementById('habilitado-items');if(!grid)return;
+ const editing=APP.user?.role==='admin';
+ const editor=document.getElementById('hab-editor-panel');if(editor)editor.style.display=editing?'':'none';
+ const note=document.getElementById('hab-readonly-note');if(note)note.style.display=editing?'none':'block';
  const {data,error}=await db.from('habilitado_intervenciones').select('*').order('id',{ascending:false});
  if(error){grid.textContent='No se pudieron consultar las intervenciones: '+error.message;return}
  seamxHabCache=data||[];
- grid.innerHTML=seamxHabCache.map(x=>'<article class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo_estructura||'')+' · '+seamxOpsSafe(x.codigo_equipo||'')+' · '+seamxOpsSafe(x.estado)+'</p><button type="button" class="lead-btn-alt" onclick="seamxEditarHabilitado('+Number(x.id)+')">Editar</button></article>').join('')||'<p>No hay estructuras registradas.</p>';
+ const validUrl=u=>typeof u==='string'&&/^https:\/\//i.test(u);
+ grid.innerHTML=seamxHabCache.map(x=>{
+  const model=validUrl(x.modelo_3d_url)?'<model-viewer src="'+seamxOpsSafe(x.modelo_3d_url)+'" camera-controls auto-rotate loading="lazy" style="height:225px;width:100%"></model-viewer>':'';
+  const plan=validUrl(x.plan_corte_url)?'<a class="lead-btn-alt" href="'+seamxOpsSafe(x.plan_corte_url)+'" target="_blank" rel="noopener noreferrer">Consultar plan de corte (PDF)</a>':'';
+  const edit=editing?'<button class="lead-btn-alt" type="button" onclick="seamxEditarHabilitado('+Number(x.id)+')">Editar</button>':'';
+  return '<article class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo_estructura||'')+' · '+seamxOpsSafe(x.codigo_equipo||'')+' · '+seamxOpsSafe(x.estado)+'</p><div class="seamx-hab-actions">'+plan+edit+'</div>'+model+'</article>';
+ }).join('')||'<p>No hay estructuras registradas.</p>';
 }
 function seamxEditarHabilitado(id){
+ if(APP.user?.role!=='admin')return showToast('Solo administración puede editar Habilitado','warning');
  const x=seamxHabCache.find(r=>Number(r.id)===Number(id));if(!x)return;
  const values={'hab-edit-id':x.id,'hab-nombre':x.nombre,'hab-tipo':x.tipo_estructura,'hab-codigo':x.codigo_equipo,'hab-estado':x.estado};
  Object.entries(values).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v||''});
@@ -7270,17 +7280,25 @@ async function seamxHabUpload(file,kind,id){
  return db.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 async function seamxGuardarHabilitado(){
- if(!['admin','supervisor','jefatura'].includes(APP.user?.role))return showToast('No tienes permiso','warning');
+ if(APP.user?.role!=='admin')return showToast('Solo administración puede registrar Habilitado','warning');
  const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Indica la estructura','warning');
  const id=val('hab-edit-id'),existing=seamxHabCache.find(x=>String(x.id)===id);
  const values={nombre,tipo_estructura:val('hab-tipo')||'Estructura',codigo_equipo:val('hab-codigo'),estado:val('hab-estado')};
  try{
   const {data:saved,error}=id?await db.from('habilitado_intervenciones').update(values).eq('id',Number(id)).select().single():await db.from('habilitado_intervenciones').insert(values).select().single();
   if(error)throw error;
+  const pdf=document.getElementById('hab-plan-file')?.files?.[0],model=document.getElementById('hab-modelo-file')?.files?.[0],uploads={};
+  if(pdf)uploads.plan_corte_url=await seamxHabUpload(pdf,'pdf',saved.id);
+  if(model)uploads.modelo_3d_url=await seamxHabUpload(model,'modelo',saved.id);
+  if(Object.keys(uploads).length){
+    const {error:uploadSaveError}=await db.from('habilitado_intervenciones').update(uploads).eq('id',saved.id);
+    if(uploadSaveError)throw uploadSaveError;
+  }
   ['hab-edit-id','hab-nombre','hab-tipo','hab-codigo'].forEach(k=>document.getElementById(k).value='');
+  ['hab-plan-file','hab-modelo-file'].forEach(k=>{const el=document.getElementById(k);if(el)el.value=''});
   const btn=document.querySelector('#view-habilitado .seamx-ops-controls button');if(btn)btn.textContent='Registrar habilitado';
   await seamxRenderHabilitado();showToast('Habilitado guardado','success');
- }catch(e){console.error(e);showToast('No se pudo guardar: '+e.message,'error')}
+ }catch(e){console.error(e);showToast('No se pudo guardar en Supabase: '+e.message+'. Revisa las políticas de acceso del módulo.','error')}
 }
 </script>
 <style>
