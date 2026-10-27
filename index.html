@@ -1779,9 +1779,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           </div>
         </div>
 
-        <div id="patio-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
-          Vista de consulta: puedes visualizar y filtrar la información, pero no editar los movimientos.
-        </div>
+        
 
         <div class="card" style="margin-bottom:20px">
           <div class="filters" style="padding:0;margin:0">
@@ -1944,16 +1942,18 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 </div>
 <div id="view-habilitado" style="display:none">
   <div class="page-header"><div><h2 class="page-title">Habilitado de estructuras y equipos</h2><p class="page-subtitle">Registro y seguimiento de intervenciones</p></div></div>
-  <div class="seamx-ops-panel" style="margin-bottom:15px">
+  <div class="seamx-ops-panel" id="hab-form-panel" style="margin-bottom:15px">
     <div class="seamx-ops-controls">
       <label>Estructura / equipo <input id="hab-nombre" placeholder="Middle Shell, Spider, tolva..."></label>
       <label>Tipo <input id="hab-tipo" placeholder="Estructura / equipo"></label>
       <label>Código <input id="hab-codigo" placeholder="Tag o código"></label>
       <label>Estado <select id="hab-estado"><option>Programado</option><option>En proceso</option><option>Finalizado</option></select></label>
+      <label>Plan de corte (PDF) <input id="hab-plan-file" type="file" accept=".pdf,application/pdf"></label>
+      <label>Modelo 3D (GLB/GLTF) <input id="hab-modelo-file" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json"></label>
       <input id="hab-edit-id" type="hidden">
       <button class="btn btn-primary" onclick="seamxGuardarHabilitado()">Registrar habilitado</button>
     </div>
-    <p class="form-hint">Registros guardados en Supabase. Selecciona Editar y guarda los cambios.</p>
+    <p class="form-hint">Los adjuntos se conservan al editar una intervención, salvo que selecciones un archivo nuevo. Archivos de hasta 30 MB.</p>
   </div>
   <div id="habilitado-items" class="seamx-habilitado-grid"></div>
 </div>
@@ -1989,9 +1989,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           </div>
         </div>
 
-        <div id="copro-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
-          Vista de consulta: puedes visualizar los modelos y la información. Solo los perfiles autorizados pueden registrar, editar o eliminar información; únicamente el administrador puede subir modelos 3D.
-        </div>
+        
         <div id="copro-alert-banner" class="copro-alert-banner">
           <div class="copro-alert-icon">⚠️</div>
           <div><strong>Alerta de evacuación</strong><span id="copro-alert-text">Hay coproductos que superan las 25 tn almacenadas.</span></div>
@@ -2779,7 +2777,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <option value="mantenimiento">🔧 Mantenimiento</option>
           <option value="supervisor">🔍 Supervisor</option>
           <option value="supervisor_hse">🦺 Supervisor HSE</option>
-          <option value="gerencia">Gerencia</option><option value="jefatura">🏢 Jefatura</option><option value="antamina">🏭 Antamina</option>
+          <option value="gerencia">📊 Gerencia</option><option value="jefatura">🏢 Jefatura</option><option value="antamina">🏭 Antamina</option>
           <option value="admin">⚙️ Administrador</option>
         </select>
       </div>
@@ -4090,7 +4088,7 @@ const NAV_CONFIG = {
   supervisor: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   jefatura: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   antamina: ['antamina'],
-  gerencia: ['liderazgo','comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
+  gerencia: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   admin: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento','admin'],
   mantenimiento: ['actividades','mantenimiento'],
 };
@@ -7216,26 +7214,38 @@ function seamxBorrarProgramacion(){
   seamxRenderOpsDashboard();
   showToast('Programación manual eliminada de este navegador','success');
 }
+function seamxCanManageHabilitado(){return APP.user?.role==='admin'}
 let seamxHabCache=[];
 async function seamxRenderHabilitado(){
  const grid=document.getElementById('habilitado-items');if(!grid)return;
+ const form=document.getElementById('hab-form-panel');if(form)form.style.display=seamxCanManageHabilitado()?'':'none';
  const {data,error}=await db.from('habilitado_intervenciones').select('*').order('id',{ascending:false});
  if(error){grid.textContent='No se pudieron consultar las intervenciones: '+error.message;return}
  seamxHabCache=data||[];
- grid.innerHTML=seamxHabCache.map(x=>'<article class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo_estructura||'')+' · '+seamxOpsSafe(x.codigo_equipo||'')+' · '+seamxOpsSafe(x.estado)+'</p><button type="button" class="lead-btn-alt" onclick="seamxEditarHabilitado('+Number(x.id)+')">Editar</button></article>').join('')||'<p>No hay estructuras registradas.</p>';
+ grid.innerHTML=seamxHabCache.map(x=>{
+   const id=Number(x.id),name=seamxOpsSafe(x.nombre),details=seamxOpsSafe(x.tipo_estructura||'')+' · '+seamxOpsSafe(x.codigo_equipo||'')+' · '+seamxOpsSafe(x.estado||'');
+   const pdf=x.plan_corte_url?'<a class="lead-btn-alt" target="_blank" rel="noopener noreferrer" href="'+seamxOpsSafe(x.plan_corte_url)+'">Ver plan de corte (PDF)</a>':'';
+   const model=x.modelo_3d_url?'<model-viewer src="'+seamxOpsSafe(x.modelo_3d_url)+'" camera-controls auto-rotate style="width:100%;height:230px" alt="Modelo tridimensional de la estructura"></model-viewer>':'';
+   const modelLink=x.modelo_3d_url?'<a class="lead-btn-alt" target="_blank" rel="noopener noreferrer" href="'+seamxOpsSafe(x.modelo_3d_url)+'">Abrir modelo 3D</a>':'';
+   const edit=seamxCanManageHabilitado()?'<button type="button" class="lead-btn-alt" onclick="seamxEditarHabilitado('+id+')">Editar registro</button>':'';
+   return '<article class="seamx-habilitado-item"><h3>'+name+'</h3><p>'+details+'</p>'+model+'<div class="seamx-hab-links">'+pdf+modelLink+edit+'</div></article>';
+ }).join('')||'<p>No hay estructuras registradas.</p>';
 }
 function seamxEditarHabilitado(id){
+ if(!seamxCanManageHabilitado())return showToast('Este perfil solo puede consultar Habilitado','warning');
  const x=seamxHabCache.find(r=>Number(r.id)===Number(id));if(!x)return;
  const values={'hab-edit-id':x.id,'hab-nombre':x.nombre,'hab-tipo':x.tipo_estructura,'hab-codigo':x.codigo_equipo,'hab-estado':x.estado};
- Object.entries(values).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v||''});
- const btn=document.querySelector('#view-habilitado .seamx-ops-controls button');if(btn)btn.textContent='Guardar cambios';document.getElementById('view-habilitado')?.scrollIntoView({behavior:'smooth',block:'start'});
- document.getElementById('hab-nombre').focus();
+ Object.entries(values).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v==null?'':v});
+ for(const k of ['hab-plan-file','hab-modelo-file']){const el=document.getElementById(k);if(el)el.value=''}
+ const btn=document.querySelector('#hab-form-panel button.btn-primary');if(btn)btn.textContent='Guardar cambios';
+ document.getElementById('hab-form-panel')?.scrollIntoView({behavior:'smooth',block:'start'});
+ document.getElementById('hab-nombre')?.focus();
 }
 async function seamxHabUpload(file,kind,id){
  if(!file)return null;
  const extension=file.name.split('.').pop().toLowerCase();
  const accepted=kind==='pdf'?['pdf']:['glb','gltf'];
- if(!accepted.includes(extension))throw new Error('Formato no permitido');
+ if(!accepted.includes(extension))throw new Error('Archivo '+file.name+': formato no permitido');
  if(file.size>30*1024*1024)throw new Error('Archivo demasiado grande (máximo 30 MB)');
  const bucket='coproductos-3d',path='habilitado/'+id+'/'+kind+'-'+Date.now()+'.'+extension;
  const {error}=await db.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type||undefined});
@@ -7243,17 +7253,27 @@ async function seamxHabUpload(file,kind,id){
  return db.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 async function seamxGuardarHabilitado(){
- if(!['admin','supervisor','jefatura'].includes(APP.user?.role))return showToast('No tienes permiso','warning');
- const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Indica la estructura','warning');
- const id=val('hab-edit-id'),existing=seamxHabCache.find(x=>String(x.id)===id);
- const values={nombre,tipo_estructura:val('hab-tipo')||'Estructura',codigo_equipo:val('hab-codigo'),estado:val('hab-estado')};
+ if(!seamxCanManageHabilitado())return showToast('Solo Administración puede registrar o editar Habilitado','warning');
+ const val=id=>document.getElementById(id)?.value?.trim()||'',nombre=val('hab-nombre');
+ if(!nombre)return showToast('Indica la estructura','warning');
+ const id=val('hab-edit-id'),values={nombre,tipo_estructura:val('hab-tipo')||'Estructura',codigo_equipo:val('hab-codigo'),estado:val('hab-estado')};
+ const pdf=document.getElementById('hab-plan-file')?.files?.[0]||null,model=document.getElementById('hab-modelo-file')?.files?.[0]||null;
+ const button=document.querySelector('#hab-form-panel button.btn-primary');if(button)button.disabled=true;
  try{
-  const {data:saved,error}=id?await db.from('habilitado_intervenciones').update(values).eq('id',Number(id)).select().single():await db.from('habilitado_intervenciones').insert(values).select().single();
-  if(error)throw error;
-  ['hab-edit-id','hab-nombre','hab-tipo','hab-codigo'].forEach(k=>document.getElementById(k).value='');
-  const btn=document.querySelector('#view-habilitado .seamx-ops-controls button');if(btn)btn.textContent='Registrar habilitado';
-  await seamxRenderHabilitado();showToast('Habilitado guardado','success');
- }catch(e){console.error(e);showToast('No se pudo guardar: '+e.message,'error')}
+   const response=id?await db.from('habilitado_intervenciones').update(values).eq('id',Number(id)).select().single():await db.from('habilitado_intervenciones').insert(values).select().single();
+   if(response.error)throw response.error;
+   const saved=response.data,files={};
+   if(pdf)files.plan_corte_url=await seamxHabUpload(pdf,'pdf',saved.id);
+   if(model)files.modelo_3d_url=await seamxHabUpload(model,'modelo',saved.id);
+   if(Object.keys(files).length){
+     const {error:uploadError}=await db.from('habilitado_intervenciones').update(files).eq('id',saved.id);
+     if(uploadError)throw uploadError;
+   }
+   for(const k of ['hab-edit-id','hab-nombre','hab-tipo','hab-codigo','hab-plan-file','hab-modelo-file']){const el=document.getElementById(k);if(el)el.value=''}
+   if(button)button.textContent='Registrar habilitado';
+   await seamxRenderHabilitado();showToast('Intervención guardada correctamente','success');
+ }catch(error){console.error(error);showToast('No se pudo guardar Habilitado: '+(error.message||'verificar los permisos de Supabase'),'error')}
+ finally{if(button)button.disabled=false}
 }
 </script>
 <style>
