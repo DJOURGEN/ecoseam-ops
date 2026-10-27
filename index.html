@@ -1406,6 +1406,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
       <!-- PAGE: CENTRO DE COMANDO -->
       <div id="view-comando" style="display:none">
+        <div id="seamx-firma-alerta" class="card" style="display:none;padding:14px;margin-bottom:16px;border-left:4px solid #e0a61c"></div>
         <div class="command-hero">
           <div class="command-hero-top">
             <div>
@@ -1985,6 +1986,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
 <!-- LIDERAZGO PREVENTIVO -->
 <div id="view-liderazgo" style="display:none">
+  <section id="seamx-signature-panel" class="card" style="padding:18px;margin:0 0 16px;border-left:4px solid #197968"><h3 style="margin:0 0 10px;color:#176e66">Firma electrónica de evaluaciones</h3><p style="margin:0 0 12px;line-height:1.55">Las solicitudes de conformidad se habilitan mediante una sesión personal autenticada. Las firmas no se aplican automáticamente.</p><div id="seamx-signature-status" role="status" style="margin-bottom:10px"></div><div id="seamx-signature-actions"></div><div id="seamx-signature-pending"></div></section>
   <div class="page-header seamx-lead-title"><div><div class="seamx-lead-code">ECOSEAM <span>HSE.LI.CMA.07 · Versión 01 · 24/10/2026</span></div><div class="page-title">ANEXO 1. LISTA DE VERIFICACIÓN DE LIDERAZGO Y ACOMPAÑAMIENTO EN CAMPO</div><div class="page-subtitle">Objetivo: evaluar el liderazgo visible, la conducta preventiva y la capacidad del supervisor para garantizar actividades bajo condiciones seguras. Compañía Minera Antamina.</div></div></div>
   <div class="lead-tabs"><button onclick="document.getElementById('lead-eval-tab').hidden=false;document.getElementById('lead-report-tab').hidden=true">Evaluar en campo</button><button onclick="document.getElementById('lead-eval-tab').hidden=true;document.getElementById('lead-report-tab').hidden=false;seamxLeadRender()">Indicadores y seguimiento</button><button onclick="seamxLeadPrint()">Imprimir / Guardar PDF</button><button onclick="seamxLeadExport()">Exportar respaldo</button></div>
   <div id="lead-access" style="display:none;padding:16px;background:#fff;border:1px solid #d1dfd3">Los registros de evaluación están reservados para jefatura y gerencia.</div>
@@ -7448,6 +7450,7 @@ async function seamxSafeAnalyze(){
 }
 </script>
 <script src="liderazgo.js"></script>
+<script src="firmas-liderazgo.js"></script>
 <style>
 /* ECOSEAM | jerarquía de información, sin animación decorativa */
 #view-liderazgo .lead-criterion{grid-template-columns:minmax(0,1fr) 210px;gap:5px;padding:6px 8px}
