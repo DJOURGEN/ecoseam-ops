@@ -1779,9 +1779,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           </div>
         </div>
 
-        <div id="patio-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
-          Vista de consulta: puedes visualizar y filtrar la información, pero no editar los movimientos.
-        </div>
+        
 
         <div class="card" style="margin-bottom:20px">
           <div class="filters" style="padding:0;margin:0">
@@ -1923,12 +1921,17 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
     <label>Mes valorizable <input type="month" id="ops-mes" onchange="seamxRenderOpsDashboard()" aria-label="Mes del periodo valorizable"></label>
     <label>Guardia de programación <select id="ops-guardia" onchange="seamxRenderOpsDashboard()"><option value="">Ambas</option><option value="A">A</option><option value="B">B</option></select></label>
   </div>
-  <p class="form-hint">Meta mensual y valorizable: 850 tn · Guardia A/B: 425 tn cada una · Valorización: 21 al 20 del mes siguiente. Programación guardada localmente.</p>
+  <p class="form-hint">Meta mensual y valorizable: 850 tn · Guardia A/B: 425 tn cada una · La selección mensual modifica únicamente valorizable. Programación manual guardada en este navegador.</p>
   <div id="ops-metrics" class="seamx-ops-metrics"></div>
 <section class="seamx-ops-panel" id="lead-dashboard-summary" style="margin:0 0 12px"><h3>Seguimiento de liderazgo preventivo</h3><div id="lead-dashboard-values" class="lead-kpis"><p class="lead-muted">Sin evaluaciones en este navegador.</p></div><button class="lead-btn-alt" onclick="navigateTo('liderazgo')" id="lead-go">Abrir evaluaciones</button><p class="lead-muted">Datos locales provisionales; no consolidados entre dispositivos.</p></section>
   <div class="seamx-ops-charts">
     <div class="seamx-ops-panel seamx-curve-panel"><h3>Curva S · Programado vs evacuado (tn)</h3>
-    <p class="form-hint">Vista de mes calendario actual. La selección del periodo valorizable no modifica esta curva.</p>
+    <div class="seamx-curve-range" aria-label="Rango de consulta de la curva S">
+      <label>Desde <input type="date" id="ops-curve-desde" onchange="seamxRenderCurvaRango()"></label>
+      <label>Hasta <input type="date" id="ops-curve-hasta" onchange="seamxRenderCurvaRango()"></label>
+      <button type="button" class="btn btn-outline" onclick="seamxCurvaMesActual()">Mes actual</button>
+      <span class="seamx-field-note">Este rango modifica solo la Curva S, no el periodo valorizable.</span>
+    </div>
     <div class="seamx-curve-programming">
       <label>Fecha <input id="ops-fecha" type="date"></label>
       <label>Guardia <select id="ops-guardia-edit"><option value="A">A</option><option value="B">B</option></select></label>
@@ -1936,7 +1939,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
       <button class="btn btn-primary" onclick="seamxGuardarPrograma()">Guardar programación</button>
       <button type="button" class="btn btn-outline" onclick="seamxBorrarProgramacion()">Borrar toda la programación</button>
     </div>
-    <canvas id="ops-curve"></canvas></div>
+    <p id="ops-curve-summary" class="seamx-curve-summary" aria-live="polite"></p><canvas id="ops-curve"></canvas></div>
     <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div><div class="seamx-ops-panel"><h3>Evacuaciones por día (tn)</h3><canvas id="ops-outbound"></canvas></div><div class="seamx-ops-panel"><h3>Meta mensual · evacuado y faltante</h3><canvas id="ops-month-share"></canvas></div><div class="seamx-ops-panel"><h3>Meta valorizable · evacuado y faltante</h3><canvas id="ops-value-share"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ocupabilidad del Patio 4388</h3><canvas id="ops-occupancy"></canvas></div>
@@ -1944,16 +1947,18 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 </div>
 <div id="view-habilitado" style="display:none">
   <div class="page-header"><div><h2 class="page-title">Habilitado de estructuras y equipos</h2><p class="page-subtitle">Registro y seguimiento de intervenciones</p></div></div>
-  <div class="seamx-ops-panel" style="margin-bottom:15px">
+  <div class="seamx-ops-panel" id="hab-form-panel" style="margin-bottom:15px">
     <div class="seamx-ops-controls">
       <label>Estructura / equipo <input id="hab-nombre" placeholder="Middle Shell, Spider, tolva..."></label>
       <label>Tipo <input id="hab-tipo" placeholder="Estructura / equipo"></label>
       <label>Código <input id="hab-codigo" placeholder="Tag o código"></label>
       <label>Estado <select id="hab-estado"><option>Programado</option><option>En proceso</option><option>Finalizado</option></select></label>
+      <label>Plan de corte (PDF) <input id="hab-plan-file" type="file" accept=".pdf,application/pdf"></label>
+      <label>Modelo 3D (GLB/GLTF) <input id="hab-modelo-file" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json"></label>
       <input id="hab-edit-id" type="hidden">
       <button class="btn btn-primary" onclick="seamxGuardarHabilitado()">Registrar habilitado</button>
     </div>
-    <p class="form-hint">Registros guardados en Supabase. Selecciona Editar y guarda los cambios.</p>
+    <p class="form-hint">Los adjuntos se conservan al editar una intervención, salvo que selecciones un archivo nuevo. Archivos de hasta 30 MB.</p>
   </div>
   <div id="habilitado-items" class="seamx-habilitado-grid"></div>
 </div>
@@ -1964,7 +1969,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
   <div class="lead-tabs"><button onclick="document.getElementById('lead-eval-tab').hidden=false;document.getElementById('lead-report-tab').hidden=true">Evaluar en campo</button><button onclick="document.getElementById('lead-eval-tab').hidden=true;document.getElementById('lead-report-tab').hidden=false;seamxLeadRender()">Indicadores y seguimiento</button><button onclick="seamxLeadPrint()">Imprimir / Guardar PDF</button><button onclick="seamxLeadExport()">Exportar respaldo</button></div>
   <div id="lead-access" style="display:none;padding:16px;background:#fff;border:1px solid #d1dfd3">Los registros de evaluación están reservados para jefatura y gerencia.</div>
   <div id="lead-eval-tab"><div id="lead-form">
-    <div class="lead-bar"><label>Supervisor<select id="lead-supervisor"><option value="">Seleccione un supervisor</option></select><small id="lead-supervisor-status" aria-live="polite">Cargando lista de supervisores</small></label><label>Fecha<input type="date" id="lead-date"></label><label>Guardia<select id="lead-shift"><option>A</option><option>B</option></select></label><label>Área<input id="lead-area" placeholder="4388 / DEG"></label><label>Actividad observada<input id="lead-activity" placeholder="Actividad"></label></div>
+    <div class="lead-bar"><label>Supervisor<select id="lead-supervisor"><option value="">Seleccione un supervisor</option></select><small id="lead-supervisor-status" aria-live="polite">Cargando lista de supervisores</small><button type="button" class="lead-btn-alt seamx-lead-reload" onclick="seamxLeadInit()">Actualizar supervisores</button></label><label>Fecha<input type="date" id="lead-date"></label><label>Guardia<select id="lead-shift"><option>A</option><option>B</option></select></label><label>Área<input id="lead-area" placeholder="4388 / DEG"></label><label>Actividad observada<input id="lead-activity" placeholder="Actividad"></label></div>
     <div class="lead-summary"><span>Evaluador: <b id="lead-evaluator"></b></span><span id="lead-score">Sin puntuación</span><span id="lead-level">Pendiente</span></div>
     <div class="lead-head" role="row"><span>N.º</span><span>Criterio de verificación</span><span>Puntaje · 2 / 1 / 0 / N/A</span><span>Observaciones / evidencia</span></div>
     <div id="lead-criteria"></div>
@@ -1972,7 +1977,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
     <div class="seamx-lead-scale"><strong>Escala de evaluación</strong><div><b>2</b><span>Cumple: requisito implementado y verificado en campo.</span></div><div><b>1</b><span>Cumple parcialmente: existen brechas por corregir.</span></div><div><b>0</b><span>No cumple: requisito no implementado.</span></div><div><b>N/A</b><span>No aplica: justificar en observaciones.</span></div><p>Resultado = puntaje obtenido / puntaje máximo aplicable × 100.</p></div><button class="btn btn-primary" onclick="seamxLeadSave()">Guardar evaluación</button>
     <p class="lead-muted">Borrador local en este navegador, no compartido ni sincronizado. N/A se excluye del denominador. La puntuación no sustituye el control de desviaciones críticas.</p>
   </div></div>
-  <div id="lead-report-tab" hidden><div id="lead-kpis" class="lead-kpis"></div><h3>Indicadores individuales</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Supervisor</th><th>Evaluaciones</th><th>Último resultado</th><th>Evolución</th><th>Compromisos pendientes</th><th>Críticas sin verificar</th></tr></thead><tbody id="lead-supervisors"></tbody></table></div><h3>Historial y compromisos</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Supervisor</th><th>Resultado</th><th>Compromiso</th><th>Verificación</th></tr></thead><tbody id="lead-records"></tbody></table></div><p class="lead-muted">Programa: 2 observaciones por semana durante 4 semanas, luego 1 mensual por 3 meses (11 sesiones por supervisor). La evidencia en campo es necesaria para confirmar la eficacia.</p></div>
+  <div id="lead-report-tab" hidden><p id="lead-private-indicator" class="lead-muted" style="display:none">Indicador individual. Únicamente se muestran las evaluaciones vinculadas a tu usuario.</p><div id="lead-kpis" class="lead-kpis"></div><h3>Indicadores individuales</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Supervisor</th><th>Evaluaciones</th><th>Último resultado</th><th>Evolución</th><th>Compromisos pendientes</th><th>Críticas sin verificar</th></tr></thead><tbody id="lead-supervisors"></tbody></table></div><h3>Historial y compromisos</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Supervisor</th><th>Resultado</th><th>Compromiso</th><th>Verificación</th></tr></thead><tbody id="lead-records"></tbody></table></div><p class="lead-muted">Programa: 2 observaciones por semana durante 4 semanas, luego 1 mensual por 3 meses (11 sesiones por supervisor). La evidencia en campo es necesaria para confirmar la eficacia.</p></div>
 </div>
 
 <div id="view-antamina" style="display:none"><div class="page-header"><div><div class="page-title">Antamina</div></div></div><div style="min-height:170px;background:#fff;border:1px solid #cbd8c9"></div></div>
@@ -1989,9 +1994,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           </div>
         </div>
 
-        <div id="copro-readonly-note" class="readonly-note" style="display:none;margin-bottom:16px">
-          Vista de consulta: puedes visualizar los modelos y la información. Solo los perfiles autorizados pueden registrar, editar o eliminar información; únicamente el administrador puede subir modelos 3D.
-        </div>
+        
         <div id="copro-alert-banner" class="copro-alert-banner">
           <div class="copro-alert-icon">⚠️</div>
           <div><strong>Alerta de evacuación</strong><span id="copro-alert-text">Hay coproductos que superan las 25 tn almacenadas.</span></div>
@@ -2779,7 +2782,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <option value="mantenimiento">🔧 Mantenimiento</option>
           <option value="supervisor">🔍 Supervisor</option>
           <option value="supervisor_hse">🦺 Supervisor HSE</option>
-          <option value="gerencia">Gerencia</option><option value="jefatura">🏢 Jefatura</option><option value="antamina">🏭 Antamina</option>
+          <option value="gerencia">📊 Gerencia</option><option value="jefatura">🏢 Jefatura</option><option value="antamina">🏭 Antamina</option>
           <option value="admin">⚙️ Administrador</option>
         </select>
       </div>
@@ -4090,7 +4093,7 @@ const NAV_CONFIG = {
   supervisor: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   jefatura: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   antamina: ['antamina'],
-  gerencia: ['liderazgo','comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
+  gerencia: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   admin: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento','admin'],
   mantenimiento: ['actividades','mantenimiento'],
 };
@@ -7203,11 +7206,47 @@ async function seamxRenderOpsDashboard(){
   seamxOpsChart('ops-month-share','doughnut',['Evacuado','Pendiente'],[{data:[evacuadas,mensualPendiente],backgroundColor:['#1d673e','#d9e2d8']}]);
   const valorTitle=document.querySelector('#ops-value-share')?.closest('.seamx-ops-panel')?.querySelector('h3');if(valorTitle)valorTitle.textContent='Meta valorizable · '+valorInicio+' al '+valorFin;
   seamxOpsChart('ops-value-share','doughnut',['Evacuado','Pendiente'],[{data:[valorReal||0,valorPendiente],backgroundColor:['#376f91','#d9e2d8']}]);
-  seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
+  await seamxRenderCurvaRango();
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
   seamxOpsChart('ops-outbound','bar',dates.map(d=>d.slice(8)),[{label:'Evacuado (tn)',data:dates.map(d=>daily[d]||0),backgroundColor:'#17643a'}]);
 }
+function seamxFechaLocal(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function seamxCurvaMesActual(){
+ const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),1),end=new Date(now.getFullYear(),now.getMonth()+1,0);
+ document.getElementById('ops-curve-desde').value=seamxFechaLocal(start);
+ document.getElementById('ops-curve-hasta').value=seamxFechaLocal(end);
+ seamxRenderCurvaRango();
+}
+async function seamxRenderCurvaRango(){
+ const fromEl=document.getElementById('ops-curve-desde'),toEl=document.getElementById('ops-curve-hasta');
+ if(!fromEl||!toEl)return;
+ if(!fromEl.value||!toEl.value){const today=new Date();if(!fromEl.value)fromEl.value=seamxFechaLocal(new Date(today.getFullYear(),today.getMonth(),1));if(!toEl.value)toEl.value=seamxFechaLocal(new Date(today.getFullYear(),today.getMonth()+1,0))}
+ const from=fromEl.value,to=toEl.value;
+ const since=new Date(from+'T12:00:00'),until=new Date(to+'T12:00:00');
+ const length=Math.round((until-since)/86400000)+1;
+ if(!Number.isFinite(length)||length<1||length>366){showToast('Selecciona un rango válido de hasta 366 días','warning');return}
+ const guardia=document.getElementById('ops-guardia')?.value||'';
+ const {data,error}=await db.from('evacuaciones_excel').select('fecha,peso_tn,peso_4388').gte('fecha',from).lte('fecha',to);
+ if(error){console.error(error);showToast('No se pudo consultar el rango de Curva S','error');return}
+ const realDays=new Map();
+ for(const x of data||[]){const fecha=String(x.fecha||'').slice(0,10);if(fecha)realDays.set(fecha,(realDays.get(fecha)||0)+seamxOpsPeso(x))}
+ const programmed=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>x.fecha>=from&&x.fecha<=to&&(!guardia||x.guardia===guardia));
+ const planByDay=new Map();for(const p of programmed)planByDay.set(p.fecha,(planByDay.get(p.fecha)||0)+Number(p.toneladas||0));
+ const labels=[],planValues=[],realValues=[];let planSum=0,realSum=0;
+ for(let i=0;i<length;i++){
+  const day=new Date(since.getFullYear(),since.getMonth(),since.getDate()+i);
+  const key=seamxFechaLocal(day);
+  planSum+=planByDay.get(key)||0;realSum+=realDays.get(key)||0;
+  labels.push(key.slice(8)+'/'+key.slice(5,7));planValues.push(Number(planSum.toFixed(2)));realValues.push(Number(realSum.toFixed(2)));
+ }
+ seamxOpsChart('ops-curve','line',labels,[
+  {label:'Programado acumulado (tn)',data:planValues,borderColor:'#c88b21',backgroundColor:'rgba(200,139,33,.08)',pointRadius:length>75?0:2,fill:false,tension:.12},
+  {label:'Ejecutado acumulado (tn)',data:realValues,borderColor:'#195f3c',backgroundColor:'rgba(25,95,60,.08)',pointRadius:length>75?0:2,fill:false,tension:.12}
+ ]);
+ const note=document.getElementById('ops-curve-summary');if(note)note.textContent='Periodo: '+from+' a '+to+' · Programado: '+planSum.toFixed(2)+' tn · Ejecutado: '+realSum.toFixed(2)+' tn';
+}
+
 function seamxGuardarPrograma(){if(APP.user?.role!=='admin')return showToast('Solo administración puede modificar la curva S','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
 function seamxBorrarProgramacion(){
   if(APP.user?.role!=='admin')return showToast('Solo administración puede borrar la programación','warning');
@@ -7216,26 +7255,38 @@ function seamxBorrarProgramacion(){
   seamxRenderOpsDashboard();
   showToast('Programación manual eliminada de este navegador','success');
 }
+function seamxCanManageHabilitado(){return APP.user?.role==='admin'}
 let seamxHabCache=[];
 async function seamxRenderHabilitado(){
  const grid=document.getElementById('habilitado-items');if(!grid)return;
+ const form=document.getElementById('hab-form-panel');if(form)form.style.display=seamxCanManageHabilitado()?'':'none';
  const {data,error}=await db.from('habilitado_intervenciones').select('*').order('id',{ascending:false});
  if(error){grid.textContent='No se pudieron consultar las intervenciones: '+error.message;return}
  seamxHabCache=data||[];
- grid.innerHTML=seamxHabCache.map(x=>'<article class="seamx-habilitado-item"><h3>'+seamxOpsSafe(x.nombre)+'</h3><p>'+seamxOpsSafe(x.tipo_estructura||'')+' · '+seamxOpsSafe(x.codigo_equipo||'')+' · '+seamxOpsSafe(x.estado)+'</p><button type="button" class="lead-btn-alt" onclick="seamxEditarHabilitado('+Number(x.id)+')">Editar</button></article>').join('')||'<p>No hay estructuras registradas.</p>';
+ grid.innerHTML=seamxHabCache.map(x=>{
+   const id=Number(x.id),name=seamxOpsSafe(x.nombre),details=seamxOpsSafe(x.tipo_estructura||'')+' · '+seamxOpsSafe(x.codigo_equipo||'')+' · '+seamxOpsSafe(x.estado||'');
+   const pdf=x.plan_corte_url?'<a class="lead-btn-alt" target="_blank" rel="noopener noreferrer" href="'+seamxOpsSafe(x.plan_corte_url)+'">Ver plan de corte (PDF)</a>':'';
+   const model=x.modelo_3d_url?'<model-viewer src="'+seamxOpsSafe(x.modelo_3d_url)+'" camera-controls auto-rotate style="width:100%;height:230px" alt="Modelo tridimensional de la estructura"></model-viewer>':'';
+   const modelLink=x.modelo_3d_url?'<a class="lead-btn-alt" target="_blank" rel="noopener noreferrer" href="'+seamxOpsSafe(x.modelo_3d_url)+'">Abrir modelo 3D</a>':'';
+   const edit=seamxCanManageHabilitado()?'<button type="button" class="lead-btn-alt" onclick="seamxEditarHabilitado('+id+')">Editar registro</button>':'';
+   return '<article class="seamx-habilitado-item"><h3>'+name+'</h3><p>'+details+'</p>'+model+'<div class="seamx-hab-links">'+pdf+modelLink+edit+'</div></article>';
+ }).join('')||'<p>No hay estructuras registradas.</p>';
 }
 function seamxEditarHabilitado(id){
+ if(!seamxCanManageHabilitado())return showToast('Este perfil solo puede consultar Habilitado','warning');
  const x=seamxHabCache.find(r=>Number(r.id)===Number(id));if(!x)return;
  const values={'hab-edit-id':x.id,'hab-nombre':x.nombre,'hab-tipo':x.tipo_estructura,'hab-codigo':x.codigo_equipo,'hab-estado':x.estado};
- Object.entries(values).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v||''});
- const btn=document.querySelector('#view-habilitado .seamx-ops-controls button');if(btn)btn.textContent='Guardar cambios';document.getElementById('view-habilitado')?.scrollIntoView({behavior:'smooth',block:'start'});
- document.getElementById('hab-nombre').focus();
+ Object.entries(values).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v==null?'':v});
+ for(const k of ['hab-plan-file','hab-modelo-file']){const el=document.getElementById(k);if(el)el.value=''}
+ const btn=document.querySelector('#hab-form-panel button.btn-primary');if(btn)btn.textContent='Guardar cambios';
+ document.getElementById('hab-form-panel')?.scrollIntoView({behavior:'smooth',block:'start'});
+ document.getElementById('hab-nombre')?.focus();
 }
 async function seamxHabUpload(file,kind,id){
  if(!file)return null;
  const extension=file.name.split('.').pop().toLowerCase();
  const accepted=kind==='pdf'?['pdf']:['glb','gltf'];
- if(!accepted.includes(extension))throw new Error('Formato no permitido');
+ if(!accepted.includes(extension))throw new Error('Archivo '+file.name+': formato no permitido');
  if(file.size>30*1024*1024)throw new Error('Archivo demasiado grande (máximo 30 MB)');
  const bucket='coproductos-3d',path='habilitado/'+id+'/'+kind+'-'+Date.now()+'.'+extension;
  const {error}=await db.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type||undefined});
@@ -7243,17 +7294,27 @@ async function seamxHabUpload(file,kind,id){
  return db.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 async function seamxGuardarHabilitado(){
- if(!['admin','supervisor','jefatura'].includes(APP.user?.role))return showToast('No tienes permiso','warning');
- const val=id=>document.getElementById(id).value.trim(),nombre=val('hab-nombre');if(!nombre)return showToast('Indica la estructura','warning');
- const id=val('hab-edit-id'),existing=seamxHabCache.find(x=>String(x.id)===id);
- const values={nombre,tipo_estructura:val('hab-tipo')||'Estructura',codigo_equipo:val('hab-codigo'),estado:val('hab-estado')};
+ if(!seamxCanManageHabilitado())return showToast('Solo Administración puede registrar o editar Habilitado','warning');
+ const val=id=>document.getElementById(id)?.value?.trim()||'',nombre=val('hab-nombre');
+ if(!nombre)return showToast('Indica la estructura','warning');
+ const id=val('hab-edit-id'),values={nombre,tipo_estructura:val('hab-tipo')||'Estructura',codigo_equipo:val('hab-codigo'),estado:val('hab-estado')};
+ const pdf=document.getElementById('hab-plan-file')?.files?.[0]||null,model=document.getElementById('hab-modelo-file')?.files?.[0]||null;
+ const button=document.querySelector('#hab-form-panel button.btn-primary');if(button)button.disabled=true;
  try{
-  const {data:saved,error}=id?await db.from('habilitado_intervenciones').update(values).eq('id',Number(id)).select().single():await db.from('habilitado_intervenciones').insert(values).select().single();
-  if(error)throw error;
-  ['hab-edit-id','hab-nombre','hab-tipo','hab-codigo'].forEach(k=>document.getElementById(k).value='');
-  const btn=document.querySelector('#view-habilitado .seamx-ops-controls button');if(btn)btn.textContent='Registrar habilitado';
-  await seamxRenderHabilitado();showToast('Habilitado guardado','success');
- }catch(e){console.error(e);showToast('No se pudo guardar: '+e.message,'error')}
+   const response=id?await db.from('habilitado_intervenciones').update(values).eq('id',Number(id)).select().single():await db.from('habilitado_intervenciones').insert(values).select().single();
+   if(response.error)throw response.error;
+   const saved=response.data,files={};
+   if(pdf)files.plan_corte_url=await seamxHabUpload(pdf,'pdf',saved.id);
+   if(model)files.modelo_3d_url=await seamxHabUpload(model,'modelo',saved.id);
+   if(Object.keys(files).length){
+     const {error:uploadError}=await db.from('habilitado_intervenciones').update(files).eq('id',saved.id);
+     if(uploadError)throw uploadError;
+   }
+   for(const k of ['hab-edit-id','hab-nombre','hab-tipo','hab-codigo','hab-plan-file','hab-modelo-file']){const el=document.getElementById(k);if(el)el.value=''}
+   if(button)button.textContent='Registrar habilitado';
+   await seamxRenderHabilitado();showToast('Intervención guardada correctamente','success');
+ }catch(error){console.error(error);showToast('No se pudo guardar Habilitado: '+(error.message||'verificar los permisos de Supabase'),'error')}
+ finally{if(button)button.disabled=false}
 }
 </script>
 <style>
@@ -7553,5 +7614,36 @@ table{border-collapse:collapse}
  @page{size:A4 portrait;margin:10mm}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-</style></body>
+</style><style id="seamx-professional-layout-20261027">
+/* Sistema visual operacional: geometría racional y densidad útil, no tarjetas decorativas */
+:root{--radius:2px;--radius-s:2px;--radius-lg:3px;--shadow:none}
+.content{padding:18px 22px!important;background:#f4f7f4}
+.page-header{margin-bottom:18px!important;padding-bottom:11px!important;border-bottom:1px solid #d2dbd4}
+.page-title{font-weight:690!important;letter-spacing:-.02em!important}
+.btn,.card,.stat-card,.modal,.form-control,.seamx-ops-panel,.seamx-ops-metric,.seamx-habilitado-item,.seamx-safe-panel,.lead-btn-alt,.lead-criterion,.lead-bar{border-radius:2px!important;box-shadow:none!important}
+.card,.seamx-ops-panel,.seamx-habilitado-item{border:1px solid #d5ded6!important}
+.card:hover,.stat-card:hover,.btn:hover{transform:none!important;box-shadow:none!important}
+.topbar{display:flex;gap:12px;padding:0 20px!important;justify-content:space-between!important}
+.topbar-title{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-actions{flex:none;margin-left:auto!important;justify-content:flex-end!important}
+#btn-logout{margin-left:auto!important;border-radius:2px!important;order:99}
+#view-programacion .prog-layout{display:grid;grid-template-columns:minmax(360px,1.15fr) minmax(350px,1fr);gap:14px;align-items:start}
+#view-programacion .prog-form-card{position:static!important}
+#view-programacion .prog-form-card .form-row{gap:10px}
+#view-programacion .prog-section-title{margin-top:12px;margin-bottom:10px}
+#view-programacion .prog-form-card .card-header{margin-bottom:12px}
+#view-programacion .prog-talk-entry{display:flex;gap:10px;align-items:end}
+#view-programacion .card{min-width:0}
+#view-habilitado .seamx-hab-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+#view-habilitado .seamx-hab-links a,#view-habilitado .seamx-hab-links button{font-size:12px;display:inline-flex;align-items:center;text-decoration:none}
+#view-habilitado #hab-form-panel .seamx-ops-controls{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+#view-opsdashboard .seamx-curve-range{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:12px 0;border-bottom:1px solid #d7e1d8;padding-bottom:12px}
+#view-opsdashboard .seamx-curve-range label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;min-width:150px}
+#view-opsdashboard .seamx-curve-range input{height:38px;border:1px solid #bacbbb;padding:6px;background:white;border-radius:2px}
+#view-opsdashboard .seamx-field-note{font-size:11px;color:#53695b;flex-basis:100%}
+#view-opsdashboard .seamx-curve-summary{font-size:12px;color:#365a41;margin:7px 0 10px;font-weight:600}
+@media(max-width:1100px){#view-programacion .prog-layout{grid-template-columns:1fr!important}#view-habilitado #hab-form-panel .seamx-ops-controls{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:640px){.content{padding:11px 10px!important}.topbar{gap:5px!important;padding:0 8px!important}.topbar-title{font-size:15px!important}#btn-logout{padding:7px!important}#view-habilitado #hab-form-panel .seamx-ops-controls{grid-template-columns:1fr!important}#view-opsdashboard .seamx-curve-range{display:grid;grid-template-columns:1fr 1fr}#view-opsdashboard .seamx-field-note{grid-column:1/-1}#view-opsdashboard .seamx-curve-range button{grid-column:1/-1}#view-programacion .prog-talk-entry{display:block}.modal{width:calc(100vw - 14px)!important;max-width:calc(100vw - 14px)!important;padding:13px!important}}
+@media(prefers-reduced-motion:reduce){.content>[id^="view-"]{animation:none!important}}
+</style><style id="seamx-lead-polish-20261027">#view-liderazgo .seamx-lead-reload{font-size:10px;min-height:28px;margin-top:7px;padding:5px 8px}#view-liderazgo .lead-criterion{min-height:48px}#view-liderazgo .lead-options input{accent-color:#1c603e}#view-liderazgo .lead-criterion:focus-within{outline:1px solid #668c71;outline-offset:-1px}#view-liderazgo .lead-fields textarea{min-height:84px;resize:vertical}@media(max-width:700px){#view-liderazgo .lead-criterion{border:1px solid #c9d6cb!important;margin-bottom:8px!important}}</style></body>
 </html>
