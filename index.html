@@ -6914,7 +6914,6 @@ function openActivityRisk(id){
  if(panel)requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}));
 }
 function openActivityEvidence(id){
-  if(APP.user?.role==='antamina')return viewActivityEvidence(id);
   const detailTitle=document.querySelector('#modal-actividad-evidencias .modal-title');if(detailTitle)detailTitle.textContent='Finalizar actividad';
   const finishButton=document.getElementById('btn-save-evidence');if(finishButton)finishButton.style.display='';
   const descField=document.getElementById('evidence-description');if(descField)descField.readOnly=false;
