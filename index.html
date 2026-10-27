@@ -1961,7 +1961,12 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
 <!-- LIDERAZGO PREVENTIVO -->
 <div id="view-liderazgo" style="display:none">
-  <div class="page-header seamx-lead-title"><div><div class="seamx-lead-code">ECOSEAM <span>HSE.LI.CMA.07 · Versión 01 · 24/10/2026</span></div><div class="page-title">ANEXO 1. LISTA DE VERIFICACIÓN DE LIDERAZGO Y ACOMPAÑAMIENTO EN CAMPO</div><div class="page-subtitle">Objetivo: evaluar el liderazgo visible, la conducta preventiva y la capacidad del supervisor para garantizar actividades bajo condiciones seguras. Compañía Minera Antamina.</div></div></div>
+  <div class="seamx-lead-paper-head">
+    <div class="seamx-lead-paper-logo"><img src="logo-ecoseam.png" alt="ECOSEAM" loading="lazy"></div>
+    <div class="seamx-lead-paper-meta"><strong>LISTA DE VERIFICACIÓN DE LIDERAZGO Y ACOMPAÑAMIENTO EN CAMPO</strong><div><span>Código: HSE.LI.CMA.07</span><span>Versión: 01</span></div><div><span>Fecha de elaboración: 24/10/2026</span><span>Página 1 de 2</span></div></div>
+    <div class="seamx-lead-paper-company">COMPAÑÍA<br>MINERA<br>ANTAMINA</div>
+  </div>
+  <div class="seamx-lead-paper-title"><strong>ANEXO 1.</strong><h2>LISTA DE VERIFICACIÓN DE LIDERAZGO Y ACOMPAÑAMIENTO EN CAMPO.</h2><p><b>Objetivo:</b> Evaluar el liderazgo visible, la conducta preventiva y la capacidad del supervisor para garantizar que las actividades se desarrollen bajo condiciones seguras.</p></div>
   <div class="lead-tabs"><button onclick="document.getElementById('lead-eval-tab').hidden=false;document.getElementById('lead-report-tab').hidden=true">Evaluar en campo</button><button onclick="document.getElementById('lead-eval-tab').hidden=true;document.getElementById('lead-report-tab').hidden=false;seamxLeadRender()">Indicadores y seguimiento</button><button onclick="seamxLeadPrint()">Imprimir / Guardar PDF</button><button onclick="seamxLeadExport()">Exportar respaldo</button></div>
   <div id="lead-access" style="display:none;padding:16px;background:#fff;border:1px solid #d1dfd3">Los registros de evaluación están reservados para jefatura y gerencia.</div>
   <div id="lead-eval-tab"><div id="lead-form">
@@ -1969,6 +1974,11 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
     <div class="lead-summary"><span>Evaluador: <b id="lead-evaluator"></b></span><span id="lead-score">Sin puntuación</span><span id="lead-level">Pendiente</span></div>
     <div class="lead-head" role="row"><span>N.º</span><span>Criterio de verificación</span><span>Puntaje · 2 / 1 / 0 / N/A</span><span>Observaciones / evidencia</span></div>
     <div id="lead-criteria"></div>
+    <div class="seamx-lead-paper-head seamx-lead-page2-head">
+    <div class="seamx-lead-paper-logo"><img src="logo-ecoseam.png" alt="ECOSEAM"></div>
+    <div class="seamx-lead-paper-meta"><strong>LISTA DE VERIFICACIÓN DE LIDERAZGO Y ACOMPAÑAMIENTO EN CAMPO</strong><div><span>Código: HSE.LI.CMA.07</span><span>Versión: 01</span></div><div><span>Fecha de elaboración: 24/10/2026</span><span>Página 2 de 2</span></div></div>
+    <div class="seamx-lead-paper-company">COMPAÑÍA<br>MINERA<br>ANTAMINA</div>
+  </div>
     <div class="lead-fields"><label><input type="checkbox" id="lead-critical"> Se identificó una desviación crítica o control crítico ineficaz</label><label>Acción inmediata<textarea id="lead-action" rows="2"></textarea></label><label>Fortalezas observadas<textarea id="lead-strengths" rows="2"></textarea></label><label>Oportunidades de mejora<textarea id="lead-improve" rows="2"></textarea></label><label>Compromiso verificable<textarea id="lead-commitment" rows="2"></textarea></label><label>Responsable<input id="lead-owner"></label><label>Plazo<input id="lead-due" type="date"></label><label>Próxima verificación<input id="lead-next" type="date"></label><label>Nombre / Firma del evaluador<input id="lead-evaluator-signature" placeholder="Nombre y conformidad"></label><label>Nombre / Firma del supervisor evaluado<input id="lead-supervisor-signature" placeholder="Nombre y conformidad"></label></div>
     <div class="seamx-lead-scale"><strong>Escala de evaluación</strong><div><b>2</b><span>Cumple: requisito implementado y verificado en campo.</span></div><div><b>1</b><span>Cumple parcialmente: existen brechas por corregir.</span></div><div><b>0</b><span>No cumple: requisito no implementado.</span></div><div><b>N/A</b><span>No aplica: justificar en observaciones.</span></div><p>Resultado = puntaje obtenido / puntaje máximo aplicable × 100.</p></div><button class="btn btn-primary" onclick="seamxLeadSave()">Guardar evaluación</button>
     <p class="lead-muted">Borrador local en este navegador, no compartido ni sincronizado. N/A se excluye del denominador. La puntuación no sustituye el control de desviaciones críticas.</p>
@@ -7682,6 +7692,35 @@ input,select,textarea{min-width:0;box-sizing:border-box;max-width:100%}
 }
 @media(prefers-reduced-motion:reduce){
  *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style><style id="seamx-liderazgo-formato-fisico">
+#view-liderazgo .seamx-lead-paper-head{display:grid;grid-template-columns:95px minmax(0,1fr) 122px;min-height:88px;background:#fff;border:1px solid #67776e;margin:0 0 20px;align-items:stretch}
+#view-liderazgo .seamx-lead-paper-logo{border-right:1px solid #67776e;display:flex;align-items:center;justify-content:center;padding:10px}
+#view-liderazgo .seamx-lead-paper-logo img{max-width:100%;max-height:65px;object-fit:contain}
+#view-liderazgo .seamx-lead-paper-meta{display:grid;grid-template-rows:1fr 28px 28px}
+#view-liderazgo .seamx-lead-paper-meta>strong{font-size:12px;font-weight:700;display:flex;align-items:center;padding:5px 12px}
+#view-liderazgo .seamx-lead-paper-meta>div{display:grid;grid-template-columns:1.3fr .8fr;border-top:1px solid #67776e;font-size:11px}
+#view-liderazgo .seamx-lead-paper-meta>div span{padding:5px 10px}
+#view-liderazgo .seamx-lead-paper-meta>div span+span{border-left:1px solid #67776e}
+#view-liderazgo .seamx-lead-paper-company{border-left:1px solid #67776e;font-size:11px;font-weight:750;text-align:center;display:flex;justify-content:center;align-items:center;line-height:1.4}
+#view-liderazgo .seamx-lead-paper-title{background:#fff;padding:0 10px 12px}
+#view-liderazgo .seamx-lead-paper-title>strong{display:block;text-align:center;font-size:21px;margin-bottom:12px;letter-spacing:.02em}
+#view-liderazgo .seamx-lead-paper-title h2{font-size:17px!important;line-height:1.35;text-transform:uppercase;margin:0 0 12px}
+#view-liderazgo .seamx-lead-paper-title p{font-size:12px;line-height:1.6;color:#263c30;margin:0}
+#view-liderazgo .seamx-lead-page2-head{margin-top:22px;margin-bottom:14px}
+#view-liderazgo .lead-fields{background:#fff;padding:12px;border:1px solid #c3d0c5;gap:12px}
+#view-liderazgo .lead-fields label:has(#lead-strengths),#view-liderazgo .lead-fields label:has(#lead-improve),#view-liderazgo .lead-fields label:has(#lead-commitment){grid-column:1/-1}
+#view-liderazgo #lead-strengths,#view-liderazgo #lead-improve,#view-liderazgo #lead-commitment{min-height:82px;resize:vertical}
+#view-liderazgo .lead-head{background:#b9d09a!important}
+#view-liderazgo .lead-criterion .lead-n{background:#e0ead9}
+@media(max-width:720px){#view-liderazgo .seamx-lead-paper-head{grid-template-columns:60px 1fr 75px}#view-liderazgo .seamx-lead-paper-company{font-size:9px}#view-liderazgo .seamx-lead-paper-meta>strong{font-size:10px}#view-liderazgo .seamx-lead-paper-meta>div{font-size:9px}#view-liderazgo .seamx-lead-paper-meta>div span{padding:4px}#view-liderazgo .seamx-lead-paper-title h2{font-size:15px!important}}
+@media print{
+ #view-liderazgo .seamx-lead-page2-head{break-before:page;page-break-before:always}
+ #view-liderazgo .seamx-lead-paper-title,#view-liderazgo .seamx-lead-paper-head{break-inside:avoid}
+ #view-liderazgo .lead-tabs,#view-liderazgo #lead-access,#view-liderazgo #lead-report-tab{display:none!important}
+ #view-liderazgo .lead-fields{padding:8px}
+ #view-liderazgo .seamx-lead-paper-title h2{font-size:15px!important}
+ #view-liderazgo .lead-criterion{font-size:10px!important}
 }
 </style></body>
 </html>
