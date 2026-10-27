@@ -90,6 +90,25 @@ window.seamxLeadSave=function(){
  read('lead-date').value=date();read('lead-supervisor').value='';seamxLeadScore();seamxLeadRender();
  alert('Evaluación guardada como registro local. Aún no está sincronizada entre dispositivos.');
 };
+
+window.seamxLeadView=function(id){
+ const r=get().find(x=>String(x.id)===String(id));if(!r)return alert('Evaluación no encontrada');
+ const lines=['Supervisor: '+r.supervisor,'Fecha: '+r.fecha,'Área: '+r.area,'Actividad: '+r.actividad,'Resultado: '+Number(r.pct).toFixed(1)+'%','Fortalezas: '+(r.strengths||'—'),'Oportunidades: '+(r.improve||'—'),'Compromiso: '+(r.commitment||'—')];
+ (r.answers||[]).forEach((a,i)=>lines.push((i+1)+'. '+CRITERIOS[i]+' — '+(a?.v||'—')+(a?.note?' | '+a.note:'')));
+ const dlg=document.getElementById('seamx-lead-detail')||document.createElement('dialog');dlg.id='seamx-lead-detail';dlg.style.cssText='max-width:min(900px,92vw);max-height:86vh;overflow:auto;padding:22px;border:1px solid #8caf9b;background:#fff;color:#17432d';if(!dlg.parentNode)document.body.appendChild(dlg);
+ dlg.innerHTML='<h2>Evaluación de liderazgo</h2><pre style="white-space:pre-wrap;font:13px/1.6 system-ui">'+esc(lines.join('\n'))+'</pre><button type="button">Cerrar</button>';dlg.querySelector('button').onclick=()=>dlg.close();dlg.showModal();
+};
+window.seamxLeadEdit=function(id){
+ if(!isEvaluator())return alert('Solo Gerencia, Jefatura y Administración pueden editar');
+ const r=get().find(x=>String(x.id)===String(id));if(!r)return alert('Evaluación no encontrada');
+ editing=r.id;
+ const fields={'lead-date':r.fecha,'lead-area':r.area,'lead-activity':r.actividad,'lead-shift':r.guardia,'lead-strengths':r.strengths,'lead-improve':r.improve,'lead-commitment':r.commitment,'lead-owner':r.owner,'lead-due':r.due,'lead-next':r.next,'lead-evaluator-signature':r.firma_evaluador,'lead-supervisor-signature':r.firma_supervisor};
+ Object.entries(fields).forEach(([k,v])=>{const el=read(k);if(el)el.value=v||''});
+ const sup=read('lead-supervisor');if(sup)sup.value=String(r.supervisor_id);
+ (r.answers||[]).forEach((a,i)=>{const radio=document.querySelector('input[name="lead-q'+i+'"][value="'+a.v+'"]');if(radio)radio.checked=true;const note=read('lead-note-'+i);if(note)note.value=a.note||''});
+ read('lead-eval-tab').hidden=false;read('lead-report-tab').hidden=true;seamxLeadScore();read('lead-eval-tab').scrollIntoView({behavior:'smooth'});
+};
+
 window.seamxLeadVerify=function(id){if(!isEvaluator())return;const x=records.find(r=>r.id===id);if(!x)return;if(!x.commitment)return alert('No existe compromiso asociado.');if(!confirm('¿Se verificó la implementación efectiva del compromiso en campo?'))return;x.verified=true;x.verifiedAt=new Date().toISOString();persist();seamxLeadRender()};
 function grouped(){const map={};records.forEach(r=>{const n=r.supervisor||'Sin identificar';(map[n]??=[]).push(r)});return Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0]))}
 window.seamxLeadRender=function(){
@@ -100,7 +119,7 @@ window.seamxLeadRender=function(){
  const n=records.length,pending=records.filter(r=>r.commitment&&!r.verified).length,critical=records.filter(r=>r.crit&&!r.verified).length,avg=n?records.reduce((t,r)=>t+Number(r.pct||0),0)/n:null;
  read('lead-kpis').innerHTML=[['Evaluaciones',n],['Promedio',avg===null?'—':avg.toFixed(1)+'%'],['Compromisos pendientes',pending],['Críticos sin verificar',critical]].map(([l,v])=>'<div class="lead-kpi"><small>'+l+'</small><b>'+v+'</b></div>').join('');
  tbl.innerHTML=grouped().map(([name,a])=>{a.sort((x,y)=>x.fecha.localeCompare(y.fecha));const first=a[0],last=a[a.length-1],improvement=last.pct-first.pct,pending=a.filter(x=>x.commitment&&!x.verified).length,cr=a.filter(x=>x.crit&&!x.verified).length;return '<tr><td>'+esc(name)+'</td><td>'+a.length+'</td><td>'+last.pct.toFixed(1)+'%</td><td>'+(a.length>1?(improvement>=0?'+':'')+improvement.toFixed(1)+' pp':'—')+'</td><td>'+pending+'</td><td>'+cr+'</td></tr>'}).join('')||'<tr><td colspan="6">No existen evaluaciones registradas en este navegador.</td></tr>';
- read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment&&isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+'</td></tr>').join('')||'<tr><td colspan="5">Sin registros</td></tr>';
+ read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment&&isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+' <button class="lead-btn-alt" onclick="seamxLeadView(\''+esc(r.id)+'\')">Ver</button> '+(isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadEdit(\''+esc(r.id)+'\')">Editar</button>':'')+'</td></tr>').join('')||'<tr><td colspan="5">Sin registros</td></tr>';
  records=source;
 };
 window.seamxLeadInit=setup;
