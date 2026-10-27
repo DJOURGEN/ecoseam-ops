@@ -25,7 +25,7 @@ const PRIORITARIOS=[3,4,7,12,13,15];
 let records=[],editing=null;
 function get(){try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){return []}}
 function persist(){try{localStorage.setItem(LS,JSON.stringify(records));return true}catch(e){alert('No se pudo guardar el registro localmente.');return false}}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','&#39;'}[c]}))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function read(id){return document.getElementById(id)}
 function val(id){return read(id)?.value?.trim()||''}
 function isEvaluator(){return ['admin','gerencia','jefatura'].includes(APP.user?.role)}
