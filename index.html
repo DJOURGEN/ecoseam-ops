@@ -269,6 +269,26 @@ tbody tr:hover{background:var(--surface-1)}
 #view-dashboard .stat-grid{gap:12px;margin-bottom:16px}#view-dashboard .stat-card{padding:15px 16px}#view-dashboard .card{padding:16px}#view-dashboard .card-header{margin-bottom:12px}#view-dashboard .grid-2{gap:16px}
 @media(max-width:620px){.hours-area-row{grid-template-columns:80px 1fr 56px}.person-hours-row{grid-template-columns:100px 1fr 72px;gap:6px}}
 
+/* Antamina · Vista de consulta optimizada */
+body.seamx-antamina #view-opsdashboard,body.seamx-antamina #view-habilitado,body.seamx-antamina #view-actividades{max-width:none;padding-bottom:24px}
+body.seamx-antamina .page-header{margin-bottom:16px}
+body.seamx-antamina .page-header .page-title{color:#176968}
+body.seamx-antamina .page-header .page-subtitle{line-height:1.55;margin-top:6px}
+body.seamx-antamina .seamx-ops-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+body.seamx-antamina .seamx-ops-panel{border:1px solid #d2e8e5;border-radius:16px;box-shadow:0 4px 16px rgba(12,97,94,.08);padding:20px}
+body.seamx-antamina .seamx-ops-panel h3{color:#176968;margin-bottom:14px}
+body.seamx-antamina .seamx-ops-metrics{gap:12px;grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+body.seamx-antamina .seamx-ops-metric{background:linear-gradient(140deg,#f1fbf7,#e4f3f1);border-left:4px solid #1c7772;padding:18px}
+body.seamx-antamina .seamx-habilitado-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+body.seamx-antamina .seamx-habilitado-item{padding:20px;border-radius:16px;border:1px solid #d2e8e5;background:#fff;box-shadow:0 4px 16px rgba(12,97,94,.07)}
+body.seamx-antamina .seamx-habilitado-item h3{color:#126c68;line-height:1.35;margin-bottom:10px}
+body.seamx-antamina .seamx-habilitado-item p{line-height:1.6;margin-bottom:12px}
+body.seamx-antamina #view-actividades .activity-hero{border-radius:16px;background:linear-gradient(120deg,#10534f,#258882)}
+body.seamx-antamina #view-actividades .card{border-radius:14px}
+body.seamx-antamina #view-actividades .data-table td{padding-top:12px;padding-bottom:12px}
+body.seamx-antamina #view-opsdashboard .seamx-curve-programming,body.seamx-antamina #hab-form-panel{display:none!important}
+.antamina-avatar{display:inline-flex;align-items:center;justify-content:center;background:#f8fffd;color:#176d69;font-size:11px;font-weight:800;padding:4px;border-radius:6px}
+@media(max-width:900px){body.seamx-antamina .seamx-ops-charts{grid-template-columns:1fr}}
 /* ===== PAGE: LOGIN ===== */
 .login-page{
   min-height:100vh;display:flex;align-items:center;justify-content:center;
@@ -4092,7 +4112,7 @@ const NAV_CONFIG = {
   controlador: ['comando','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','entrega'],
   supervisor: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   jefatura: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
-  antamina: ['antamina'],
+  antamina: ['opsdashboard','habilitado','actividades'],
   gerencia: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento'],
   admin: ['liderazgo','comando','programacion','entrega','actividades','patios','opsdashboard','habilitado','ocupabilidad','coproductos','mantenimiento','admin'],
   mantenimiento: ['actividades','mantenimiento'],
@@ -4137,7 +4157,7 @@ function esGerenciaSoloLectura(){
 }
 
 function puedeVerDashboardActividades(){
-  return Boolean(APP.user && ['supervisor','gerencia','admin'].includes(APP.user.role));
+  return Boolean(APP.user && ['supervisor','gerencia','admin','antamina'].includes(APP.user.role));
 }
 
 function mergeDashboardIntoActividades(){
@@ -4151,10 +4171,12 @@ function setupUI() {
   const u = APP.user;
   document.body.classList.toggle('seamx-gerencia',u.role==='gerencia');
   document.body.classList.toggle('seamx-operacion',u.role!=='gerencia');
+  document.body.classList.toggle('seamx-antamina',u.role==='antamina');
   mergeDashboardIntoActividades();
   const dashboardSlot=document.getElementById('actividades-dashboard-slot');
-  if(dashboardSlot)dashboardSlot.style.display='none';
+  if(dashboardSlot)dashboardSlot.style.display=u.role==='antamina'?'block':'none';
   document.getElementById('user-avatar-side').textContent = u.initials;
+  if(u.role==='antamina')document.getElementById('user-avatar-side').innerHTML='<span class="antamina-avatar">ANT</span>'; 
   document.getElementById('user-name-side').textContent = u.name;
   document.getElementById('user-role-side').textContent = u.role;
   const handDate=document.getElementById('handover-date');if(handDate&&!handDate.value)handDate.value=seamxToday();
@@ -4204,6 +4226,7 @@ function setupUI() {
 
   // Nueva actividad solo dentro de la página Actividades
   const puedeRegistrarActividad = ['operador','controlador','mantenimiento','admin'].includes(u.role);
+  const btnAsignar=document.getElementById('btn-asignar-actividad');if(btnAsignar&&u.role==='antamina')btnAsignar.style.display='none';
   const btnNuevaPage = document.getElementById('btn-nueva-actividad-page');
   if(btnNuevaPage) btnNuevaPage.style.display = puedeRegistrarActividad ? 'inline-flex' : 'none';
   const btnSyncSheets = document.getElementById('btn-sync-actividades-sheets');
@@ -4297,7 +4320,7 @@ function getDefaultViewForRole(){
   if(!APP.user)return 'actividades';
   if(['admin','supervisor','gerencia','jefatura'].includes(APP.user.role))return 'comando';
   if(APP.user.role==='controlador')return 'comando';
-  if(APP.user.role==='antamina')return 'antamina';
+  if(APP.user.role==='antamina')return 'opsdashboard';
   if(APP.user.role==='mantenimiento')return 'actividades';
   return 'actividades';
 }
