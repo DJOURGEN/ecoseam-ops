@@ -2782,7 +2782,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
           <option value="mantenimiento">🔧 Mantenimiento</option>
           <option value="supervisor">🔍 Supervisor</option>
           <option value="supervisor_hse">🦺 Supervisor HSE</option>
-          <option value="gerencia">📊 Gerencia</option><option value="jefatura">🏢 Jefatura</option><option value="antamina">🏭 Antamina</option>
+          <option value="gerencia">🏛️ Gerencia</option><option value="jefatura">🏢 Jefatura</option><option value="antamina">🏭 Antamina</option>
           <option value="admin">⚙️ Administrador</option>
         </select>
       </div>
@@ -5284,7 +5284,7 @@ async function saveUsuario() {
 
 function renderUsuarios() {
   const tbody=document.getElementById('tbody-usuarios');
-  const rolIcons={jefatura:'🏢',antamina:'🏭',supervisor_hse:'🦺',operador:'👷',supervisor:'📋',controlador:'🚚',mantenimiento:'🔧',gerencia:'📊',admin:'⚙️'};
+  const rolIcons={jefatura:'🏢',antamina:'🏭',supervisor_hse:'🦺',operador:'👷',supervisor:'📋',controlador:'🚚',mantenimiento:'🔧',gerencia:'🏛️',admin:'⚙️'};
   const rolColors={jefatura:'background:#e4ebe2;color:#234f31',antamina:'background:#e9edee;color:#475c62',supervisor_hse:'background:#fff8e1;color:#8a5a00',operador:'background:#e3f0e5;color:#1a5c2a',supervisor:'background:#e3f2fd;color:#0d47a1',controlador:'background:#e8f5e9;color:#1b5e20',mantenimiento:'background:#fff8e1;color:#8a5a00',gerencia:'background:#f3e5f5;color:#6a1b9a',admin:'background:#fff3e0;color:#e65100'};
   const thead=tbody.closest('table').querySelector('thead tr');
   if(thead)thead.innerHTML='<th>Usuario</th><th>Nombre completo</th><th>Contraseña</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th>';
@@ -7648,5 +7648,26 @@ table{border-collapse:collapse}
 @media(max-width:1100px){#view-programacion .prog-layout{grid-template-columns:1fr!important}#view-habilitado #hab-form-panel .seamx-ops-controls{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:640px){.content{padding:11px 10px!important}.topbar{gap:5px!important;padding:0 8px!important}.topbar-title{font-size:15px!important}#btn-logout{padding:7px!important}#view-habilitado #hab-form-panel .seamx-ops-controls{grid-template-columns:1fr!important}#view-opsdashboard .seamx-curve-range{display:grid;grid-template-columns:1fr 1fr}#view-opsdashboard .seamx-field-note{grid-column:1/-1}#view-opsdashboard .seamx-curve-range button{grid-column:1/-1}#view-programacion .prog-talk-entry{display:block}.modal{width:calc(100vw - 14px)!important;max-width:calc(100vw - 14px)!important;padding:13px!important}}
 @media(prefers-reduced-motion:reduce){.content>[id^="view-"]{animation:none!important}}
-</style><style id="seamx-lead-polish-20261027">#view-liderazgo .seamx-lead-reload{font-size:10px;min-height:28px;margin-top:7px;padding:5px 8px}#view-liderazgo .lead-criterion{min-height:48px}#view-liderazgo .lead-options input{accent-color:#1c603e}#view-liderazgo .lead-criterion:focus-within{outline:1px solid #668c71;outline-offset:-1px}#view-liderazgo .lead-fields textarea{min-height:84px;resize:vertical}@media(max-width:700px){#view-liderazgo .lead-criterion{border:1px solid #c9d6cb!important;margin-bottom:8px!important}}</style></body>
+</style><style id="seamx-lead-polish-20261027">#view-liderazgo .seamx-lead-reload{font-size:10px;min-height:28px;margin-top:7px;padding:5px 8px}#view-liderazgo .lead-criterion{min-height:48px}#view-liderazgo .lead-options input{accent-color:#1c603e}#view-liderazgo .lead-criterion:focus-within{outline:1px solid #668c71;outline-offset:-1px}#view-liderazgo .lead-fields textarea{min-height:84px;resize:vertical}@media(max-width:700px){#view-liderazgo .lead-criterion{border:1px solid #c9d6cb!important;margin-bottom:8px!important}}</style><style id="seamx-refine-20261027">
+/* Interfaz operacional profesional: paneles rectangulares, menos espacios muertos */
+:root{--radius:3px;--radius-s:2px;--radius-lg:4px;--shadow:none}
+.content{padding:16px 20px!important;background:#f6f8f6!important}
+.content>[id^="view-"]{width:100%;max-width:none;min-width:0;box-sizing:border-box}
+.topbar{display:flex!important;align-items:center;min-width:0;padding:0 16px!important}
+.topbar-title{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis}
+.topbar-actions{display:flex;align-items:center;justify-content:flex-end;margin-left:auto;flex:none}
+#btn-logout{margin-left:auto!important;border-radius:2px!important;position:relative}
+.card,.stat-card,.seamx-ops-panel,.seamx-ops-metric,.seamx-habilitado-item,.lead-btn-alt,.lead-tabs button,.btn,.modal,.form-control,
+#view-liderazgo .lead-head,#view-liderazgo .lead-bar,#view-liderazgo .lead-criterion{border-radius:2px!important;box-shadow:none!important}
+.page-header{margin-bottom:14px!important;padding-bottom:11px!important;border-bottom:1px solid #d6ded7}
+.page-title{font-size:20px!important;font-weight:650!important;letter-spacing:-.02em}
+.card,.seamx-ops-panel,.seamx-habilitado-item{border:1px solid #dae2db!important}
+#view-programacion .card,#view-programacion .prog-section,.prog-layout{max-width:none;min-width:0}
+#view-opsdashboard .seamx-ops-charts{gap:12px}
+#view-opsdashboard .seamx-curve-panel{grid-column:1/-1}
+#view-opsdashboard .seamx-curve-programming{gap:8px}
+#view-opsdashboard .seamx-curve-programming button{height:auto;min-height:35px}
+@media(max-width:860px){.content{padding:12px!important}.topbar{padding:0 9px!important}#view-liderazgo .lead-criterion{width:100%}}
+@media(max-width:520px){.content{padding:9px!important}.topbar{gap:5px!important}#btn-logout{padding:7px!important;flex-shrink:0}#view-opsdashboard .seamx-ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.seamx-ops-panel{padding:10px!important}}
+</style></body>
 </html>
