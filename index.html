@@ -1350,6 +1350,13 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 body.seamx-antamina #seamx-safe-panel,body.seamx-antamina #activity-evidence-upload,body.seamx-antamina .activity-shared-control-note,body.seamx-antamina #btn-save-evidence,body.seamx-antamina #btn-asignar-actividad,body.seamx-antamina #btn-nueva-actividad-page{display:none!important}
 body.seamx-antamina #view-actividades .activity-hero{background:linear-gradient(125deg,#0b5851,#169078)!important}
 body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;border-left:3px solid #3dbb95}
+</style><style id="seamx-dashboard-two-row-fix">
+@media(min-width:1100px){
+#view-opsdashboard .seamx-ops-charts{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(170px,1fr))!important}
+#view-opsdashboard .seamx-ops-charts>.seamx-ops-panel.seamx-curve-panel{grid-column:span 2!important}
+#view-opsdashboard .seamx-curve-panel{position:relative!important}
+#view-opsdashboard .seamx-curve-panel canvas{min-height:115px!important}
+}
 </style></head>
 <body>
 
@@ -7280,16 +7287,22 @@ function seamxOcupabilidadHeatmap(rows){
 }
 function seamxRenderMaterialComposicion(){
  const rows=(APP.data.movimientos||[]).filter(r=>String(r.fecha||'').startsWith(seamxOpsMonth())&&String(r.movimiento||'').toLowerCase()==='ingreso');
- const vals=[0,0,0,0];
- rows.forEach(r=>{const raw=[r.tipo,r.tipo_material,r.clase,r.subclase,r.descripcion].filter(Boolean).join(' ').toLowerCase(),peso=Number(r.peso_tn??r.peso??0)||0;
-  const heavy=/pesado|pesada/.test(raw),non=/no met[aá]lic|no-met[aá]lic|hdpe|pl[aá]stic|madera/.test(raw);vals[(heavy?2:0)+(non?1:0)]+=Math.max(0,peso);
+ const vals=[0,0,0,0];let unclassified=0;
+ rows.forEach(r=>{
+  const text=String(r.tipo_residuo||'').toLowerCase(),sub=String(r.subclase||'').toLowerCase();
+  const heavy=/pesad/.test(text),light=/livian/.test(text);
+  const non=/no\s*met[aá]lic|no[- ]met[aá]lic/.test(sub),metal=/^met[aá]lic/.test(sub);
+  const peso=Number(r.peso_tn??0);
+  if(!Number.isFinite(peso)||peso<=0)return;
+  if((!heavy&&!light)||(!non&&!metal)){unclassified+=peso;return;}
+  vals[(heavy?2:0)+(non?1:0)]+=peso;
  });
  const names=['Liviano metálico','Liviano no metálico','Pesado metálico','Pesado no metálico'];
  const total=vals.reduce((a,b)=>a+b,0);
  const panel=document.getElementById('ops-material-composition')?.closest('.seamx-ops-panel');
  let note=panel?.querySelector('.seamx-material-note');
  if(panel&&!note){note=document.createElement('small');note.className='seamx-material-note';panel.appendChild(note);}
- if(note)note.textContent=total?'Tonelaje por categoría · '+total.toFixed(2)+' tn':'Sin ingresos clasificados en el periodo';
+ if(note)note.textContent='Clasificado: '+total.toFixed(2)+' tn'+(unclassified?' · Sin clasificación: '+unclassified.toFixed(2)+' tn':'');
  seamxOpsChart('ops-material-composition','doughnut',names,[{data:vals,backgroundColor:['#38a873','#77c9c0','#17643a','#28719a'],hoverOffset:10}]);
 }
 function seamxOpsPeso(r){const n=v=>v==null||v===''?NaN:Number(String(v).replace(',','.'));const p=n(r.peso_tn),q=n(r.peso_4388);return Number.isFinite(p)?p:(Number.isFinite(q)?q:0)}
