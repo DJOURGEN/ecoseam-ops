@@ -1357,7 +1357,7 @@ body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;bord
 #view-opsdashboard .seamx-curve-panel{position:relative!important}
 #view-opsdashboard .seamx-curve-panel canvas{min-height:115px!important}
 }
-</style></head>
+</style><style id="seamx-pyramid-layout">#ops-gerencias-chart{display:flex;flex-direction:column;gap:5px;overflow:auto;flex:1;min-height:0}.seamx-pyramid-row{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px}.seamx-pyramid-row>span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.seamx-pyramid-bar{padding:5px;text-align:center;color:white;border-radius:3px;min-width:55px;font-weight:700}@media(min-width:1100px){#view-opsdashboard .seamx-ops-charts{grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(175px,1fr))!important}#view-opsdashboard .seamx-ops-charts>.seamx-curve-panel{grid-column:span 3!important}}</style></head>
 <body>
 
 <!-- ==================== LOGIN PAGE ==================== -->
@@ -2043,7 +2043,7 @@ body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;bord
     <div class="seamx-ops-panel"><h3>Camiones por día (ticket único)</h3><canvas id="ops-trucks"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ingresos de material por día (tn)</h3><canvas id="ops-inbound"></canvas></div><div class="seamx-ops-panel"><h3>Evacuaciones por día (tn)</h3><canvas id="ops-outbound"></canvas></div><div class="seamx-ops-panel"><h3>Meta mensual · evacuado y faltante</h3><canvas id="ops-month-share"></canvas></div><div class="seamx-ops-panel"><h3>Meta valorizable · evacuado y faltante</h3><canvas id="ops-value-share"></canvas></div>
     <div class="seamx-ops-panel"><h3>Ocupabilidad del Patio 4388</h3><div id="ops-occupancy-heatmap" class="seamx-heatmap" aria-label="Mapa de calor de ocupabilidad por categoría"></div></div>
-    <div class="seamx-ops-panel"><h3>Material pesado y liviano · metálico y no metálico</h3><canvas id="ops-material-composition"></canvas></div>
+    <div class="seamx-ops-panel"><h3>Material pesado y liviano</h3><canvas id="ops-material-composition"></canvas></div><div class="seamx-ops-panel"><h3>Ingresos por gerencia · pirámide invertida</h3><div id="ops-gerencias-chart" class="seamx-pyramid"></div></div>
   </div>
 </div>
 <div id="view-habilitado" style="display:none">
@@ -7285,25 +7285,34 @@ function seamxOcupabilidadHeatmap(rows){
  const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
  el.innerHTML=(rows||[]).map(r=>{const pct=r.totalM2?Math.max(0,Math.min(100,100*r.occupiedM2/r.totalM2)):0;return '<div class="seamx-heat-cell" style="background:hsl('+Math.max(0,120-pct*1.2)+' 60% 88%)" title="'+safe(r.name)+': '+pct.toFixed(1)+'% ocupado"><strong>'+safe(r.name)+'</strong><b>'+pct.toFixed(1)+'%</b></div>'}).join('')||'<p>No hay datos de ocupabilidad</p>';
 }
-function seamxRenderMaterialComposicion(){
- const rows=(APP.data.movimientos||[]).filter(r=>String(r.fecha||'').startsWith(seamxOpsMonth())&&String(r.movimiento||'').toLowerCase()==='ingreso');
- const vals=[0,0,0,0];let unclassified=0;
+async function seamxMaterialIngresos(){
+ const month=seamxOpsMonth();const end=new Date(Number(month.slice(0,4)),Number(month.slice(5)),1);const to=seamxFechaLocal(end);
+ const {data,error}=await db.from('movimientos_material').select('fecha,movimiento,tipo_residuo,subclase,peso_tn,gerencia').gte('fecha',month+'-01').lt('fecha',to).eq('movimiento','ingreso').limit(10000);
+ if(error){console.error(error);return []}
+ return data||[];
+}
+async function seamxRenderMaterialComposicion(){
+ const rows=await seamxMaterialIngresos(),vals=[0,0,0,0];let unclassified=0;
  rows.forEach(r=>{
-  const text=String(r.tipo_residuo||'').toLowerCase(),sub=String(r.subclase||'').toLowerCase();
-  const heavy=/pesad/.test(text),light=/livian/.test(text);
-  const non=/no\s*met[aá]lic|no[- ]met[aá]lic/.test(sub),metal=/^met[aá]lic/.test(sub);
-  const peso=Number(r.peso_tn??0);
-  if(!Number.isFinite(peso)||peso<=0)return;
-  if((!heavy&&!light)||(!non&&!metal)){unclassified+=peso;return;}
-  vals[(heavy?2:0)+(non?1:0)]+=peso;
+ const type=String(r.tipo_residuo||'').toLowerCase(),sub=String(r.subclase||'').toLowerCase(),peso=Number(r.peso_tn)||0;
+ const heavy=type.includes('pesad'),light=type.includes('livian'),non=/^no\s*met[aá]lico/.test(sub),metal=/^met[aá]lico/.test(sub);
+ if(!heavy&&!light||!non&&!metal){unclassified+=peso;return}
+ vals[(heavy?2:0)+(non?1:0)]+=peso;
  });
- const names=['Liviano metálico','Liviano no metálico','Pesado metálico','Pesado no metálico'];
- const total=vals.reduce((a,b)=>a+b,0);
- const panel=document.getElementById('ops-material-composition')?.closest('.seamx-ops-panel');
- let note=panel?.querySelector('.seamx-material-note');
- if(panel&&!note){note=document.createElement('small');note.className='seamx-material-note';panel.appendChild(note);}
- if(note)note.textContent='Clasificado: '+total.toFixed(2)+' tn'+(unclassified?' · Sin clasificación: '+unclassified.toFixed(2)+' tn':'');
- seamxOpsChart('ops-material-composition','doughnut',names,[{data:vals,backgroundColor:['#38a873','#77c9c0','#17643a','#28719a'],hoverOffset:10}]);
+ const total=vals.reduce((a,b)=>a+b,0),names=['Liviano','Pesado'],sum=[vals[0]+vals[1],vals[2]+vals[3]];
+ const cv=document.getElementById('ops-material-composition');if(!cv||typeof Chart==='undefined')return;
+ seamxOpsCharts['ops-material-composition']?.destroy();
+ seamxOpsCharts['ops-material-composition']=new Chart(cv,{type:'doughnut',data:{labels:names,datasets:[{data:sum,backgroundColor:['#62c6a1','#196a52'],hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:(ctx)=>{const i=ctx.dataIndex,metal=vals[i?2:0],nonmetal=vals[i?3:1];return [names[i]+': '+sum[i].toFixed(2)+' tn','Metálico: '+metal.toFixed(2)+' tn','No metálico: '+nonmetal.toFixed(2)+' tn']}}}}}});
+ const panel=cv.closest('.seamx-ops-panel');let note=panel.querySelector('.seamx-material-note');if(!note){note=document.createElement('small');note.className='seamx-material-note';panel.appendChild(note)}
+ note.textContent='Ingresos clasificados: '+total.toFixed(2)+' tn'+(unclassified?' · Sin clasificar: '+unclassified.toFixed(2)+' tn':'');
+}
+async function seamxRenderGerenciaPiramide(){
+ const rows=await seamxMaterialIngresos(),totals=new Map();
+ rows.forEach(r=>{const name=String(r.gerencia||'Sin gerencia').trim()||'Sin gerencia';totals.set(name,(totals.get(name)||0)+(Number(r.peso_tn)||0))});
+ const entries=[...totals].sort((a,b)=>b[1]-a[1]);const el=document.getElementById('ops-gerencias-chart');if(!el)return;
+ if(!entries.length){el.textContent='Sin ingresos por gerencia en este periodo';return}
+ const max=entries[0][1]||1;
+ el.innerHTML=entries.map(([name,value],i)=>'<div class="seamx-pyramid-row" title="'+seamxOpsSafe(name)+': '+value.toFixed(2)+' tn"><span>'+seamxOpsSafe(name)+'</span><div class="seamx-pyramid-bar" style="width:'+Math.max(8,100*value/max)+'%;background:hsl('+(161-i*7%45)+' 56% '+(29+Math.min(i*4,30))+'%)">'+value.toFixed(2)+' tn</div></div>').join('');
 }
 function seamxOpsPeso(r){const n=v=>v==null||v===''?NaN:Number(String(v).replace(',','.'));const p=n(r.peso_tn),q=n(r.peso_4388);return Number.isFinite(p)?p:(Number.isFinite(q)?q:0)}
 function seamxOpsMaterialTipo(r){const d=String(r.descripcion||r.tipo_residuo||'').toLowerCase();return /liner|linners|hdpe|tuber[ií]a|faja/.test(d)?'Plataforma':'Tolva'}
@@ -7335,7 +7344,7 @@ async function seamxRenderOpsDashboard(){
   if(valorRes.error)console.warn('No se pudo calcular el periodo valorizable:',valorRes.error);
   const valorMeta=850;
   const target=850;
-  document.getElementById('ops-metrics').innerHTML=[['Meta mensual/valorizable','850 tn'],['Programado',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Ocupabilidad 4388',occupied],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%']].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
+  document.getElementById('ops-metrics').innerHTML=[['Meta mensual/valorizable','850 tn'],['Evacuación programada',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Ocupabilidad 4388',occupied],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%']].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
   if(['admin','gerencia','jefatura'].includes(APP.user?.role)){
     const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='';
     try{const evaluations=JSON.parse(localStorage.getItem('seamx_liderazgo_borradores_v1')||'[]');const avg=evaluations.length?evaluations.reduce((s,x)=>s+Number(x.pct||0),0)/evaluations.length:0;
@@ -7350,7 +7359,8 @@ async function seamxRenderOpsDashboard(){
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
   seamxOpsChart('ops-outbound','bar',dates.map(d=>d.slice(8)),[{label:'Evacuado (tn)',data:dates.map(d=>daily[d]||0),backgroundColor:'#17643a'}]);
-  seamxRenderMaterialComposicion();
+  await seamxRenderMaterialComposicion();
+  await seamxRenderGerenciaPiramide();
 }
 function seamxFechaLocal(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function seamxCurvaMesActual(){
@@ -7386,6 +7396,7 @@ async function seamxRenderCurvaRango(){
   {label:'Ejecutado acumulado (tn)',data:realValues,borderColor:'#195f3c',backgroundColor:'rgba(25,95,60,.08)',pointRadius:length>75?0:2,fill:false,tension:.12}
  ]);
  const note=document.getElementById('ops-curve-summary');if(note)note.textContent='Periodo: '+from+' a '+to+' · Programado: '+planSum.toFixed(2)+' tn · Ejecutado: '+realSum.toFixed(2)+' tn';
+ const metrics=document.querySelectorAll('#ops-metrics .seamx-ops-metric');if(metrics[1])metrics[1].querySelector('strong').textContent=planSum.toFixed(2)+' tn';if(metrics[2])metrics[2].querySelector('strong').textContent=realSum.toFixed(2)+' tn';
 }
 
 function seamxGuardarPrograma(){if(APP.user?.role!=='admin')return showToast('Solo administración puede modificar la curva S','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
