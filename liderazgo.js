@@ -43,6 +43,7 @@ async function setup(){
  }catch(error){console.error('SEAMX Liderazgo: no se pudo consultar supervisores',error);}
  const active=users.filter(u=>u.activo!==false&&u.activo!==0&&u.activo!=='false'&&u.activo!=='f');
  select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions(active);
+ select.style.pointerEvents='auto';select.removeAttribute('readonly');
  select.disabled=active.length===0;
  if(retained&&Array.from(select.options).some(o=>o.value===retained))select.value=retained;
  if(!active.length){select.innerHTML='<option value="">No hay supervisores disponibles</option>';select.title='Comprueba los permisos de lectura y usuarios activos';}
@@ -68,7 +69,7 @@ function scoreInfo(){
 }
 window.seamxLeadScore=function(){const p=scoreInfo(),out=read('lead-score');if(out)out.textContent=p.pct===null?'Sin puntuación':p.points+' / '+p.max+' · '+p.pct.toFixed(1)+'%';const state=read('lead-level');if(state)state.textContent=p.pct===null?'Pendiente':p.pct>=90?'Satisfactorio':p.pct>=80?'Con oportunidades de mejora':'Requiere plan de mejora'};
 window.seamxLeadSave=function(){
- if(!isEvaluator())return alert('Evaluación reservada para gerencia y administración.');
+ if(!isEvaluator())return alert('Solo gerencia, jefatura y administración pueden registrar evaluaciones.');
  const supervisor=read('lead-supervisor'),id=supervisor.value,name=supervisor.selectedOptions[0]?.dataset.name||'';
  const p=scoreInfo();
  if(!id||!val('lead-date')||!val('lead-activity')||!val('lead-area'))return alert('Indica supervisor, fecha, actividad y área.');
@@ -76,7 +77,7 @@ window.seamxLeadSave=function(){
  if(!p.max)return alert('Debe existir al menos un criterio aplicable.');
  if(p.gaps.length)return alert('Justifica cada criterio con 0, 1 o N/A.');
  if(read('lead-critical').checked&&!val('lead-action'))return alert('Describe la acción inmediata ante una desviación crítica.');
- const newRec={firma_evaluador:val('lead-evaluator-signature')||read('lead-evaluator').textContent,firma_supervisor:val('lead-supervisor-signature'),id:editing||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),supervisor_id:id,supervisor:name,evaluator:read('lead-evaluator').textContent,fecha:val('lead-date'),area:val('lead-area'),actividad:val('lead-activity'),guardia:val('lead-shift'),fase:val('lead-phase'),answers:p.answers,points:p.points,max:p.max,pct:p.pct,crit:read('lead-critical').checked,action:val('lead-action'),strengths:val('lead-strengths'),improve:val('lead-improve'),commitment:val('lead-commitment'),owner:val('lead-owner'),due:val('lead-due'),next:val('lead-next'),verified:false,created:new Date().toISOString()};
+ const newRec={firma_evaluador:val('lead-evaluator-signature')||read('lead-evaluator').textContent,firma_supervisor:val('lead-supervisor-signature'),id:editing||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),supervisor_id:id,supervisor:name,evaluator:read('lead-evaluator').textContent,fecha:val('lead-date'),area:val('lead-area'),actividad:val('lead-activity'),guardia:val('lead-shift'),fase:'',answers:p.answers,points:p.points,max:p.max,pct:p.pct,crit:read('lead-critical').checked,action:val('lead-action'),strengths:val('lead-strengths'),improve:val('lead-improve'),commitment:val('lead-commitment'),owner:val('lead-owner'),due:val('lead-due'),next:val('lead-next'),verified:false,created:new Date().toISOString()};
  records=records.filter(r=>r.id!==newRec.id);records.push(newRec);
  if(!persist())return;
  editing=null;read('lead-form').querySelectorAll('input:not([type=radio]):not([type=checkbox]), textarea').forEach(el=>{if(el.id!=='lead-evaluator')el.value=''});read('lead-form').querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el=>el.checked=false);read('lead-criteria').querySelectorAll('.lead-note').forEach(n=>n.value='');
@@ -88,7 +89,7 @@ function grouped(){const map={};records.forEach(r=>{const n=r.supervisor||'Sin i
 window.seamxLeadRender=function(){
  records=get();
  const tbl=read('lead-supervisors');if(!tbl)return;
- const visible=isEvaluator()?records:records.filter(r=>String(r.supervisor_id)===String(APP.user?.id));
+ const visible=isEvaluator()?records:records.filter(r=>String(r.supervisor_id)===String(APP.user?.id)||String(r.supervisor||'').trim().toLowerCase()===String(APP.user?.name||'').trim().toLowerCase());
  const source=records;records=visible;
  const n=records.length,pending=records.filter(r=>r.commitment&&!r.verified).length,critical=records.filter(r=>r.crit&&!r.verified).length,avg=n?records.reduce((t,r)=>t+Number(r.pct||0),0)/n:null;
  read('lead-kpis').innerHTML=[['Evaluaciones',n],['Promedio',avg===null?'—':avg.toFixed(1)+'%'],['Compromisos pendientes',pending],['Críticos sin verificar',critical]].map(([l,v])=>'<div class="lead-kpi"><small>'+l+'</small><b>'+v+'</b></div>').join('');
@@ -96,7 +97,15 @@ window.seamxLeadRender=function(){
  read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>'+esc(r.fase)+'</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+'</td></tr>').join('')||'<tr><td colspan="6">Sin registros</td></tr>';
  records=source;
 };
-window.seamxLeadInit=setup;
+window.seamxLeadInit=async function(){
+ try{await setup()}catch(err){
+ console.error('Error al iniciar liderazgo:',err);
+ const select=read('lead-supervisor');if(select){
+ select.innerHTML='<option value="">Seleccionar supervisor</option>'+supervisorOptions(APP.data?.usuarios||[]);
+ select.disabled=select.options.length<=1;
+ }
+ }
+};
 window.seamxLeadPrint=function(){if(!isEvaluator())return;const v=read('lead-eval-tab');if(v)v.hidden=false;const rep=read('lead-report-tab');if(rep)rep.hidden=true;window.print()};
 window.seamxLeadExport=function(){if(!isEvaluator())return;const payload=JSON.stringify(get(),null,2),blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='seamx_evaluaciones_liderazgo_'+date()+'.json';a.click();URL.revokeObjectURL(url)};
 })();
