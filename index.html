@@ -7166,6 +7166,10 @@ function seamxOpsMaterialTipo(r){const d=String(r.descripcion||r.tipo_residuo||'
 async function seamxRenderOpsDashboard(){
   if(!document.getElementById('ops-mes').value)document.getElementById('ops-mes').value=seamxOpsMonth();
   if(!document.getElementById('ops-fecha').value)document.getElementById('ops-fecha').value=new Date().toLocaleDateString('en-CA');
+  const periodStart=document.getElementById('ops-curve-from'),periodEnd=document.getElementById('ops-curve-to');
+  if(periodStart&&!periodStart.value)periodStart.value=seamxOpsMonth()+'-01';
+  if(periodEnd&&!periodEnd.value)periodEnd.value=new Date().toLocaleDateString('en-CA');
+  const editor=document.getElementById('ops-curve-programming');if(editor)editor.style.display=APP.user?.role==='admin'?'flex':'none';
   const month=seamxOpsMonth(),guardia=document.getElementById('ops-guardia').value;
   let res=await db.from('evacuaciones_excel').select('fecha,ticket_balanza,peso_tn,peso_4388,descripcion,tipo_residuo').gte('fecha',month+'-01').lt('fecha',new Date(Number(month.slice(0,4)),Number(month.slice(5)),1).toLocaleDateString('en-CA'));
   if(res.error){console.error(res.error);showToast('Error al cargar evacuaciones','warning');return}
@@ -7200,12 +7204,45 @@ async function seamxRenderOpsDashboard(){
   seamxOpsChart('ops-month-share','doughnut',['Evacuado','Pendiente'],[{data:[evacuadas,mensualPendiente],backgroundColor:['#1d673e','#d9e2d8']}]);
   const valorTitle=document.querySelector('#ops-value-share')?.closest('.seamx-ops-panel')?.querySelector('h3');if(valorTitle)valorTitle.textContent='Meta valorizable · '+valorInicio+' al '+valorFin;
   seamxOpsChart('ops-value-share','doughnut',['Evacuado','Pendiente'],[{data:[valorReal||0,valorPendiente],backgroundColor:['#376f91','#d9e2d8']}]);
-  seamxOpsChart('ops-curve','line',dates.map(d=>d.slice(8)),[{label:'Programado acumulado',data:pc,borderColor:'#d99c00',tension:.2},{label:'Evacuado acumulado',data:rc,borderColor:'#1a5c2a',tension:.2}]);
+  let cfrom=periodStart?.value||dates[0],cto=periodEnd?.value||dates[dates.length-1];
+  const startUTC=Date.parse(cfrom+'T00:00:00Z'),endUTC=Date.parse(cto+'T00:00:00Z');
+  if(!Number.isFinite(startUTC)||!Number.isFinite(endUTC)||endUTC<startUTC||endUTC-startUTC>366*86400000){
+    showToast('Elige un rango Desde/Hasta válido (máximo 366 días)','warning');
+  }else{
+    const rangeDays=Array.from({length:Math.round((endUTC-startUTC)/86400000)+1},(_,i)=>new Date(startUTC+i*86400000).toISOString().slice(0,10));
+    const {data:rangeRows,error:rangeError}=await db.from('evacuaciones_excel').select('fecha,peso_tn,peso_4388').gte('fecha',cfrom).lte('fecha',cto);
+    if(rangeError)showToast('No se pudieron cargar datos de la Curva S: '+rangeError.message,'warning');
+    else{
+      const dailyRange={};(rangeRows||[]).forEach(r=>{const day=String(r.fecha||'').slice(0,10);dailyRange[day]=(dailyRange[day]||0)+seamxOpsPeso(r)});
+      const rangePlan=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>x.fecha>=cfrom&&x.fecha<=cto&&(!guardia||x.guardia===guardia));
+      const totals={};rangePlan.forEach(x=>{totals[x.fecha]=(totals[x.fecha]||0)+Number(x.toneladas||0)});
+      let accumulatedPlanned=0,accumulatedExecuted=0;
+      const chartPlanned=[],chartExecuted=[];
+      for(const day of rangeDays){accumulatedPlanned+=totals[day]||0;accumulatedExecuted+=dailyRange[day]||0;chartPlanned.push(accumulatedPlanned);chartExecuted.push(accumulatedExecuted)}
+      seamxOpsChart('ops-curve','line',rangeDays.map(d=>d.slice(5)),[
+        {label:'Programado acumulado',data:chartPlanned,borderColor:'#9b7436',backgroundColor:'#9b7436',tension:.16,pointRadius:2},
+        {label:'Ejecutado acumulado',data:chartExecuted,borderColor:'#206b49',backgroundColor:'#206b49',tension:.16,pointRadius:2}
+      ]);
+    }
+  }
   seamxOpsChart('ops-trucks','bar',dates.map(d=>d.slice(8)),[{label:'Plataforma',data:dates.map(d=>plataforma[d]||0),backgroundColor:'#00897b'},{label:'Tolva',data:dates.map(d=>tolva[d]||0),backgroundColor:'#1a5c2a'}]);
   seamxOpsChart('ops-inbound','bar',dates.map(d=>d.slice(8)),[{label:'Ingreso (tn)',data:dates.map(d=>inDaily[d]||0),backgroundColor:'#69b57a'}]);
   seamxOpsChart('ops-outbound','bar',dates.map(d=>d.slice(8)),[{label:'Evacuado (tn)',data:dates.map(d=>daily[d]||0),backgroundColor:'#17643a'}]);
 }
-function seamxGuardarPrograma(){if(!['admin','supervisor'].includes(APP.user?.role))return showToast('Solo supervisión y administración','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
+function seamxGuardarPrograma(){if(APP.user?.role!=='admin')return showToast('Solo el administrador puede programar la Curva S','warning');const fecha=document.getElementById('ops-fecha').value,guardia=document.getElementById('ops-guardia-edit').value,t=Number(document.getElementById('ops-toneladas').value);if(!fecha||!Number.isFinite(t)||t<0)return showToast('Revisa fecha y toneladas','warning');const rows=seamxOpsLocal('seamx_ops_programacion_v1').filter(x=>!(x.fecha===fecha&&x.guardia===guardia));rows.push({fecha,guardia,toneladas:t});seamxOpsSave('seamx_ops_programacion_v1',rows);seamxRenderOpsDashboard();showToast('Programación guardada en este navegador','success')}
+function seamxBorrarProgramacion(){
+ if(APP.user?.role!=='admin')return showToast('Solo administración puede borrar la programación','warning');
+ const rows=seamxOpsLocal('seamx_ops_programacion_v1');
+ if(!rows.length)return showToast('No existen toneladas programadas manualmente en este navegador','warning');
+ if(!confirm('¿Eliminar TODA la programación manual de Curva S guardada en este navegador? No se borrarán evacuaciones reales.'))return;
+ localStorage.removeItem('seamx_ops_programacion_v1');
+ seamxRenderOpsDashboard();showToast('Programación manual eliminada (este navegador)','success');
+}
+function seamxReiniciarFiltroCurva(){
+ const a=document.getElementById('ops-curve-from'),b=document.getElementById('ops-curve-to');
+ if(a)a.value=seamxOpsMonth()+'-01';if(b)b.value=new Date().toLocaleDateString('en-CA');
+ seamxRenderOpsDashboard();
+}
 let seamxHabCache=[];
 async function seamxRenderHabilitado(){
  const grid=document.getElementById('habilitado-items');if(!grid)return;
