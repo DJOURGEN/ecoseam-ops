@@ -2401,7 +2401,7 @@ body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;bord
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Usuario</th><th>Nombre completo</th><th>Contraseña</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th></tr>
+                <tr><th>Usuario</th><th>Nombre completo</th><th>Rol</th><th>Guardia</th><th>Estado</th><th>Acciones</th></tr>
               </thead>
               <tbody id="tbody-usuarios"></tbody>
             </table>
@@ -3515,7 +3515,7 @@ async function loadAllDataOnline() {
   const [actRes, restRes, userRes, movRes, occEvacRes, coproRes, coproMovRes, segDocRes, segFragRes, segQRes, segTryRes, progRes, handPendRes, handHeadRes, handRecvRes, maintRes] = await Promise.all([
     db.from('actividades').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('restricciones').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
-    db.from('usuarios').select('*').order('id', { ascending: true }),
+    db.from('usuarios').select('id,login,nombre,apellido,rol,guardia,activo,created_at,auth_user_id').order('id', { ascending: true }),
     db.from('movimientos_material').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('evacuaciones_excel').select('*').order('fecha', { ascending: false }).order('id', { ascending: false }),
     db.from('coproductos').select('*').order('id', { ascending: false }),
@@ -3635,11 +3635,11 @@ function initSampleData() {
   ];
 
   APP.data.usuarios = [
-    {id:1,login:'operador1',pass:'1234',nombre:'Juan',apellido:'Pérez',rol:'operador',guardia:'A',activo:true},
-    {id:2,login:'operador2',pass:'1234',nombre:'María',apellido:'García',rol:'operador',guardia:'A',activo:true},
-    {id:3,login:'operador3',pass:'1234',nombre:'Carlos',apellido:'López',rol:'operador',guardia:'B',activo:true},
-    {id:4,login:'supervisor1',pass:'1234',nombre:'Roberto',apellido:'Torres',rol:'supervisor',guardia:'ambas',activo:true},
-    {id:5,login:'gerencia1',pass:'1234',nombre:'Alejandro',apellido:'Castro',rol:'gerencia',guardia:'ambas',activo:true},
+    {id:1,login:'operador1',nombre:'Juan',apellido:'Pérez',rol:'operador',guardia:'A',activo:true},
+    {id:2,login:'operador2',nombre:'María',apellido:'García',rol:'operador',guardia:'A',activo:true},
+    {id:3,login:'operador3',nombre:'Carlos',apellido:'López',rol:'operador',guardia:'B',activo:true},
+    {id:4,login:'supervisor1',nombre:'Roberto',apellido:'Torres',rol:'supervisor',guardia:'ambas',activo:true},
+    {id:5,login:'gerencia1',nombre:'Alejandro',apellido:'Castro',rol:'gerencia',guardia:'ambas',activo:true},
     {id:6,login:'admin',pass:'admin123',nombre:'Admin',apellido:'Sistema',rol:'admin',guardia:'ambas',activo:true},
   ];
 }
@@ -5338,7 +5338,7 @@ function renderUsuarios() {
     <tr>
       <td><code style="font-size:13px;background:var(--surface-1);padding:2px 8px;border-radius:4px;color:var(--teal);font-weight:600">${escapeHtml(u.login)}</code></td>
       <td style="font-weight:500">${escapeHtml(`${u.nombre||''} ${u.apellido||''}`.trim())}</td>
-      <td><span id="pass-${u.id}" style="font-family:monospace;font-size:13px;letter-spacing:2px">••••••</span><button onclick="togglePass(${u.id})" style="background:none;border:none;cursor:pointer;color:var(--text-m);padding:2px 6px;font-size:11px" title="Ver/ocultar contraseña">👁</button></td>
+      
       <td><span class="badge" style="${rolColors[u.rol]||'background:var(--surface-2);color:var(--text-s)'};text-transform:capitalize">${rolIcons[u.rol]||'👤'} ${escapeHtml(u.rol==='supervisor_hse'?'Supervisor HSE':u.rol==='antamina'?'Antamina':u.rol)}</span></td>
       <td>${u.guardia==='ambas'?'A y B':'Guardia '+escapeHtml(u.guardia)}</td>
       <td><span class="badge ${u.activo?'badge-done':'badge-open'}">${u.activo?'Activo':'Inactivo'}</span></td>
@@ -5351,7 +5351,7 @@ function renderUsuarios() {
     </tr>`).join('');
 }
 
-function togglePass(id){const user=APP.data.usuarios.find(u=>u.id===id);if(!user)return;const el=document.getElementById('pass-'+id);el.textContent=el.textContent==='••••••'?user.pass:'••••••';}
+function togglePass(id){showToast('Las contraseñas ya no son visibles.','warning');}
 
 function openPasswordModal(id){
   const u=APP.data.usuarios.find(x=>x.id===id);if(!u)return;
