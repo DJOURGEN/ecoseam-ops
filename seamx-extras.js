@@ -7,7 +7,7 @@ const localStore=(key)=>{try{return JSON.parse(localStorage.getItem(key)||'[]')}
 const clean=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 function toast(message,type='warning'){if(typeof showToast==='function')showToast(message,type);else alert(message)}
 async function requireAuth(){
- const app=window.APP;
+ const app=APP;
  const c=window.seamxSignatureDb;
  if(!app?.user?.id||!c)throw Error('Inicia sesión en SEAMX.');
  let u=await c.auth.getUser();
@@ -46,7 +46,7 @@ async function readPlan(){
  return sharedPlan;
 }
 async function writePlan(body){
- if(window.APP?.user?.role!=='admin')return toast('Solo el Administrador puede editar la Curva S');
+ if(APP?.user?.role!=='admin')return toast('Solo el Administrador puede editar la Curva S');
  const c=await requireAuth();
  const result=await c.functions.invoke('seamx-curva-admin',{body});
  if(result.error||!result.data?.ok)throw Error(result.data?.error||result.error?.message||'No se pudo actualizar');
@@ -55,7 +55,7 @@ async function writePlan(body){
  await window.seamxRenderCurvaRango();
 }
 function hideControls(){
- const isAdmin=window.APP?.user?.role==='admin';
+ const isAdmin=APP?.user?.role==='admin';
  const launch=document.querySelector('.seamx-program-launch');
  const panel=$('seamx-program-dialog');
  if(launch)launch.style.display=isAdmin?'':'none';
@@ -138,18 +138,18 @@ function install(){
  const originalRange=window.seamxRenderCurvaRango;
  if(typeof originalRange==='function')window.seamxRenderCurvaRango=async function(){await readPlan();return originalRange()};
  window.seamxGuardarPrograma=async function(){
-  if(window.APP?.user?.role!=='admin')return toast('Solo Administración puede programar');
+  if(APP?.user?.role!=='admin')return toast('Solo Administración puede programar');
   const fecha=$('ops-fecha')?.value,guardia=$('ops-guardia-edit')?.value,toneladas=Number($('ops-toneladas')?.value);
   if(!fecha||!Number.isFinite(toneladas)||toneladas<0)return toast('Fecha y tonelaje inválidos');
   try{await writePlan({action:'save',fecha,guardia,toneladas});toast('Programación compartida actualizada','success')}catch(e){toast(e.message||'No se pudo guardar','error')}
  };
  window.seamxBorrarProgramacion=async function(){
-  if(window.APP?.user?.role!=='admin')return toast('Solo Administración puede borrar');
+  if(APP?.user?.role!=='admin')return toast('Solo Administración puede borrar');
   if(!confirm('¿Eliminar TODA la programación compartida de la Curva S?'))return;
   try{await writePlan({action:'clear'});toast('Programación compartida eliminada','success')}catch(e){toast(e.message||'No se pudo borrar','error')}
  };
  window.seamxImportarPlanAnterior=async function(){
-  if(window.APP?.user?.role!=='admin')return;
+  if(APP?.user?.role!=='admin')return;
   const rows=localStore('seamx_ops_programacion_v1');
   if(!rows.length)return toast('No existe programación anterior en este equipo');
   if(!confirm('¿Importar '+rows.length+' registros del navegador a Supabase para compartirlos?'))return;
