@@ -1,0 +1,4 @@
+[functions.seamx-login]
+# El login es público; la función usa credenciales privilegiadas SOLO en servidor.
+# No desplegar sin SQL, alias, limitación de intentos y protección RLS.
+verify_jwt = false

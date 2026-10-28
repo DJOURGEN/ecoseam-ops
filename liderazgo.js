@@ -65,6 +65,7 @@ async function setup(){
  return '<div class="lead-criterion" role="row"><span class="lead-n" role="cell">'+(i+1)+'</span><div class="lead-criterion-label" role="cell">'+esc(x)+(PRIORITARIOS.includes(i+1)?'<span class="lead-critical-label">Control prioritario</span>':'')+'</div><div class="lead-options" role="cell">'+radios+'</div><div role="cell"><input class="lead-note" id="lead-note-'+i+'" aria-label="Observación o evidencia del criterio '+(i+1)+'" placeholder="Observaciones / evidencia (obligatoria para 0, 1 o N/A)"></div></div>';
  }).join('');
  seamxLeadScore();seamxLeadRender();
+ window.seamxLiderazgoFirmasRefresh?.();
 }
 function scoreInfo(){
  const answers=CRITERIOS.map((_,i)=>{const el=document.querySelector('input[name="lead-q'+i+'"]:checked');return el?{v:el.value,note:val('lead-note-'+i)}:null});
@@ -91,6 +92,28 @@ window.seamxLeadSave=function(){
  alert('Evaluación guardada como registro local. Aún no está sincronizada entre dispositivos.');
 };
 
+
+window.seamxLeadRequestSignature=async function(id){
+ if(!isEvaluator())return alert('Solo Administración, Gerencia y Jefatura pueden solicitar firmas.');
+ const r=get().find(x=>String(x.id)===String(id));
+ if(!r)return alert('La evaluación no está disponible en este dispositivo.');
+ const session=await window.seamxSignatureDb.auth.getUser();
+ if(session.error||!session.data?.user?.id)
+    return alert('Primero verifica tu cuenta con la contraseña nueva de Supabase Auth en el panel de firmas.');
+ const owner=await window.seamxSignatureDb.from('usuarios').select('id,login,rol,activo').eq('auth_user_id',session.data.user.id).eq('activo',true).maybeSingle();
+ if(owner.error||owner.data?.id!==APP.user?.id||!['admin','gerencia','jefatura'].includes(owner.data?.rol))
+    return alert('La cuenta autenticada no coincide con quien inició sesión.');
+ if(!confirm('¿Enviar esta evaluación al supervisor para que la revise y firme personalmente?'))return;
+ const payload={id:r.id,supervisor_id:r.supervisor_id,fecha:r.fecha,area:r.area,
+    actividad:r.actividad,guardia:r.guardia||'',answers:r.answers,
+    strengths:r.strengths||'',improve:r.improve||'',commitment:r.commitment||'',
+    owner:r.owner||'',due:r.due||'',next:r.next||''};
+ const result=await window.seamxSignatureDb.functions.invoke('seamx-liderazgo-sync',{body:payload});
+ if(result.error||!result.data?.ok)
+    return alert('No se pudo enviar la evaluación. '+(result.data?.error||result.error?.message||'Intenta nuevamente.'));
+ alert('Solicitud enviada. El supervisor podrá firmarla con su cuenta de Supabase Auth.');
+ window.seamxLiderazgoFirmasRefresh?.();
+};
 window.seamxLeadView=function(id){
  const r=get().find(x=>String(x.id)===String(id));if(!r)return alert('Evaluación no encontrada');
  const lines=['Supervisor: '+r.supervisor,'Fecha: '+r.fecha,'Área: '+r.area,'Actividad: '+r.actividad,'Resultado: '+Number(r.pct).toFixed(1)+'%','Fortalezas: '+(r.strengths||'—'),'Oportunidades: '+(r.improve||'—'),'Compromiso: '+(r.commitment||'—')];
@@ -129,6 +152,16 @@ window.seamxLeadRender=function(){
  read('lead-kpis').innerHTML=[['Evaluaciones',n],['Promedio',avg===null?'—':avg.toFixed(1)+'%'],['Compromisos pendientes',pending],['Críticos sin verificar',critical]].map(([l,v])=>'<div class="lead-kpi"><small>'+l+'</small><b>'+v+'</b></div>').join('');
  tbl.innerHTML=grouped().map(([name,a])=>{a.sort((x,y)=>x.fecha.localeCompare(y.fecha));const first=a[0],last=a[a.length-1],improvement=last.pct-first.pct,pending=a.filter(x=>x.commitment&&!x.verified).length,cr=a.filter(x=>x.crit&&!x.verified).length;return '<tr><td>'+esc(name)+'</td><td>'+a.length+'</td><td>'+last.pct.toFixed(1)+'%</td><td>'+(a.length>1?(improvement>=0?'+':'')+improvement.toFixed(1)+' pp':'—')+'</td><td>'+pending+'</td><td>'+cr+'</td></tr>'}).join('')||'<tr><td colspan="6">No existen evaluaciones registradas en este navegador.</td></tr>';
  read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment&&isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+' <button class="lead-btn-alt" onclick="seamxLeadView(\''+esc(r.id)+'\')">Ver</button> '+(isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadEdit(\''+esc(r.id)+'\')">Editar</button>':'')+(isEvaluator()?'<button class="lead-btn-alt" style="color:#a83232" onclick="seamxLeadDelete(\''+esc(r.id)+'\')">Eliminar</button>':'')+'</td></tr>').join('')||'<tr><td colspan="5">Sin registros</td></tr>';
+ if(isEvaluator()){
+   read('lead-records')?.querySelectorAll('tr').forEach((tr,i)=>{
+     const r=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha))[i];
+     if(!r)return;
+     const btn=document.createElement('button');btn.type='button';btn.className='lead-btn-alt';
+     btn.textContent='Solicitar firma';
+     btn.addEventListener('click',()=>window.seamxLeadRequestSignature(r.id));
+     tr.lastElementChild?.append(' ',btn);
+   });
+ }
  records=source;
 };
 window.seamxLeadInit=setup;
