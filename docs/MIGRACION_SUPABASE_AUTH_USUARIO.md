@@ -64,3 +64,10 @@ Referencias:
 
 ## Actualización de ejecución — 28/10/2026
 Se aplicó a producción únicamente la migración aditiva de preparación: `usuarios.auth_user_id`, `seamx_auth_aliases` y `seamx_login_attempts` con RLS y revocación de accesos cliente para las nuevas tablas. Validación SQL: 29 perfiles antiguos, 0 cuentas Auth, 0 alias, columna de vínculo existente. No se desplegó la Edge Function ni se modificó `index.html`; la autenticación anterior sigue activa. Los cambios de Auth deben esperar pruebas integrales, provisionamiento seguro de contraseñas y políticas RLS completas. No ejecutar el SQL de preparación nuevamente salvo verificación de migraciones.
+
+## Revisión de implementación del 28/10/2026
+- El frontend `index.html` fue actualizado **solo en esta rama** con `db.functions.invoke('seamx-login')`, `db.auth.setSession`, `db.auth.getUser` y `db.auth.signOut` para sustituir la comparación `usuarios.pass` en el login. Se eliminó la persistencia de contraseñas en la casilla Recordarme y la lectura masiva de `usuarios.pass` al cargar usuarios.
+- Se verificó sintaxis de los scripts JS embebidos; **no se probaron sesiones reales**.
+- Datos agregados de producción sin revelar contraseñas: 29 perfiles, 26 activos, 3 inactivos, 0 Auth, 0 vínculos; 25 usuarios activos tienen claves inferiores a 6 caracteres; hay 16 contraseñas distintas entre 26 activos. NO reutilizar contraseñas anteriores ni establecer una contraseña común.
+- Falta integrar gestión de contraseñas y altas de usuarios con Auth; las pantallas de administración antiguas de `index.html` siguen escribiendo en `usuarios.pass`. La aplicación NO ESTÁ LISTA PARA FUSIONAR/IMPLEMENTAR.
+- Falta aprovisionar 26 identidades con contraseñas individuales seguras, confirmar dominio/alias interno, configurar secretos y desplegar pasarela, revisar RLS por módulo y hacer pruebas e2e antes de modificar `main`.
