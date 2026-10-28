@@ -1400,7 +1400,7 @@ body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;bord
           <input id="login-remember" type="checkbox">
           <span>
             <b>Recordarme en este equipo</b>
-            <small>Conserva el usuario y la contraseña para el próximo ingreso.</small>
+            <small>Guarda únicamente el nombre de usuario.</small>
           </span>
         </label>
 
@@ -3031,20 +3031,13 @@ async function syncOfflineQueue(){
 window.addEventListener('online',()=>{updateOfflineUI();setTimeout(syncOfflineQueue,500)});window.addEventListener('offline',updateOfflineUI);document.addEventListener('DOMContentLoaded',updateOfflineUI);
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./seamx-sw.js').catch(err=>console.warn('Service Worker:',err)));}
 
-function encodeRememberedCredentials(login,pass){
-  try{return btoa(encodeURIComponent(JSON.stringify({login,pass})))}catch(_){return ''}
-}
-function decodeRememberedCredentials(raw){
-  try{return JSON.parse(decodeURIComponent(atob(raw)))}catch(_){return null}
-}
+// Guardar únicamente el usuario; nunca contraseñas en localStorage.
 function loadRememberedCredentials(){
-  const saved=decodeRememberedCredentials(localStorage.getItem(REMEMBER_KEY)||'');
-  const user=document.getElementById('login-user'),pass=document.getElementById('login-pass'),remember=document.getElementById('login-remember');
-  if(saved?.login&&saved?.pass){
-    if(user)user.value=saved.login;
-    if(pass)pass.value=saved.pass;
-    if(remember)remember.checked=true;
-  }else if(remember){remember.checked=false;}
+  let saved;try{saved=JSON.parse(localStorage.getItem(REMEMBER_KEY)||'null')}catch(_){}
+  const u=document.getElementById('login-user'),r=document.getElementById('login-remember');
+  if(saved?.login&&typeof saved.login==='string'){
+    if(u)u.value=saved.login;if(r)r.checked=true;
+  }else{localStorage.removeItem(REMEMBER_KEY);if(r)r.checked=false;}
 }
 function saveCurrentViewPosition(){
   if(!APP.user||!APP.currentView)return;
@@ -4034,139 +4027,86 @@ function exportarRankingSeguridad(){
 function editarPreguntaSeguridad(id){const q=APP.data.seguridadPreguntas.find(x=>x.id===id);if(!q)return;document.getElementById('game-q-id').value=q.id;document.getElementById('game-q-tema').value=q.tema;document.getElementById('game-q-text').value=q.pregunta;['a','b','c','d'].forEach((x,i)=>document.getElementById('game-q-'+x).value=q.opciones[i]||'');document.getElementById('game-q-correct').value=String(q.correcta);document.getElementById('game-q-exp').value=q.explicacion;document.getElementById('game-q-doc').value=q.documentoId||'';document.getElementById('game-q-difficulty').value=String(q.dificultad||1);}
 async function eliminarPreguntaSeguridad(id){if(!confirm('¿Retirar esta pregunta del juego?'))return;const {error}=await db.from('seguridad_preguntas').update({activo:false}).eq('id',id);if(error){showToast('No se pudo retirar','error');return;}await loadAllData();renderQuestionAdminList();showToast('Pregunta retirada','warning');}
 
-/* ===== AUTH ===== */
-async function doLogin() {
-  const loginInput = document.getElementById('login-user').value.trim().toLowerCase();
-  const passInput  = document.getElementById('login-pass').value;
-  const errEl      = document.getElementById('login-error');
-  errEl.style.display = 'none';
-
-  // Un inicio de sesión explícito siempre reemplaza cualquier sesión anterior.
-  sessionStorage.removeItem(SESSION_KEYS.user);
-  sessionStorage.removeItem(SESSION_KEYS.view);
-  APP.user = null;
-
-  if(!loginInput || !passInput) {
-    errEl.textContent = 'Ingresa tu usuario y contraseña.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const rememberRequested=Boolean(document.getElementById('login-remember')?.checked);
-
-  let data=null,error=null;
-  if(!navigator.onLine){
-    restoreCachedAppData();
-    const cachedUsers=(APP.data.usuarios||[]).filter(u=>String(u.login||'').toLowerCase()===loginInput&&String(u.pass||'')===passInput&&u.activo!==false);
-    data=cachedUsers;
-    if(!cachedUsers.length&&!localStorage.getItem(SEAMX_CACHE_KEY))error={message:'No existe información offline guardada en este equipo.'};
-  }else{
-    const res=await db.from('usuarios').select('*').eq('login',loginInput).eq('pass',passInput).eq('activo',true).limit(2);
-    data=res.data;error=res.error;
-  }
-
-  if(error) {
-    console.error(error);
-    errEl.textContent = navigator.onLine?'No se pudo conectar con Supabase. Revisa la conexión o las políticas RLS.':'No hay una sesión offline disponible todavía. Inicia sesión una vez con internet para habilitar el modo campo.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  if((data || []).length > 1) {
-    errEl.textContent = 'Existe más de un usuario con el mismo login y contraseña. Solicita al administrador corregir el usuario duplicado.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const userMatch = data?.[0];
-  if(!userMatch || String(userMatch.login||'').toLowerCase() !== loginInput) {
-    errEl.textContent = 'Usuario o contraseña incorrectos.';
-    errEl.style.display = 'block';
-    document.getElementById('login-pass').value = '';
-    document.getElementById('login-pass').focus();
-    return;
-  }
-
-  const initials = ((userMatch.nombre || 'U')[0] + (userMatch.apellido ? userMatch.apellido[0] : '')).toUpperCase();
-  APP.user = {
-    id: userMatch.id,
-    login: userMatch.login,
-    name: `${userMatch.nombre || ''} ${userMatch.apellido || ''}`.trim(),
-    role: normalizarRolSeguridad(userMatch.rol),
-    initials,
-    guardia: userMatch.guardia,
-  };
+/* ===== AUTH - SUPABASE AUTH / NOMBRE DE USUARIO ===== */
+function seamxSetIdentity(profile){
+  const initials=((profile.nombre||'U')[0]+(profile.apellido?profile.apellido[0]:'')).toUpperCase();
+  APP.user={id:profile.id,login:profile.login,name:((profile.nombre||'')+' '+(profile.apellido||'')).trim(),
+    role:normalizarRolSeguridad(profile.rol),initials,guardia:profile.guardia};
   sessionStorage.setItem(SESSION_KEYS.user,JSON.stringify(APP.user));
-  if(rememberRequested)localStorage.setItem(REMEMBER_KEY,encodeRememberedCredentials(loginInput,passInput));
-  else localStorage.removeItem(REMEMBER_KEY);
-
-  document.getElementById('page-login').style.display = 'none';
-  document.getElementById('page-app').style.display = 'flex';
-  if(!rememberRequested){
-    document.getElementById('login-user').value = '';
-    document.getElementById('login-pass').value = '';
-  }
-
-  await loadAllData();
-  setupUI();
-  startPatiosAutoRefresh();
-  navigateTo(getDefaultViewForRole());
-} 
-
-function doLogout() {
-  sessionStorage.removeItem(SESSION_KEYS.user);
-  sessionStorage.removeItem(SESSION_KEYS.view);
-  Object.keys(sessionStorage).filter(k=>k.startsWith(SESSION_KEYS.scrollPrefix)).forEach(k=>sessionStorage.removeItem(k));
-  history.replaceState(null,'',location.pathname+location.search);
-  APP.user = null;
-  document.getElementById('page-app').style.display = 'none';
-  document.getElementById('page-login').style.display = 'flex';
-  document.getElementById('login-user').value = '';
-  document.getElementById('login-pass').value = '';
-  document.getElementById('login-error').style.display = 'none';
-  stopGoogleSheetsAutoSync();stopPatiosAutoRefresh();
-  loadRememberedCredentials();
 }
-
-async function restoreSession(){
-  const raw=sessionStorage.getItem(SESSION_KEYS.user);
-  if(!raw)return;
+async function doLogin(){
+  const loginInput=document.getElementById('login-user').value.trim().toLowerCase();
+  const passInput=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-error');errEl.style.display='none';
+  if(!/^[\p{L}\p{N}._-]{2,80}$/u.test(loginInput)||!passInput){
+    errEl.textContent='Ingresa tu usuario y contraseña.';errEl.style.display='block';return;
+  }
+  if(!navigator.onLine){
+    errEl.textContent='Conéctate a internet para iniciar sesión.';errEl.style.display='block';return;
+  }
   try{
-    const saved=JSON.parse(raw);
-    if(!saved?.id||!saved?.login)throw new Error('Sesión incompleta');
-
-    // Validar que la sesión guardada todavía pertenece al mismo usuario activo.
-    const {data,error}=await db.from('usuarios')
-      .select('*')
-      .eq('id',saved.id)
-      .eq('login',saved.login)
-      .eq('activo',true)
-      .limit(1);
-    if(error||!data?.[0])throw new Error('Sesión inválida');
-
-    const current=data[0];
-    APP.user={
-      id:current.id,
-      login:current.login,
-      name:`${current.nombre||''} ${current.apellido||''}`.trim(),
-      role:normalizarRolSeguridad(current.rol),
-      initials:((current.nombre||'U')[0]+(current.apellido?current.apellido[0]:'')).toUpperCase(),
-      guardia:current.guardia
-    };
-    sessionStorage.setItem(SESSION_KEYS.user,JSON.stringify(APP.user));
-
+    await db.auth.signOut({scope:'local'});
+    sessionStorage.removeItem(SESSION_KEYS.user);APP.user=null;
+    const {data,error}=await db.functions.invoke('seamx-login',{body:{username:loginInput,password:passInput}});
+    if(error||!data?.access_token||!data?.refresh_token)throw Error('Acceso no autorizado');
+    const set=await db.auth.setSession({access_token:data.access_token,refresh_token:data.refresh_token});
+    if(set.error||!set.data?.user)throw Error('Sesión inválida');
+    const {data:profile,error:profileError}=await db.from('usuarios')
+      .select('id,login,nombre,apellido,rol,guardia,activo,auth_user_id')
+      .eq('auth_user_id',set.data.user.id).eq('activo',true).maybeSingle();
+    if(profileError||!profile||profile.login?.toLowerCase()!==loginInput)throw Error('Perfil no autorizado');
+    seamxSetIdentity(profile);
+    if(document.getElementById('login-remember')?.checked)
+      localStorage.setItem(REMEMBER_KEY,JSON.stringify({login:loginInput}));
+    else localStorage.removeItem(REMEMBER_KEY);
+    document.getElementById('login-pass').value='';
     document.getElementById('page-login').style.display='none';
     document.getElementById('page-app').style.display='flex';
-    await loadAllData();
-    setupUI();
-    startPatiosAutoRefresh();
+    await loadAllData();setupUI();startPatiosAutoRefresh();navigateTo(getDefaultViewForRole());
+  }catch(e){
+    await db.auth.signOut({scope:'local'}).catch(()=>{});
+    sessionStorage.removeItem(SESSION_KEYS.user);APP.user=null;
+    errEl.textContent='Usuario o contraseña incorrectos, o servicio de acceso no disponible.';
+    errEl.style.display='block';document.getElementById('login-pass').value='';
+  }
+}
+async function doLogout(){
+  await db.auth.signOut().catch(()=>{});
+  sessionStorage.removeItem(SESSION_KEYS.user);sessionStorage.removeItem(SESSION_KEYS.view);
+  Object.keys(sessionStorage).filter(k=>k.startsWith(SESSION_KEYS.scrollPrefix)).forEach(k=>sessionStorage.removeItem(k));
+  history.replaceState(null,'',location.pathname+location.search);
+  APP.user=null;document.getElementById('page-app').style.display='none';
+  document.getElementById('page-login').style.display='flex';
+  document.getElementById('login-user').value='';document.getElementById('login-pass').value='';
+  document.getElementById('login-error').style.display='none';
+  stopGoogleSheetsAutoSync();stopPatiosAutoRefresh();loadRememberedCredentials();
+}
+async function restoreSession(){
+  let saved;try{saved=JSON.parse(sessionStorage.getItem(SESSION_KEYS.user)||'null')}catch(_){}
+  if(!saved?.id||!saved?.login)return;
+  try{
+    const {data:sData}=await db.auth.getSession();const session=sData?.session;
+    if(!session?.user?.id||!session.expires_at||session.expires_at*1000<=Date.now())
+      throw Error('Sesión Auth ausente o vencida');
+    if(!navigator.onLine)throw Error('Requiere conexión para validar identidad');
+    const {data:verified,error:authError}=await db.auth.getUser();
+    if(authError||verified?.user?.id!==session.user.id)throw Error('JWT inválido');
+    const {data:profile,error}=await db.from('usuarios')
+      .select('id,login,nombre,apellido,rol,guardia,activo,auth_user_id')
+      .eq('auth_user_id',session.user.id).eq('activo',true).maybeSingle();
+    if(error||!profile||profile.id!==saved.id||profile.login!==saved.login)
+      throw Error('Perfil inválido');
+    seamxSetIdentity(profile);
+    document.getElementById('page-login').style.display='none';
+    document.getElementById('page-app').style.display='flex';
+    await loadAllData();setupUI();startPatiosAutoRefresh();
     const hashView=location.hash.replace(/^#/,'');
     const remembered=hashView||sessionStorage.getItem(SESSION_KEYS.view);
     const allowed=NAV_CONFIG[APP.user.role]||NAV_CONFIG.operador;
     navigateTo(remembered&&allowed.includes(remembered)?remembered:getDefaultViewForRole());
-  }catch(err){
-    sessionStorage.removeItem(SESSION_KEYS.user);
-    sessionStorage.removeItem(SESSION_KEYS.view);
+  }catch(e){
+    await db.auth.signOut({scope:'local'}).catch(()=>{});
+    sessionStorage.removeItem(SESSION_KEYS.user);sessionStorage.removeItem(SESSION_KEYS.view);
     APP.user=null;
     document.getElementById('page-app').style.display='none';
     document.getElementById('page-login').style.display='flex';
