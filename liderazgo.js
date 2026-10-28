@@ -91,6 +91,49 @@ window.seamxLeadSave=function(){
  alert('Evaluación guardada como registro local. Aún no está sincronizada entre dispositivos.');
 };
 
+
+window.seamxLeadRequestSignature=async function(id){
+ if(!isEvaluator())return alert('Solo Administración, Gerencia y Jefatura pueden solicitar firmas.');
+ const r=get().find(x=>String(x.id)===String(id));
+ if(!r)return alert('Evaluación no disponible en este equipo.');
+ const session=await db.auth.getUser();
+ if(session.error||!session.data?.user)return alert('Primero verifica tu cuenta de Supabase Auth en el panel de Firma electrónica.');
+ const uid=session.data.user.id;
+ const owner=await db.from('usuarios').select('id,login,rol,activo').eq('auth_user_id',uid).eq('activo',true).maybeSingle();
+ if(owner.error||!owner.data||owner.data.id!==APP.user?.id||!['admin','gerencia','jefatura'].includes(owner.data.rol))
+   return alert('La cuenta Auth no corresponde al evaluador que inició sesión.');
+ const supervisor=await db.from('usuarios').select('id,nombre,apellido,activo,rol,auth_user_id')
+   .eq('id',Number(r.supervisor_id)).eq('activo',true).maybeSingle();
+ const p=supervisor.data;
+ if(supervisor.error||!p?.auth_user_id||!['supervisor','supervisor_hse'].includes(p.rol))
+   return alert('Este supervisor aún no tiene una identidad Auth disponible.');
+ if(!confirm('¿Solicitar firma personal a '+p.nombre+'?'))return;
+ const key=uid+':'+String(r.id);
+ const lookup=await db.from('evaluaciones_liderazgo').select('id').eq('origen_cliente_key',key).maybeSingle();
+ if(lookup.error)return alert('No se pudo verificar el registro: '+lookup.error.message);
+ let rowId=lookup.data?.id;
+ if(!rowId){
+   const insert=await db.from('evaluaciones_liderazgo').insert({
+     origen_cliente_key:key,supervisor_id:p.id,supervisor_nombre:[p.nombre,p.apellido].filter(Boolean).join(' '),
+     evaluador_login:owner.data.login,evaluador_nombre:APP.user.name||owner.data.login,
+     fecha:r.fecha,area:r.area,actividad:r.actividad,guardia:r.guardia||'',
+     fase:'Evaluación de campo',respuestas:r.answers,puntaje_obtenido:r.points,
+     puntaje_maximo:r.max,porcentaje:r.pct,riesgo_critico:!!r.crit,
+     fortalezas:r.strengths||'',oportunidades:r.improve||'',
+     compromisos:r.commitment?[{texto:r.commitment,responsable:r.owner||'',fecha:r.due||''}]:[],
+     fecha_proxima:/^\d{4}-\d{2}-\d{2}$/.test(r.next||'')?r.next:null,
+     observaciones:'Pendiente de firma personal'
+   }).select('id').single();
+   if(insert.error)return alert('No se pudo sincronizar la evaluación: '+insert.error.message);
+   rowId=insert.data.id;
+ }
+ const request=await db.from('liderazgo_solicitudes_firma').upsert({
+    evaluacion_id:rowId,supervisor_auth_uid:p.auth_user_id,evaluador_auth_uid:uid
+ },{onConflict:'evaluacion_id',ignoreDuplicates:true});
+ if(request.error)return alert('Evaluación registrada, pero no se pudo solicitar firma: '+request.error.message);
+ alert('Solicitud enviada. El supervisor debe aceptarla personalmente al iniciar sesión con Supabase Auth.');
+};
+
 window.seamxLeadView=function(id){
  const r=get().find(x=>String(x.id)===String(id));if(!r)return alert('Evaluación no encontrada');
  const lines=['Supervisor: '+r.supervisor,'Fecha: '+r.fecha,'Área: '+r.area,'Actividad: '+r.actividad,'Resultado: '+Number(r.pct).toFixed(1)+'%','Fortalezas: '+(r.strengths||'—'),'Oportunidades: '+(r.improve||'—'),'Compromiso: '+(r.commitment||'—')];
@@ -129,6 +172,16 @@ window.seamxLeadRender=function(){
  read('lead-kpis').innerHTML=[['Evaluaciones',n],['Promedio',avg===null?'—':avg.toFixed(1)+'%'],['Compromisos pendientes',pending],['Críticos sin verificar',critical]].map(([l,v])=>'<div class="lead-kpi"><small>'+l+'</small><b>'+v+'</b></div>').join('');
  tbl.innerHTML=grouped().map(([name,a])=>{a.sort((x,y)=>x.fecha.localeCompare(y.fecha));const first=a[0],last=a[a.length-1],improvement=last.pct-first.pct,pending=a.filter(x=>x.commitment&&!x.verified).length,cr=a.filter(x=>x.crit&&!x.verified).length;return '<tr><td>'+esc(name)+'</td><td>'+a.length+'</td><td>'+last.pct.toFixed(1)+'%</td><td>'+(a.length>1?(improvement>=0?'+':'')+improvement.toFixed(1)+' pp':'—')+'</td><td>'+pending+'</td><td>'+cr+'</td></tr>'}).join('')||'<tr><td colspan="6">No existen evaluaciones registradas en este navegador.</td></tr>';
  read('lead-records').innerHTML=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(r=>'<tr><td>'+esc(r.fecha)+'</td><td>'+esc(r.supervisor)+'</td><td>'+r.pct.toFixed(1)+'%</td><td>'+esc(r.commitment||'—')+'</td><td>'+(r.verified?'Verificado':r.commitment&&isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadVerify(\''+esc(r.id)+'\')">Verificar en campo</button>':'—')+' <button class="lead-btn-alt" onclick="seamxLeadView(\''+esc(r.id)+'\')">Ver</button> '+(isEvaluator()?'<button class="lead-btn-alt" onclick="seamxLeadEdit(\''+esc(r.id)+'\')">Editar</button>':'')+(isEvaluator()?'<button class="lead-btn-alt" style="color:#a83232" onclick="seamxLeadDelete(\''+esc(r.id)+'\')">Eliminar</button>':'')+'</td></tr>').join('')||'<tr><td colspan="5">Sin registros</td></tr>';
+ if(isEvaluator()){
+   read('lead-records')?.querySelectorAll('tr').forEach((tr,i)=>{
+     const r=records.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha))[i];
+     if(!r)return;
+     const btn=document.createElement('button');btn.type='button';btn.className='lead-btn-alt';
+     btn.textContent='Solicitar firma';
+     btn.addEventListener('click',()=>window.seamxLeadRequestSignature(r.id));
+     tr.lastElementChild?.append(' ',btn);
+   });
+ }
  records=source;
 };
 window.seamxLeadInit=setup;
