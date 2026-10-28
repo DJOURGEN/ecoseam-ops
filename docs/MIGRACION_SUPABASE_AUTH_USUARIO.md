@@ -61,3 +61,6 @@ Referencias:
 - https://supabase.com/docs/guides/auth/passwords
 - https://supabase.com/docs/guides/auth/users
 - https://supabase.com/docs/guides/database/postgres/row-level-security
+
+## Actualización de ejecución — 28/10/2026
+Se aplicó a producción únicamente la migración aditiva de preparación: `usuarios.auth_user_id`, `seamx_auth_aliases` y `seamx_login_attempts` con RLS y revocación de accesos cliente para las nuevas tablas. Validación SQL: 29 perfiles antiguos, 0 cuentas Auth, 0 alias, columna de vínculo existente. No se desplegó la Edge Function ni se modificó `index.html`; la autenticación anterior sigue activa. Los cambios de Auth deben esperar pruebas integrales, provisionamiento seguro de contraseñas y políticas RLS completas. No ejecutar el SQL de preparación nuevamente salvo verificación de migraciones.
