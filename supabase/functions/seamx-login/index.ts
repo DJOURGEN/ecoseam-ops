@@ -7,8 +7,8 @@ import { createClient } from "npm:@supabase/supabase-js@2.95.0";
 const url = Deno.env.get("SUPABASE_URL") || "";
 const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-const auditSalt = Deno.env.get("SEAMX_LOGIN_RATE_SALT") || "";
-const origins = (Deno.env.get("SEAMX_ALLOWED_ORIGINS") || "")
+const auditSalt = Deno.env.get("SEAMX_LOGIN_RATE_SALT") || serviceKey;
+const origins = (Deno.env.get("SEAMX_ALLOWED_ORIGINS") || "https://ecoseam.netlify.app")
   .split(",").map((value) => value.trim()).filter(Boolean);
 
 const admin = createClient(url, serviceKey, {
@@ -22,7 +22,7 @@ function reply(payload: unknown, status: number, origin: string | null): Respons
     "X-Content-Type-Options": "nosniff",
     "Vary": "Origin",
   });
-  if (origin && origins.includes(origin)) {
+  if (origin && (origins.includes(origin) || /^https:\/\/deploy-preview-\d+--ecoseam\.netlify\.app$/.test(origin))) {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Access-Control-Allow-Headers", "content-type, authorization, apikey, x-client-info");
     headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -65,7 +65,7 @@ Deno.serve(async (req: Request) => {
   if (!url || !serviceKey || !anonKey || auditSalt.length < 32 || !origins.length) {
     return reply({ error: "Servicio no configurado" }, 503, origin);
   }
-  if (!origin || !origins.includes(origin)) {
+  if (!origin || !(origins.includes(origin) || /^https:\/\/deploy-preview-\d+--ecoseam\.netlify\.app$/.test(origin))) {
     return reply({ error: "Origen no autorizado" }, 403, null);
   }
   if (req.method === "OPTIONS") return reply({}, 200, origin);
