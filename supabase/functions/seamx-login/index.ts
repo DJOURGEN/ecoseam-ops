@@ -68,7 +68,7 @@ Deno.serve(async (req: Request) => {
   if (!origin || !origins.includes(origin)) {
     return reply({ error: "Origen no autorizado" }, 403, null);
   }
-  if (req.method === "OPTIONS") return reply({}, 204, origin);
+  if (req.method === "OPTIONS") return reply({}, 200, origin);
   if (req.method !== "POST") return reply({ error: "Método no permitido" }, 405, origin);
   if (Number(req.headers.get("content-length") || 0) > 4096) {
     return reply({ error: "Solicitud inválida" }, 413, origin);
