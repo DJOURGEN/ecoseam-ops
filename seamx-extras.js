@@ -123,6 +123,18 @@ async function loadRiskReport(id){
   for(const report of r.data.informes.slice(0,2)){
    const p=document.createElement('p');p.textContent='Análisis: '+report.resumen;box.appendChild(p);
    if(report.iperc){const ip=document.createElement('p');ip.textContent='IPERC: '+report.iperc;box.appendChild(ip)}
+   if(report.fotos?.length){
+     const gallery=document.createElement('div');gallery.style.cssText='display:flex;gap:7px;flex-wrap:wrap;margin:7px 0';
+     for(const pic of report.fotos.slice(0,4)){
+       if(!/^https:\/\//i.test(pic.url))continue;
+       const wrap=document.createElement('figure');wrap.style.cssText='margin:0;max-width:145px';
+       const im=document.createElement('img');im.src=pic.url;im.alt='Evidencia de '+(pic.etapa||'análisis');
+       im.style.cssText='max-width:145px;max-height:110px;object-fit:cover;border-radius:6px';
+       const caption=document.createElement('figcaption');caption.textContent=pic.etapa||'Evidencia';
+       caption.style.fontSize='10px';wrap.append(im,caption);gallery.appendChild(wrap);
+     }
+     box.appendChild(gallery);
+   }
    const list=document.createElement('ul');
    for(const h of report.hallazgos.slice(0,4)){const li=document.createElement('li');li.textContent=h.riesgo+' · Control: '+h.control+' · '+h.estado;list.appendChild(li)}
    box.appendChild(list);
