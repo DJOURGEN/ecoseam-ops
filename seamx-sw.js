@@ -1,10 +1,12 @@
-const CACHE_NAME = 'seamx-shell-20260928-v3';
+const CACHE_NAME = 'seamx-shell-20261028-firmas-v1';
 
 const CORE_ASSETS = [
   './',
   './index.html',
   './logo-ecoseam.png',
   './manifest.json',
+  './liderazgo.js',
+  './firmas-liderazgo.js',
 
   'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
   'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
