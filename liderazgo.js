@@ -65,6 +65,7 @@ async function setup(){
  return '<div class="lead-criterion" role="row"><span class="lead-n" role="cell">'+(i+1)+'</span><div class="lead-criterion-label" role="cell">'+esc(x)+(PRIORITARIOS.includes(i+1)?'<span class="lead-critical-label">Control prioritario</span>':'')+'</div><div class="lead-options" role="cell">'+radios+'</div><div role="cell"><input class="lead-note" id="lead-note-'+i+'" aria-label="Observación o evidencia del criterio '+(i+1)+'" placeholder="Observaciones / evidencia (obligatoria para 0, 1 o N/A)"></div></div>';
  }).join('');
  seamxLeadScore();seamxLeadRender();
+ window.seamxLiderazgoFirmasRefresh?.();
 }
 function scoreInfo(){
  const answers=CRITERIOS.map((_,i)=>{const el=document.querySelector('input[name="lead-q'+i+'"]:checked');return el?{v:el.value,note:val('lead-note-'+i)}:null});
@@ -96,10 +97,10 @@ window.seamxLeadRequestSignature=async function(id){
  if(!isEvaluator())return alert('Solo Administración, Gerencia y Jefatura pueden solicitar firmas.');
  const r=get().find(x=>String(x.id)===String(id));
  if(!r)return alert('La evaluación no está disponible en este dispositivo.');
- const session=await db.auth.getUser();
+ const session=await window.seamxSignatureDb.auth.getUser();
  if(session.error||!session.data?.user?.id)
     return alert('Primero verifica tu cuenta con la contraseña nueva de Supabase Auth en el panel de firmas.');
- const owner=await db.from('usuarios').select('id,login,rol,activo').eq('auth_user_id',session.data.user.id).eq('activo',true).maybeSingle();
+ const owner=await window.seamxSignatureDb.from('usuarios').select('id,login,rol,activo').eq('auth_user_id',session.data.user.id).eq('activo',true).maybeSingle();
  if(owner.error||owner.data?.id!==APP.user?.id||!['admin','gerencia','jefatura'].includes(owner.data?.rol))
     return alert('La cuenta autenticada no coincide con quien inició sesión.');
  if(!confirm('¿Enviar esta evaluación al supervisor para que la revise y firme personalmente?'))return;
@@ -107,7 +108,7 @@ window.seamxLeadRequestSignature=async function(id){
     actividad:r.actividad,guardia:r.guardia||'',answers:r.answers,
     strengths:r.strengths||'',improve:r.improve||'',commitment:r.commitment||'',
     owner:r.owner||'',due:r.due||'',next:r.next||''};
- const result=await db.functions.invoke('seamx-liderazgo-sync',{body:payload});
+ const result=await window.seamxSignatureDb.functions.invoke('seamx-liderazgo-sync',{body:payload});
  if(result.error||!result.data?.ok)
     return alert('No se pudo enviar la evaluación. '+(result.data?.error||result.error?.message||'Intenta nuevamente.'));
  alert('Solicitud enviada. El supervisor podrá firmarla con su cuenta de Supabase Auth.');
