@@ -16,8 +16,9 @@ async function refresh(){
   try{
     sessionUser=await authenticated();
     if(!sessionUser){
-      notice('La firma aún no está habilitada para las cuentas antiguas. Se requiere migrar el inicio de sesión a Supabase Auth.');
-      by('seamx-signature-actions').innerHTML='';
+      notice('Para habilitar la firma, verifica tu identidad con la contraseña NUEVA de Supabase Auth. No necesitas otra cuenta.');
+      by('seamx-signature-actions').innerHTML='<div style="max-width:420px"><label for="seamx-auth-firma-password">Contraseña nueva de Supabase Auth</label><input type="password" id="seamx-auth-firma-password" autocomplete="current-password" style="display:block;width:100%;padding:10px;margin:8px 0;border:1px solid #bccfc3"><button type="button" id="seamx-auth-firma-activate" style="padding:10px 16px;background:#176e64;color:white;border:0;cursor:pointer">Habilitar firma personal</button><p id="seamx-auth-firma-error" role="status"></p></div>';
+      by('seamx-auth-firma-activate')?.addEventListener('click',linkCurrentUserAuth);
       by('seamx-signature-pending').innerHTML='';
       const banner=by('seamx-firma-alerta');if(banner)banner.style.display='none';
       return;
@@ -41,6 +42,37 @@ async function refresh(){
     notice(personalSignature?'Firma personal registrada.':'Carga tu firma para poder aceptar evaluaciones.');
   }catch(e){console.error('Firmas SEAMX',e);notice('No se pudieron consultar las firmas. Verifica la sesión y los permisos.');}
 }
+
+async function linkCurrentUserAuth(){
+  const msg=by('seamx-auth-firma-error'),password=by('seamx-auth-firma-password')?.value||'';
+  if(!APP?.user?.id||!APP?.user?.login||!password){
+    if(msg)msg.textContent='Introduce la contraseña nueva de tu usuario.';
+    return;
+  }
+  const login=String(APP.user.login).toLowerCase();
+  const identity=await db.from('usuarios')
+    .select('id,login,activo,auth_user_id').eq('id',APP.user.id)
+    .eq('login',login).eq('activo',true).maybeSingle();
+  if(identity.error||!identity.data?.auth_user_id){
+    if(msg)msg.textContent='La cuenta no está vinculada a Auth. Consulta a administración.';
+    return;
+  }
+  const email=login==='admin'?'admin@ecoseam.com.pe':
+     'seamx-'+String(APP.user.id)+'@ecoseam.com.pe';
+  const btn=by('seamx-auth-firma-activate');if(btn)btn.disabled=true;
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+    if(error||!data?.user||data.user.id!==identity.data.auth_user_id){
+      await db.auth.signOut({scope:'local'});
+      throw Error('Contraseña nueva incorrecta o identidad no coincidente.');
+    }
+    if(by('seamx-auth-firma-password'))by('seamx-auth-firma-password').value='';
+    await refresh();
+  }catch(e){
+    if(msg)msg.textContent=e?.message||'No se pudo verificar tu identidad.';
+  }finally{if(btn)btn.disabled=false;}
+}
+
 async function onUpload(e){
  const f=e.target.files?.[0];if(!f)return;
  if(!['image/jpeg','image/png'].includes(f.type)||f.size>180000)return notice('Usa una imagen PNG/JPG de hasta 180 KB.');
