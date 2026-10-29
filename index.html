@@ -2528,7 +2528,7 @@ body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;bord
       <h3>SEAMX SAFE · Análisis de riesgos con IA</h3>
       <p class="seamx-safe-note">Complemento del IPERC físico, PETS y supervisión. Las fotografías por sí solas no certifican la ausencia de riesgos.</p>
       <div class="seamx-safe-iperc">
-        <label class="evidence-file-btn">▣ Adjuntar IPERC<input type="file" id="seamx-safe-iperc-file" accept="image/*" onchange="seamxSafePreviewIperc(this)"></label>
+        <label class="evidence-file-btn">▣ Adjuntar IPERC<input type="file" id="seamx-safe-iperc-file" accept="image/*" multiple onchange="seamxSafePreviewIperc(this)"></label>
         <label class="evidence-file-btn camera">📷 Cámara<input type="file" id="seamx-safe-iperc-camera" accept="image/*" capture="environment" onchange="seamxSafePreviewIperc(this)"></label>
         <span id="seamx-safe-iperc-info" aria-live="polite">Sin IPERC adjunto</span>
       </div>
@@ -7513,13 +7513,14 @@ function seamxSafeOutput(message,warning=false){
  el.replaceChildren();const p=document.createElement('p');p.textContent=message;if(warning)p.className='seamx-safe-warning';el.appendChild(p);
 }
 function seamxSafePreviewIperc(input){
- const file=input.files?.[0];if(!file)return;
- if(!file.type.startsWith('image/'))return seamxSafeOutput('Solo se admiten fotografías del IPERC.',true);
- if(file.size>12*1024*1024)return seamxSafeOutput('El archivo supera el máximo de 12 MB.',true);
- seamxSafe.iperc=file;seamxSafe.analysis=null;
+ const files=Array.from(input.files||[]);
+ if(!files.length)return;
+ if(files.length>3)return seamxSafeOutput('Máximo tres fotografías del IPERC.',true);
+ if(files.some(f=>!f.type.startsWith('image/')||f.size>12*1024*1024))return seamxSafeOutput('Utiliza fotografías válidas de hasta 12 MB cada una.',true);
+ seamxSafe.iperc=files;seamxSafe.analysis=null;
  ['seamx-safe-iperc-file','seamx-safe-iperc-camera'].forEach(id=>{const el=document.getElementById(id);if(el&&el!==input)el.value=''});
- document.getElementById('seamx-safe-iperc-info').textContent='IPERC seleccionado: '+file.name+' (pendiente de análisis)';
- seamxSafeOutput('IPERC seleccionado. El documento físico sigue siendo la referencia. No se han identificado peligros todavía.');
+ document.getElementById('seamx-safe-iperc-info').textContent=files.length+' fotografía(s) del IPERC seleccionada(s)';
+ seamxSafeOutput('IPERC registrado para revisión. El documento físico sigue siendo la referencia.');
 }
 function seamxSafeClear(){
  seamxSafe.iperc=null;seamxSafe.analysis=null;
@@ -7539,6 +7540,17 @@ async function seamxSafeRecordAction(analysisId,findingId,action,container){
 function seamxSafeAsImage(file){
  return new Promise((resolve,reject)=>{if(!file)return resolve(null);const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('No se pudo leer la imagen'));reader.readAsDataURL(file)});
 }
+async function seamxSafeIpercCollage(files){
+ if(!files?.length)return null;
+ if(files.length===1)return seamxSafeAsImage(files[0]);
+ const images=await Promise.all(files.map(file=>createImageBitmap(file)));
+ try{
+ const c=document.createElement('canvas');c.width=1200;c.height=files.length*900;
+ const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+ images.forEach((im,i)=>{const scale=Math.min(1200/im.width,860/im.height),w=im.width*scale,h=im.height*scale;ctx.drawImage(im,(1200-w)/2,i*900+30,w,h)});
+ return c.toDataURL('image/jpeg',0.78);
+ }finally{images.forEach(im=>im.close?.())}
+}
 function seamxSafeEvidenceFile(stage){
  return typeof selectedActivityEvidenceFile==='function'?selectedActivityEvidenceFile(stage):null;
 }
@@ -7555,7 +7567,7 @@ async function seamxSafeAnalyze(){
    await window.seamxExtrasEnsureAuth();
    const sessionResult=await window.seamxSignatureDb.auth.getSession();
    if(sessionResult.error||!sessionResult.data?.session)return seamxSafeOutput('SEAMX SAFE pendiente de configuración segura: inicia sesión mediante Supabase Auth. No se enviaron imágenes.',true);
-   const files=await Promise.all([seamxSafeAsImage(seamxSafe.iperc),...['before','during','after'].map(x=>seamxSafeAsImage(seamxSafeEvidenceFile(x)))]);
+   const files=await Promise.all([seamxSafeIpercCollage(seamxSafe.iperc),...['before','during','after'].map(x=>seamxSafeAsImage(seamxSafeEvidenceFile(x)))]);
    const payload={activity_id:id,description:a.actividad,area:a.area,stage:'evaluacion',iperc:files[0],before:files[1],during:files[2],after:files[3]};
    const response=await window.seamxSignatureDb.functions.invoke('seamx-safe-analyze',{body:payload});
    if(response.error)throw response.error;
