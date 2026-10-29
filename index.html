@@ -2305,6 +2305,9 @@ body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;bord
           <span id="programacion-readonly-badge" class="badge badge-process" style="display:none">Vista de consulta</span>
         </div>
 
+        <div class="seamx-reprog-entry" style="display:flex;justify-content:flex-end;margin:12px 0 16px">
+          <button type="button" id="seamx-reprogramar-principal" class="btn btn-primary" onclick="if(typeof window.seamxAbrirReprogramacion==='function'){window.seamxAbrirReprogramacion()}else{showToast('No se pudo cargar el formulario de reprogramación. Verifica la conexión.','error')}" style="background:#17563a;border-radius:3px">↻ Reprogramación</button>
+        </div>
         <div class="prog-layout">
           <div class="card prog-form-card" id="programacion-form-card">
             <div class="card-header">
