@@ -6130,28 +6130,27 @@ function renderProgramacion(){
   const actividades=rows.flatMap(p=>(p.actividades||[]).map(a=>({...a,hse:a.hse||p.hse,supervisor:a.supervisor||p.supervisor,_draft:p._draft})));
   const personalUnico=[...new Set(actividades.flatMap(a=>a.personal||[]))],areas=[...new Set(actividades.map(a=>a.area).filter(Boolean))];
   const hseUnicos=[...new Set(actividades.map(a=>a.hse).filter(Boolean))],supervisoresUnicos=[...new Set(actividades.map(a=>a.supervisor).filter(Boolean))];
-  const taskCards=actividades.length?actividades.map((a,i)=>`<div class="guard-task"><div class="guard-task-top"><span class="guard-area">${escapeHtml(a.area||'Área por definir')}</span><span class="guard-task-num">${a._draft?'BORRADOR · ':''}ACT. ${String(i+1).padStart(2,'0')}</span></div><div class="guard-task-desc">${escapeHtml(a.descripcion||'Descripción pendiente')}</div><div class="guard-task-meta"><div class="guard-meta-block"><span class="guard-meta-label hse">Supervisión HSE</span><span class="guard-meta-value">${escapeHtml(a.hse||'Por definir')}</span></div><div class="guard-meta-block"><span class="guard-meta-label supervisor">Supervisor a cargo</span><span class="guard-meta-value">${escapeHtml(a.supervisor||'Por definir')}</span></div></div><div class="guard-people">${(a.personal||[]).map(n=>`<span class="guard-person">${escapeHtml(n)}</span>`).join('')}</div></div>`).join(''):`<div class="guard-empty">Aún no hay actividades programadas para esta fecha.</div>`;
-  card.innerHTML=`<div class="guard-hero"><div class="guard-brand"><img src="logo-ecoseam.png" alt="ECOSEAM"><span class="guard-brand-tag">Control operacional</span></div><div class="guard-title">PROGRAMACIÓN<br>DE INICIO DE GUARDIA</div><div class="guard-date">FECHA · ${escapeHtml(fechaTexto)}</div></div><div class="guard-summary"><div class="guard-summary-item"><span>Supervisores asignados</span><strong>${supervisoresUnicos.length}</strong></div><div class="guard-summary-item"><span>Ingenieros HSE asignados</span><strong>${hseUnicos.length}</strong></div><div class="guard-summary-item"><span>Personal</span><strong>${personalUnico.length} involucrados</strong></div></div><div class="guard-safety"><div class="guard-safety-icon" title="Chaleco de seguridad"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 3h4c.2 1.4.8 2.2 2 2.2S17.8 4.4 18 3h4l6 8-4 3v15H8V14l-4-3 6-8z" fill="#ef6c00" stroke="#9a4300" stroke-width="1.2" stroke-linejoin="round"/><path d="M10.5 4.5 15 13v16M21.5 4.5 17 13v16M8 18h16" fill="none" stroke="#ffe082" stroke-width="2.2" stroke-linejoin="round"/></svg></div><div><span>${charlas.length===1?'Charla de seguridad del día':'Charlas de seguridad del día'}</span><div class="guard-safety-talks">${charlas.length?charlas.map(c=>`<div class="guard-safety-talk">${escapeHtml(c)}</div>`).join(''):'<strong>Tema pendiente de registrar</strong>'}</div></div></div><div class="guard-body"><div class="guard-body-title">Actividades operativas programadas <span>${actividades.length} actividades · ${areas.length} áreas</span></div>${taskCards}</div><div class="guard-foot">ECOSEAM · Planificación segura, clara y visible antes de iniciar la jornada</div>`;
-  const safetyIcon=card.querySelector('.guard-safety-icon');
-  if(safetyIcon)safetyIcon.innerHTML=`<img src="${ECOSEAM_VEST_CUTOUT_DATA_URL}" alt="Chaleco de seguridad">`;
+  const taskCards=actividades.length?actividades.map((a,i)=>`<tr class="seamx-doc-row"><td class="seamx-doc-num">${String(i+1).padStart(2,'0')}</td><td class="seamx-doc-activity"><div class="seamx-doc-area">${escapeHtml(a.area||'Área por definir')}</div><div class="seamx-doc-description">${escapeHtml(a.descripcion||'Descripción pendiente')}</div>${a._draft?'<small>BORRADOR</small>':''}</td><td><div class="seamx-doc-responsible"><b>Operaciones</b><span>${escapeHtml(a.supervisor||'Por definir')}</span></div><div class="seamx-doc-responsible"><b>HSE</b><span>${escapeHtml(a.hse||'Por definir')}</span></div></td><td><div class="seamx-doc-staff">${(a.personal||[]).map(n=>`<div>${escapeHtml(n)}</div>`).join('')||'Por asignar'}</div></td></tr>`).join(''):`<tr><td colspan="4" class="seamx-doc-empty">Sin actividades para esta fecha</td></tr>`;
+  card.innerHTML=`<div class="seamx-doc-page"><header class="seamx-doc-header"><div class="seamx-doc-brand"><img src="logo-ecoseam.png" alt="ECOSEAM"><div><b>ECOSEAM</b><span>GESTIÓN OPERACIONAL</span></div></div><div class="seamx-doc-titlebox"><h2>PROGRAMACIÓN DIARIA DE ACTIVIDADES</h2><p>Fecha: ${escapeHtml(fechaTexto)}</p></div></header><table class="seamx-doc-meta"><tbody><tr><th>Supervisores asignados</th><td>${supervisoresUnicos.length}</td><th>Ingenieros HSE</th><td>${hseUnicos.length}</td><th>Personal involucrado</th><td>${personalUnico.length}</td></tr></tbody></table><section class="seamx-doc-section"><h3>01 · Charlas de seguridad</h3><div class="seamx-doc-talks">${charlas.length?charlas.map((c,i)=>`<p><b>${i+1}.</b> ${escapeHtml(c)}</p>`).join(''):'<p>Tema pendiente de registrar</p>'}</div></section><section class="seamx-doc-section"><h3>02 · Actividades operativas programadas <small>${actividades.length} actividades · ${areas.length} áreas</small></h3><table class="seamx-doc-table"><colgroup><col style="width:6%"><col style="width:40%"><col style="width:25%"><col style="width:29%"></colgroup><thead><tr><th>N.º</th><th>Ubicación / actividad</th><th>Responsables</th><th>Personal asignado</th></tr></thead><tbody>${taskCards}</tbody></table></section><footer class="seamx-doc-footer"><span>ECOSEAM · Operaciones</span><span>Programación de inicio de guardia · SEAMX</span></footer></div>`;
   const saved=APP.data.programaciones.filter(p=>p.fecha===fecha);
   list.innerHTML=saved.length?saved.map(p=>{const d=new Date(p.fecha+'T00:00:00'),acts=p.actividades||[],hse=[...new Set(acts.map(a=>a.hse||p.hse).filter(Boolean))],talks=(p.charlas?.length?p.charlas:[p.charla]).filter(Boolean);return `<div class="prog-row"><div class="prog-row-day"><strong>${String(d.getDate()).padStart(2,'0')}</strong><span>${d.toLocaleDateString('es-PE',{month:'short'}).replace('.','')}</span></div><div><div class="prog-row-title">${acts.length} ${acts.length===1?'actividad programada':'actividades programadas'}</div><div class="prog-row-meta">${[...new Set(acts.map(a=>a.area))].join(', ')} · ${[...new Set(acts.flatMap(a=>a.personal||[]))].length} personas · ${hse.length} HSE · ${talks.length} ${talks.length===1?'charla':'charlas'}</div></div><div class="prog-row-actions">${editable?`<button class="btn btn-outline btn-sm" onclick="editProgramacion(${p.id})">Editar</button><button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteProgramacion(${p.id})">×</button>`:''}</div></div>`;}).join(''):`<div class="wa-empty">Sin programaciones guardadas para la fecha seleccionada.</div>`;
 }
 
 async function programacionCanvas(){
   renderProgramacion();
-  const el=document.getElementById('programacion-report-card');
-  if(!window.html2canvas)throw new Error('No se cargó html2canvas');
+  const source=document.getElementById('programacion-report-card');
+  if(!source||!window.html2canvas)throw new Error('No se cargó el motor de exportación');
   if(document.fonts?.ready)await document.fonts.ready;
-  const images=[...el.querySelectorAll('img')];
-  await Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
-  el.classList.add('guard-export-mode');
+  const mount=document.createElement('div');mount.style.cssText='position:fixed;left:-10000px;top:0;width:920px;overflow:visible;z-index:-1;pointer-events:none;background:white';
+  const clone=source.cloneNode(true);clone.removeAttribute('id');clone.classList.add('seamx-doc-export');
+  clone.style.cssText='width:920px;max-width:none;min-width:920px;overflow:visible;margin:0;display:block;transform:none;background:#fff';
+  mount.appendChild(clone);document.body.appendChild(mount);
   try{
-    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-    return await html2canvas(el,{scale:3,backgroundColor:'#f7faf7',useCORS:true,allowTaint:true,logging:false,width:620,windowWidth:1200,scrollX:0,scrollY:0});
-  }finally{
-    el.classList.remove('guard-export-mode');
-  }
+    await Promise.all([...clone.querySelectorAll('img')].map(img=>img.complete?Promise.resolve():new Promise(ok=>{img.onload=ok;img.onerror=ok})));
+    await new Promise(ok=>requestAnimationFrame(()=>requestAnimationFrame(ok)));
+    const height=Math.ceil(clone.scrollHeight);
+    return await html2canvas(clone,{scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:false,logging:false,width:920,height,windowWidth:1100,scrollX:0,scrollY:0});
+  }finally{mount.remove()}
 }
 
 async function downloadProgramacionImage(){
@@ -7844,5 +7843,49 @@ table{border-collapse:collapse}
 #view-opsdashboard .seamx-curve-programming button{height:auto;min-height:35px}
 @media(max-width:860px){.content{padding:12px!important}.topbar{padding:0 9px!important}#view-liderazgo .lead-criterion{width:100%}}
 @media(max-width:520px){.content{padding:9px!important}.topbar{gap:5px!important}#btn-logout{padding:7px!important;flex-shrink:0}#view-opsdashboard .seamx-ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.seamx-ops-panel{padding:10px!important}}
+</style><style id="seamx-word-programacion-20261029">
+/* Programación: ancho y tipografía controlados en pantalla y en exportación */
+#view-programacion,#view-programacion *{box-sizing:border-box}
+#view-programacion .prog-layout{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)!important;gap:18px!important;align-items:start}
+#view-programacion .prog-layout>*,#view-programacion .card,#view-programacion .form-group{min-width:0;max-width:100%}
+#view-programacion .prog-layout input,#view-programacion .prog-layout select,#view-programacion .prog-layout textarea{max-width:100%;min-width:0}
+#view-programacion .card-header,#view-programacion .prog-row{gap:10px;flex-wrap:wrap}
+#view-programacion .prog-row-title,#view-programacion .prog-row-meta{overflow-wrap:anywhere;line-height:1.4}
+#view-programacion .prog-layout .form-label{white-space:normal;line-height:1.4}
+#programacion-report-card{width:100%;max-width:100%;overflow:visible;background:white;border:1px solid #c4cdc5;padding:0!important;box-shadow:none!important;border-radius:0!important;color:#1e3026}
+#programacion-report-card .seamx-doc-page{font-family:Arial,'Helvetica Neue',sans-serif;padding:30px 34px 24px;background:#fff;width:100%;line-height:1.4;min-width:0}
+#programacion-report-card .seamx-doc-header{display:flex;align-items:center;gap:22px;justify-content:space-between;border-top:7px solid #1c5b38;border-bottom:2px solid #b0bdb2;padding:15px 0 20px}
+#programacion-report-card .seamx-doc-brand{display:flex;align-items:center;gap:10px;flex:0 0 26%;min-width:0}
+#programacion-report-card .seamx-doc-brand img{width:58px;height:52px;object-fit:contain}
+#programacion-report-card .seamx-doc-brand b{display:block;color:#235138;font-size:18px;line-height:1.2}
+#programacion-report-card .seamx-doc-brand span{display:block;font-size:9px;letter-spacing:1px;color:#708075}
+#programacion-report-card .seamx-doc-titlebox{min-width:0;flex:1;text-align:right}
+#programacion-report-card .seamx-doc-titlebox h2{font-size:19px!important;line-height:1.25!important;letter-spacing:0;font-weight:700;color:#1f3d2d;margin:0 0 10px;white-space:normal}
+#programacion-report-card .seamx-doc-titlebox p{font-size:12px!important;margin:0;color:#5b6f60;line-height:1.4!important}
+#programacion-report-card .seamx-doc-meta{width:100%;border-collapse:collapse;table-layout:auto;margin:20px 0}
+#programacion-report-card .seamx-doc-meta th,#programacion-report-card .seamx-doc-meta td{font-size:10px!important;padding:10px 7px;line-height:1.3;border:1px solid #d6ded6;vertical-align:middle}
+#programacion-report-card .seamx-doc-meta th{color:#415949;background:#eff3ef;text-align:left;font-weight:600}
+#programacion-report-card .seamx-doc-meta td{text-align:center;font-size:14px!important;font-weight:700;color:#174a30}
+#programacion-report-card .seamx-doc-section{margin:22px 0 0}
+#programacion-report-card .seamx-doc-section h3{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px!important;letter-spacing:.3px;line-height:1.35!important;margin:0 0 10px;padding:8px 10px;background:#eaf0e9;border-left:4px solid #25643f;color:#244936;font-weight:700}
+#programacion-report-card .seamx-doc-section h3 small{font-size:10px!important;color:#55715b;font-weight:400;white-space:normal}
+#programacion-report-card .seamx-doc-talks{padding:3px 6px 8px}
+#programacion-report-card .seamx-doc-talks p{font-size:12px!important;line-height:1.5!important;margin:5px 0;white-space:normal;overflow-wrap:break-word}
+#programacion-report-card .seamx-doc-table{width:100%;border-collapse:collapse;table-layout:fixed}
+#programacion-report-card .seamx-doc-table th{font-size:11px!important;color:#fff;background:#26573c;padding:10px 9px;line-height:1.3!important;text-align:left}
+#programacion-report-card .seamx-doc-table td{font-size:11px!important;line-height:1.45!important;padding:13px 9px;vertical-align:top;border-bottom:1px solid #cfd9d0;overflow-wrap:anywhere;white-space:normal}
+#programacion-report-card .seamx-doc-row:nth-child(even){background:#f7f9f7}
+#programacion-report-card .seamx-doc-num{font-weight:700;color:#21603a}
+#programacion-report-card .seamx-doc-area{font-size:9px!important;font-weight:700;text-transform:uppercase;color:#3c7551;letter-spacing:.25px;line-height:1.4!important;margin-bottom:7px}
+#programacion-report-card .seamx-doc-description{font-size:12px!important;line-height:1.45!important;font-weight:600;white-space:normal;overflow-wrap:anywhere}
+#programacion-report-card .seamx-doc-responsible{margin:0 0 8px}
+#programacion-report-card .seamx-doc-responsible b{display:block;font-size:9px!important;color:#547262;line-height:1.4!important}
+#programacion-report-card .seamx-doc-responsible span{display:block;font-size:11px!important;line-height:1.4!important;overflow-wrap:anywhere}
+#programacion-report-card .seamx-doc-staff div{font-size:10px!important;line-height:1.45!important;padding:1px 0 4px;overflow-wrap:anywhere}
+#programacion-report-card .seamx-doc-footer{display:flex;justify-content:space-between;gap:10px;border-top:2px solid #b0bdb2;margin-top:24px;padding-top:11px;color:#5b6d61;font-size:10px!important}
+#programacion-report-card.seamx-doc-export{width:920px!important;min-width:920px!important;max-width:none!important}
+#programacion-report-card.seamx-doc-export .seamx-doc-page,.seamx-doc-export .seamx-doc-page{width:920px!important;padding:38px 48px!important}
+@media(max-width:1050px){#view-programacion .prog-layout{grid-template-columns:minmax(0,1fr)!important}}
+@media(max-width:620px){#programacion-report-card .seamx-doc-page{padding:15px 12px!important}#programacion-report-card .seamx-doc-brand img{width:36px;height:38px}#programacion-report-card .seamx-doc-titlebox h2{font-size:14px!important}#programacion-report-card .seamx-doc-meta th,#programacion-report-card .seamx-doc-meta td{padding:5px 3px;font-size:9px!important}}
 </style></body>
 </html>
