@@ -6137,22 +6137,29 @@ function renderProgramacion(){
 }
 
 async function programacionCanvas(){
-  renderProgramacion();
-  const source=document.getElementById('programacion-report-card');
-  if(!source||!window.html2canvas)throw new Error('No se cargó el motor de exportación');
-  if(document.fonts?.ready)await document.fonts.ready;
-  const mount=document.createElement('div');mount.style.cssText='position:fixed;left:-10000px;top:0;width:920px;overflow:visible;z-index:-1;pointer-events:none;background:white';
-  const clone=source.cloneNode(true);clone.id='programacion-report-card';clone.classList.add('seamx-doc-export');
-  clone.style.cssText='width:920px;max-width:none;min-width:920px;overflow:visible;margin:0;display:block;transform:none;background:#fff';
-  mount.appendChild(clone);document.body.appendChild(mount);
-  try{
-    await Promise.all([...clone.querySelectorAll('img')].map(img=>img.complete?Promise.resolve():new Promise(ok=>{img.onload=ok;img.onerror=ok})));
-    await new Promise(ok=>requestAnimationFrame(()=>requestAnimationFrame(ok)));
-    const height=Math.ceil(clone.scrollHeight);
-    return await html2canvas(clone,{scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:false,logging:false,width:920,height,windowWidth:1100,scrollX:0,scrollY:0,onclone:doc=>{const el=doc.querySelector('#programacion-report-card.seamx-doc-export');if(el){el.style.width='920px';el.style.minWidth='920px';el.style.maxWidth='920px';el.style.transform='none';el.querySelectorAll('img').forEach(im=>{im.style.objectFit='contain';im.style.transform='none'})}}});
-  }finally{mount.remove()}
+ renderProgramacion();
+ if(!window.html2canvas)throw new Error('No se cargó html2canvas');
+ await document.fonts?.ready;
+ const src=document.getElementById('programacion-report-card');
+ const stage=document.createElement('div');
+ stage.style.cssText='position:fixed;left:0;top:0;width:1123px;visibility:hidden;pointer-events:none;z-index:-1;background:#fff;overflow:visible';
+ const el=src.cloneNode(true);el.id='programacion-report-card';el.classList.add('seamx-doc-a4');
+ el.style.cssText='width:1123px!important;min-width:1123px!important;max-width:1123px!important;height:auto;overflow:visible;border:0;box-shadow:none;background:#fff;box-sizing:border-box';
+ stage.append(el);document.body.append(stage);
+ try{
+  const imgs=[...el.querySelectorAll('img')];
+  await Promise.all(imgs.map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));
+  await new Promise(ok=>requestAnimationFrame(()=>requestAnimationFrame(ok)));
+  const page=el.querySelector('.seamx-doc-page');
+  const realHeight=page?.scrollHeight||794;
+  if(realHeight>794){showToast('La programación ocupa más de una hoja A4. Se exportará completa sin cortar actividades.','warning')}
+  const height=Math.max(794,realHeight+12);
+  return await html2canvas(el,{scale:2,backgroundColor:'#fff',useCORS:true,allowTaint:false,logging:false,width:1123,height,windowWidth:1123,windowHeight:height,scrollX:0,scrollY:0,onclone:doc=>{
+   const e=doc.querySelector('#programacion-report-card.seamx-doc-a4');
+   if(e){e.style.setProperty('width','1123px','important');e.style.setProperty('max-width','1123px','important');e.style.setProperty('min-width','1123px','important');e.style.setProperty('visibility','visible','important')}
+  }});
+ }finally{stage.remove()}
 }
-
 async function downloadProgramacionImage(){
   try{
     showToast('Generando imagen profesional...','success');
@@ -7905,5 +7912,48 @@ table{border-collapse:collapse}
 #programacion-report-card .seamx-doc-area,#programacion-report-card .seamx-doc-description,#programacion-report-card .seamx-doc-staff div,#programacion-report-card .seamx-doc-responsible span{white-space:normal!important;line-height:1.45!important;overflow-wrap:break-word!important}
 #programacion-report-card.seamx-doc-export .seamx-doc-page{width:920px!important;min-width:920px!important;max-width:920px!important;transform:none!important}
 @media(max-width:610px){#programacion-report-card .seamx-doc-header{grid-template-columns:65px minmax(0,1fr) 65px!important;gap:7px!important}#programacion-report-card .seamx-doc-brand,#programacion-report-card .seamx-doc-antamina{width:65px!important;max-width:65px!important;height:52px!important}#programacion-report-card .seamx-doc-brand img,#programacion-report-card .seamx-doc-antamina img{width:62px!important;max-width:62px!important;height:48px!important}#programacion-report-card .seamx-doc-titlebox h2{font-size:12px!important}#programacion-report-card .seamx-doc-talk-layout{grid-template-columns:65px minmax(0,1fr)!important}#programacion-report-card .seamx-doc-safety-illustration{width:62px!important;height:68px!important}}
-</style></body>
+</style><style id="seamx-mobile-fab-a4">
+/* Only handset layouts */
+@media(max-width:768px){
+ #mobile-nav{display:none!important}
+ #seamx-mobile-fab{display:flex!important}
+ .content{padding:12px 11px calc(98px + env(safe-area-inset-bottom,0px))!important;width:100%!important;min-width:0!important;overflow-x:hidden}
+ .main,[id^="view-"],.card,.prog-layout,.prog-form-card,.form-row{max-width:100%!important;min-width:0!important;box-sizing:border-box}
+ [id^="view-"]{overflow-x:clip}
+ .form-row,.form-row-3,.prog-layout{grid-template-columns:minmax(0,1fr)!important}
+ input,select,textarea{max-width:100%!important;min-width:0;box-sizing:border-box}
+ .table-wrap{max-width:100%;overflow-x:auto}
+ #seamx-mobile-fab-toggle{touch-action:manipulation}
+}
+#seamx-mobile-fab{display:none;position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:10030;flex-direction:column;align-items:center}
+#seamx-mobile-fab-toggle{width:58px;height:58px;border-radius:50%;border:2px solid #fff;background:#16543a;color:#fff;font-size:27px;box-shadow:0 6px 25px #0005;cursor:pointer}
+#seamx-mobile-fab-panel{position:absolute;bottom:72px;left:50%;transform:translateX(-50%);width:min(355px,92vw);max-height:min(68vh,570px);overflow-y:auto;display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px;background:#fff;border:1px solid #ccdacd;border-radius:12px;box-shadow:0 12px 42px #0004}
+#seamx-mobile-fab-panel.open{display:grid}
+.seamx-mobile-fab-link{min-height:51px;border:1px solid #dce7de;background:#f4f8f4;border-radius:7px;font-size:12px;font-weight:650;color:#19462e;text-align:left;padding:10px;overflow-wrap:anywhere}
+#programacion-report-card.seamx-doc-a4 .seamx-doc-page{width:1123px!important;min-width:1123px!important;max-width:1123px!important;min-height:794px!important;padding:36px 48px!important;box-sizing:border-box;background:#fff}
+#programacion-report-card.seamx-doc-a4 .seamx-doc-header{grid-template-columns:130px minmax(0,1fr) 130px!important}
+#programacion-report-card.seamx-doc-a4 .seamx-doc-brand,#programacion-report-card.seamx-doc-a4 .seamx-doc-antamina{width:130px!important;height:92px!important;max-width:130px!important}
+#programacion-report-card.seamx-doc-a4 .seamx-doc-brand img,#programacion-report-card.seamx-doc-a4 .seamx-doc-antamina img{width:116px!important;height:84px!important;object-fit:contain!important;max-width:116px!important;max-height:84px!important;transform:none!important}
+</style>
+<div id="seamx-mobile-fab"><div id="seamx-mobile-fab-panel" role="menu" aria-label="Módulos de SEAMX"></div><button id="seamx-mobile-fab-toggle" type="button" aria-label="Abrir menú de navegación" aria-expanded="false">☰</button></div>
+<script>
+(function(){
+ const fab=document.getElementById('seamx-mobile-fab'),panel=document.getElementById('seamx-mobile-fab-panel'),button=document.getElementById('seamx-mobile-fab-toggle');
+ function close(){panel.classList.remove('open');button.textContent='☰';button.setAttribute('aria-expanded','false')}
+ function build(){
+  if(!window.APP?.user){close();fab.style.visibility='hidden';return}fab.style.visibility='';
+  const links=window.NAV_CONFIG?.[APP.user.role]||[];
+  panel.replaceChildren();
+  for(const id of links){if(!document.getElementById('view-'+id))continue;
+   const e=document.createElement('button');e.type='button';e.className='seamx-mobile-fab-link';e.textContent=window.VIEW_TITLES?.[id]||id;
+   e.onclick=()=>{close();navigateTo(id)};panel.appendChild(e);
+  }
+ }
+ button.onclick=()=>{build();const open=panel.classList.toggle('open');button.textContent=open?'×':'☰';button.setAttribute('aria-expanded',String(open))};
+ document.addEventListener('pointerdown',e=>{if(!fab.contains(e.target))close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+ window.addEventListener('resize',close);
+ setInterval(build,4000);build();
+})();
+</script></body>
 </html>
