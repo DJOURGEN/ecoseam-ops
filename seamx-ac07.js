@@ -1,7 +1,7 @@
 /* SEAMX · Reprogramación operacional · 29-10-2026 */
 (function(){
 'use strict';
-const $=id=>document.getElementById(id), can=()=>['admin','supervisor'].includes(window.APP?.user?.role);
+const $=id=>document.getElementById(id), can=()=>['admin','supervisor'].includes((typeof APP!=='undefined'?APP?.user?.role:null));
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;', '"':'&quot;',"'":'&#39;'}[c]));
 const say=(s,t='warning')=>typeof showToast==='function'?showToast(s,t):alert(s);
 const name=a=>String(a?.descripcion||a?.actividad||'Actividad sin descripción');
