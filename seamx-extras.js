@@ -171,12 +171,13 @@ function install(){
  if(program&&!$('seamx-plan-import')){const btn=document.createElement('button');btn.id='seamx-plan-import';btn.type='button';btn.className='btn btn-outline';btn.textContent='Importar programación anterior';btn.addEventListener('click',window.seamxImportarPlanAnterior);program.appendChild(btn)}
  const originalOpen=window.openActivityEvidence;
  if(typeof originalOpen==='function')window.openActivityEvidence=function(id){
-  const result=originalOpen(id),grid=document.querySelector('#modal-actividad-evidencias .evidence-grid'),field=typeof activityIsFieldUser==='function'&&activityIsFieldUser();
+  const result=originalOpen(id);
+  const field=APP?.user?.role==='operador';
+  const grid=document.querySelector('#modal-actividad-evidencias .evidence-grid');
   if(grid)grid.style.display=field?'none':'';
-  const hint=$('evidence-upload-hint');if(hint&&field)hint.textContent='Para finalizar solo debes describir el trabajo. Las fotografías son opcionales.';
-  let switcher=$('seamx-photo-toggle');
-  if(!switcher&&grid){switcher=document.createElement('button');switcher.id='seamx-photo-toggle';switcher.type='button';switcher.className='btn btn-outline btn-sm';switcher.textContent='Añadir fotos opcionales';grid.parentNode.insertBefore(switcher,grid);switcher.onclick=()=>{grid.style.display=grid.style.display==='none'?'grid':'none'};}
-  if(switcher)switcher.style.display=field?'':'none';
+  const switcher=$('seamx-photo-toggle');if(switcher)switcher.remove();
+  const hint=$('evidence-upload-hint');
+  if(hint&&field)hint.textContent='Escribe únicamente la descripción del trabajo realizado. Las fotografías y el análisis de riesgos se registran previamente, no durante el cierre.';
   return result;
  };
  const originalView=window.viewActivityEvidence;
