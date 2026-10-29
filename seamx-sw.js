@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seamx-shell-20261029-reprogramacion-v2';
+const CACHE_NAME = 'seamx-shell-20261029-mobile-a4-v3';
 
 const CORE_ASSETS = [
   './',
