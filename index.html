@@ -6142,7 +6142,7 @@ async function programacionCanvas(){
   if(!source||!window.html2canvas)throw new Error('No se cargó el motor de exportación');
   if(document.fonts?.ready)await document.fonts.ready;
   const mount=document.createElement('div');mount.style.cssText='position:fixed;left:-10000px;top:0;width:920px;overflow:visible;z-index:-1;pointer-events:none;background:white';
-  const clone=source.cloneNode(true);clone.removeAttribute('id');clone.classList.add('seamx-doc-export');
+  const clone=source.cloneNode(true);clone.id='programacion-report-card';clone.classList.add('seamx-doc-export');
   clone.style.cssText='width:920px;max-width:none;min-width:920px;overflow:visible;margin:0;display:block;transform:none;background:#fff';
   mount.appendChild(clone);document.body.appendChild(mount);
   try{
