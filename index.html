@@ -6153,6 +6153,35 @@ function fitProgramacionPreview(){
  el.style.setProperty('overflow','hidden','important');
 }
 
+// El generador HTML a canvas no rasteriza de forma fiable los SVG externos.
+// Conservar la ilustración original y convertirla a PNG en memoria antes de exportar.
+async function prepararIlustracionCharlaParaExportar(root){
+ const safety=root.querySelector('.seamx-doc-safety-illustration');
+ if(!safety)return;
+ try{
+  const response=await fetch(safety.getAttribute('src')||'seamx-seguridad-charla.svg');
+  if(!response.ok)throw new Error('Ilustración no disponible ('+response.status+')');
+  let svgText=await response.text();
+  // Un SVG con solo viewBox puede fallar en drawImage: dar dimensiones intrínsecas.
+  svgText=svgText.replace(/<svg\b/, '<svg width="260" height="300"');
+  const illustration=new Image();
+  await new Promise((resolve,reject)=>{
+   illustration.onload=resolve;illustration.onerror=()=>reject(new Error('No se pudo cargar el dibujo SVG'));
+   illustration.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgText);
+  });
+  const raster=document.createElement('canvas');
+  raster.width=520;raster.height=600;
+  const ctx=raster.getContext('2d');
+  ctx.clearRect(0,0,raster.width,raster.height);
+  ctx.drawImage(illustration,0,0,raster.width,raster.height);
+  safety.src=raster.toDataURL('image/png');
+  if(safety.decode)await safety.decode();
+ }catch(err){
+  console.warn('SEAMX: no se pudo rasterizar la charla de seguridad',err);
+  // La imagen SVG original continúa disponible en el reporte y la vista previa.
+ }
+}
+
 async function programacionCanvas(){
  renderProgramacion();
  if(!window.html2canvas)throw new Error('No se cargó html2canvas');
@@ -6162,6 +6191,17 @@ async function programacionCanvas(){
  stage.style.cssText='position:fixed;left:0;top:0;width:1123px;visibility:hidden;pointer-events:none;z-index:-1;background:#fff;overflow:visible';
  const el=src.cloneNode(true);el.id='programacion-report-card';el.classList.add('seamx-doc-a4');
  const inner=el.querySelector('.seamx-doc-page');if(inner){inner.style.removeProperty('transform');inner.style.setProperty('transform','none','important');inner.style.setProperty('transform-origin','top left','important')}
+ // Logo ECOSEAM: proporción original 359:82; no estirar como si fuera cuadrado.
+ const ecoLogo=el.querySelector('.seamx-doc-brand img');
+ if(ecoLogo){
+  ecoLogo.setAttribute('width','124');ecoLogo.setAttribute('height','28');
+  ecoLogo.style.setProperty('width','124px','important');
+  ecoLogo.style.setProperty('height','28px','important');
+  ecoLogo.style.setProperty('min-height','28px','important');
+  ecoLogo.style.setProperty('max-height','28px','important');
+  ecoLogo.style.setProperty('object-fit','contain','important');
+ }
+ await prepararIlustracionCharlaParaExportar(el);
  el.style.cssText='width:1123px!important;min-width:1123px!important;max-width:1123px!important;height:auto;overflow:visible;border:0;box-shadow:none;background:#fff;box-sizing:border-box';
  stage.append(el);document.body.append(stage);
  try{
@@ -7952,6 +7992,10 @@ table{border-collapse:collapse}
 #programacion-report-card.seamx-doc-a4 .seamx-doc-header{grid-template-columns:130px minmax(0,1fr) 130px!important}
 #programacion-report-card.seamx-doc-a4 .seamx-doc-brand,#programacion-report-card.seamx-doc-a4 .seamx-doc-antamina{width:130px!important;height:92px!important;max-width:130px!important}
 #programacion-report-card.seamx-doc-a4 .seamx-doc-brand img,#programacion-report-card.seamx-doc-a4 .seamx-doc-antamina img{width:116px!important;height:84px!important;object-fit:contain!important;max-width:116px!important;max-height:84px!important;transform:none!important}
+/* ECOSEAM es un logotipo horizontal (359x82). Antamina mantiene sus reglas originales. */
+#programacion-report-card.seamx-doc-a4 .seamx-doc-brand img{width:124px!important;height:28px!important;min-height:28px!important;max-width:124px!important;max-height:28px!important;object-fit:contain!important;transform:none!important}
+#programacion-report-card .seamx-doc-brand img{object-fit:contain!important;object-position:center!important;aspect-ratio:359 / 82}
+
 </style>
 <div id="seamx-mobile-fab"><div id="seamx-mobile-fab-panel" role="menu" aria-label="Módulos de SEAMX"></div><button id="seamx-mobile-fab-toggle" type="button" aria-label="Abrir menú de navegación" aria-expanded="false">☰</button></div>
 <script>
