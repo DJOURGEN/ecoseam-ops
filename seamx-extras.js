@@ -193,3 +193,6 @@ function install(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
+
+/* Cargar módulo AC-07 sin alterar el archivo principal */
+(function(){if(document.querySelector('script[data-seamx-ac07]'))return;const s=document.createElement('script');s.src='seamx-ac07.js';s.defer=true;s.dataset.seamxAc07='true';document.head.appendChild(s)})();
