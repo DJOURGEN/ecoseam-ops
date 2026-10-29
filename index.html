@@ -7941,11 +7941,11 @@ table{border-collapse:collapse}
  const fab=document.getElementById('seamx-mobile-fab'),panel=document.getElementById('seamx-mobile-fab-panel'),button=document.getElementById('seamx-mobile-fab-toggle');
  function close(){panel.classList.remove('open');button.textContent='☰';button.setAttribute('aria-expanded','false')}
  function build(){
-  if(!window.APP?.user){close();fab.style.visibility='hidden';return}fab.style.visibility='';
-  const links=window.NAV_CONFIG?.[APP.user.role]||[];
+  if(typeof APP==='undefined'||!APP?.user){close();fab.style.visibility='hidden';return}fab.style.visibility='';
+  const links=(typeof NAV_CONFIG!=='undefined'&&NAV_CONFIG[APP.user.role])||[];
   panel.replaceChildren();
   for(const id of links){if(!document.getElementById('view-'+id))continue;
-   const e=document.createElement('button');e.type='button';e.className='seamx-mobile-fab-link';e.textContent=window.VIEW_TITLES?.[id]||id;
+   const e=document.createElement('button');e.type='button';e.className='seamx-mobile-fab-link';e.textContent=(typeof VIEW_TITLES!=='undefined'&&VIEW_TITLES[id])||id;
    e.onclick=()=>{close();navigateTo(id)};panel.appendChild(e);
   }
  }
