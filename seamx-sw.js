@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seamx-shell-20261029-ac07-v1';
+const CACHE_NAME = 'seamx-shell-20261029-reprogramacion-v2';
 
 const CORE_ASSETS = [
   './',
