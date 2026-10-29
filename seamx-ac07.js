@@ -85,7 +85,7 @@ async function produce(rec,action){
  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
  if(action==='share')msg('JPG descargado. Adjunta el archivo en WhatsApp; no se requiere Business API.','success');
 }
-function boot(){wrapSave();if(TARGET.has(state())){const bell=document.createElement('button');bell.type='button';bell.id='ac07-notify-bell';bell.textContent='🔔 Cambios';bell.style.cssText='position:fixed;right:18px;bottom:16px;z-index:8501;background:#174b34;color:white;border:0;border-radius:6px;padding:11px 17px;box-shadow:0 4px 13px #0003;font-weight:600;cursor:pointer';document.body.appendChild(bell);bell.onclick=()=>{const panel=container();panel.style.display=panel.style.display==='none'?'block':'none';load()};load()}}
+function boot(){wrapSave();if(TARGET.has(state())&&!E('ac07-notify-bell')){const bell=document.createElement('button');bell.type='button';bell.id='ac07-notify-bell';bell.textContent='🔔 Cambios';bell.style.cssText='position:fixed;right:18px;bottom:16px;z-index:8501;background:#174b34;color:white;border:0;border-radius:6px;padding:11px 17px;box-shadow:0 4px 13px #0003;font-weight:600;cursor:pointer';document.body.appendChild(bell);bell.onclick=async()=>{const panel=container();panel.style.display=panel.style.display==='none'?'block':'none';try{await window.seamxExtrasEnsureAuth();await load()}catch(e){msg('Verifica tu identidad para visualizar avisos de cambios')}};load()}}
 window.seamxAc07Refresh=load;
-document.addEventListener('DOMContentLoaded',()=>{setTimeout(boot,1000);setInterval(()=>{wrapSave();if(APP?.user&&TARGET.has(state()))load()},45000)});
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(boot,1000);setInterval(()=>{boot();if(APP?.user&&TARGET.has(state()))load()},15000)});
 })();
