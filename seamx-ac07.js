@@ -10,6 +10,7 @@ function plans(){return (APP?.data?.programaciones||[]).filter(p=>p?.id&&Array.i
 function selectedPlans(){const date=$('prog-reporte-fecha')?.value||$('prog-fecha')?.value;return plans().filter(p=>!date||p.fecha===date)}
 function install(){
  const view=$('view-programacion');if(!view)return;
+ if($('seamx-reprogramar-principal')){const primary=$('seamx-reprogramar-principal');primary.style.display=can()?'':'none';return;}
  if($('seamx-reprogramar')){ $('seamx-reprogramar').style.display=can()?'':'none';return; }
  const b=document.createElement('button');b.id='seamx-reprogramar';b.type='button';b.className='btn btn-outline';b.style.cssText='margin:12px 0;background:#174f37;color:#fff;border-radius:4px;font-weight:600';b.textContent='↻ Reprogramación';b.onclick=open;
  const h=view.querySelector('.page-header');if(h)h.after(b);else view.prepend(b);
@@ -81,6 +82,7 @@ async function report(rec,mode){
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
  say('JPG descargado. Puedes adjuntarlo en WhatsApp o compartirlo desde tu dispositivo.','success');
 }
+window.seamxAbrirReprogramacion=open;
 function start(){install();setInterval(()=>{install();if($('view-programacion')?.style.display!=='none')load()},3000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
