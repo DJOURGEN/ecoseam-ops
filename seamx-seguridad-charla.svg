@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 240" role="img" aria-label="Ilustración original de seguridad operacional">
+<rect width="300" height="240" rx="16" fill="#f2f7f3"/>
+<ellipse cx="138" cy="222" rx="98" ry="9" fill="#dce8df"/>
+<path d="M68 203q-12-82 41-93h57q51 17 46 93z" fill="#143e55" stroke="#0e3041" stroke-width="4"/>
+<path d="M101 112h74l20 91H85z" fill="#f58c30" stroke="#cc6116" stroke-width="3"/>
+<path d="M106 121l-7 81m58-83l15 83" stroke="#f6d05b" stroke-width="9"/><path d="M108 120l-8 81m58-81l15 81" stroke="#f8f6dd" stroke-width="3"/>
+<path d="M117 91v32q22 24 47 0V90" fill="#e6aa7c" stroke="#a66d55" stroke-width="3"/>
+<ellipse cx="141" cy="76" rx="48" ry="52" fill="#f1bb92" stroke="#a76d54" stroke-width="3"/>
+<path d="M92 65q0-59 48-60 51 3 49 57l-23-21q-36 24-74 24z" fill="#fefefe" stroke="#244e5b" stroke-width="4"/>
+<path d="M97 45q41-19 86 0" stroke="#ef9a2a" stroke-width="9" fill="none"/>
+<path d="M97 65h88" stroke="#264c54" stroke-width="5"/>
+<circle cx="123" cy="81" r="4" fill="#2c3334"/><circle cx="156" cy="81" r="4" fill="#2c3334"/>
+<path d="M129 104q15 10 27-2" stroke="#9a5348" stroke-width="3" fill="none"/>
+<path d="M76 145l-37 28 49 20m105-58 35-42" stroke="#143e55" stroke-width="21" fill="none" stroke-linecap="round"/>
+<path d="M211 104l13-21 21 11-17 28" fill="#f1bb92" stroke="#915f46" stroke-width="3"/>
+<rect x="102" y="164" width="85" height="61" rx="5" fill="#fcfcfb" stroke="#496275" stroke-width="5"/>
+<path d="M116 181h54m-54 14h42m-42 13h47" stroke="#9aafaa" stroke-width="3"/>
+<path d="M246 23l28 50h-56z" fill="#f5c957" stroke="#ac7515" stroke-width="4" stroke-linejoin="round"/>
+<path d="M246 40v16" stroke="#3b3321" stroke-width="5" stroke-linecap="round"/><circle cx="246" cy="64" r="3.5" fill="#3b3321"/>
+</svg>
