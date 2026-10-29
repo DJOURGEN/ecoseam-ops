@@ -169,27 +169,18 @@ function install(){
  };
  const program=$('seamx-program-dialog');
  if(program&&!$('seamx-plan-import')){const btn=document.createElement('button');btn.id='seamx-plan-import';btn.type='button';btn.className='btn btn-outline';btn.textContent='Importar programación anterior';btn.addEventListener('click',window.seamxImportarPlanAnterior);program.appendChild(btn)}
- const originalOpen=window.openActivityEvidence;
- if(typeof originalOpen==='function')window.openActivityEvidence=function(id){
-  const result=originalOpen(id);
-  const field=APP?.user?.role==='operador';
-  const grid=document.querySelector('#modal-actividad-evidencias .evidence-grid');
-  if(grid)grid.style.display=field?'none':'';
-  const switcher=$('seamx-photo-toggle');if(switcher)switcher.remove();
-  const hint=$('evidence-upload-hint');
-  if(hint&&field)hint.textContent='Escribe únicamente la descripción del trabajo realizado. Las fotografías y el análisis de riesgos se registran previamente, no durante el cierre.';
-  return result;
- };
+ /* El modal de riesgos y el de cierre los controla index.html.
+    Nunca presentar informes IPERC al operario desde Detalle. */
  const originalView=window.viewActivityEvidence;
  if(typeof originalView==='function')window.viewActivityEvidence=function(id){
-  const result=originalView(id);
-  const grid=document.querySelector('#modal-actividad-evidencias .evidence-grid');if(grid)grid.style.display='';
-  const switcher=$('seamx-photo-toggle');if(switcher)switcher.style.display='none';
-  let box=$('seamx-risk-brief');
-  if(!box){box=document.createElement('section');box.id='seamx-risk-brief';box.style.cssText='margin:12px 0;padding:12px;border:1px solid #c3d5c7;background:#f7faf7;border-radius:6px;font-size:12px';const modal=$('modal-actividad-evidencias');modal?.querySelector('#activity-detail-review')?.before(box)}
-  box.innerHTML='<button type="button" class="btn btn-outline btn-sm" id="seamx-risk-load">Ver reporte breve de riesgos e IPERC</button>';
-  $('seamx-risk-load').onclick=()=>loadRiskReport(id);
-  return result;
+   const result=originalView(id);
+   const box=$('seamx-risk-brief');if(box)box.remove();
+   if(APP?.user?.role!=='operador'){
+     let report=$('seamx-risk-brief');
+     if(!report){report=document.createElement('section');report.id='seamx-risk-brief';report.style.cssText='margin:12px 0;padding:12px;border:1px solid #c3d5c7;background:#f7faf7;border-radius:6px;font-size:12px';$('modal-actividad-evidencias')?.querySelector('#activity-detail-review')?.before(report);}
+     if(report){report.innerHTML='<button type="button" class="btn btn-outline btn-sm" id="seamx-risk-load">Ver reporte breve de riesgos e IPERC</button>';$('seamx-risk-load').onclick=()=>loadRiskReport(id);}
+   }
+   return result;
  };
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
