@@ -6134,6 +6134,23 @@ function renderProgramacion(){
   card.innerHTML=`<div class="seamx-doc-page"><header class="seamx-doc-header"><div class="seamx-doc-brand"><img src="logo-ecoseam.png" alt="ECOSEAM"></div><div class="seamx-doc-titlebox"><h2>PROGRAMACIÓN DIARIA DE ACTIVIDADES</h2><p>Fecha: ${escapeHtml(fechaTexto)}</p></div><div class="seamx-doc-antamina"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Antamina_Logo.png" crossorigin="anonymous" alt="ANTAMINA"></div></header><table class="seamx-doc-meta"><tbody><tr><th>Supervisores asignados</th><td>${supervisoresUnicos.length}</td><th>Ingenieros HSE</th><td>${hseUnicos.length}</td><th>Personal involucrado</th><td>${personalUnico.length}</td></tr></tbody></table><section class="seamx-doc-section"><h3>01 · Charlas de seguridad</h3><div class="seamx-doc-talk-layout"><img class="seamx-doc-safety-illustration" src="seamx-seguridad-charla.svg" alt="Ilustración de prevención y seguridad"><div class="seamx-doc-talks">${charlas.length?charlas.map((c,i)=>`<p><b>${i+1}.</b> ${escapeHtml(c)}</p>`).join(''):'<p>Tema pendiente de registrar</p>'}</div></div></section><section class="seamx-doc-section"><h3>02 · Actividades operativas programadas <small>${actividades.length} actividades · ${areas.length} áreas</small></h3><table class="seamx-doc-table"><colgroup><col style="width:6%"><col style="width:40%"><col style="width:25%"><col style="width:29%"></colgroup><thead><tr><th>N.º</th><th>Ubicación / actividad</th><th>Responsables</th><th>Personal asignado</th></tr></thead><tbody>${taskCards}</tbody></table></section><footer class="seamx-doc-footer"><span>ECOSEAM · Operaciones</span><span>Programación de inicio de guardia · SEAMX</span></footer></div>`;
   const saved=APP.data.programaciones.filter(p=>p.fecha===fecha);
   list.innerHTML=saved.length?saved.map(p=>{const d=new Date(p.fecha+'T00:00:00'),acts=p.actividades||[],hse=[...new Set(acts.map(a=>a.hse||p.hse).filter(Boolean))],talks=(p.charlas?.length?p.charlas:[p.charla]).filter(Boolean);return `<div class="prog-row"><div class="prog-row-day"><strong>${String(d.getDate()).padStart(2,'0')}</strong><span>${d.toLocaleDateString('es-PE',{month:'short'}).replace('.','')}</span></div><div><div class="prog-row-title">${acts.length} ${acts.length===1?'actividad programada':'actividades programadas'}</div><div class="prog-row-meta">${[...new Set(acts.map(a=>a.area))].join(', ')} · ${[...new Set(acts.flatMap(a=>a.personal||[]))].length} personas · ${hse.length} HSE · ${talks.length} ${talks.length===1?'charla':'charlas'}</div></div><div class="prog-row-actions">${editable?`<button class="btn btn-outline btn-sm" onclick="editProgramacion(${p.id})">Editar</button><button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteProgramacion(${p.id})">×</button>`:''}</div></div>`;}).join(''):`<div class="wa-empty">Sin programaciones guardadas para la fecha seleccionada.</div>`;
+  requestAnimationFrame(fitProgramacionPreview);
+}
+
+function fitProgramacionPreview(){
+ const el=document.getElementById('programacion-report-card'),page=el?.querySelector('.seamx-doc-page');
+ if(!el||!page||el.classList.contains('seamx-doc-a4'))return;
+ const available=Math.max(280,el.parentElement?.clientWidth||el.clientWidth||650);
+ const scale=Math.min(1,available/1123);
+ page.style.setProperty('width','1123px','important');
+ page.style.setProperty('min-width','1123px','important');
+ page.style.setProperty('max-width','1123px','important');
+ page.style.setProperty('min-height','794px','important');
+ page.style.setProperty('transform','scale('+scale+')','important');
+ page.style.setProperty('transform-origin','top left','important');
+ page.style.setProperty('padding','36px 48px','important');
+ el.style.setProperty('height',Math.ceil(Math.max(794,page.scrollHeight)*scale+2)+'px','important');
+ el.style.setProperty('overflow','hidden','important');
 }
 
 async function programacionCanvas(){
@@ -6144,6 +6161,7 @@ async function programacionCanvas(){
  const stage=document.createElement('div');
  stage.style.cssText='position:fixed;left:0;top:0;width:1123px;visibility:hidden;pointer-events:none;z-index:-1;background:#fff;overflow:visible';
  const el=src.cloneNode(true);el.id='programacion-report-card';el.classList.add('seamx-doc-a4');
+ const inner=el.querySelector('.seamx-doc-page');if(inner){inner.style.removeProperty('transform');inner.style.setProperty('transform','none','important');inner.style.setProperty('transform-origin','top left','important')}
  el.style.cssText='width:1123px!important;min-width:1123px!important;max-width:1123px!important;height:auto;overflow:visible;border:0;box-shadow:none;background:#fff;box-sizing:border-box';
  stage.append(el);document.body.append(stage);
  try{
