@@ -1,93 +1,85 @@
-/* SEAMX AC-07 — control de cambios 29/10/2026 */
+/* SEAMX · Reprogramación operacional · 29-10-2026 */
 (function(){
 'use strict';
-const TARGET=new Set(['admin','jefatura','gerencia','supervisor_hse','operador','antamina','supervisor']);
-let records=[],pending=null;
-const E=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const msg=(s,type='warning')=>typeof showToast==='function'?showToast(s,type):alert(s);
-function container(){
- let e=E('ac07-panel');if(e)return e;
- e=document.createElement('section');e.id='ac07-panel';e.style.cssText='margin:18px 0;padding:17px;border:1px solid #c6d4cb;border-radius:8px;background:#fff;color:#25352f;box-shadow:0 3px 14px #002b1810';
- const anchor=E('view-programacion')||E('view-programacion-diaria')||document.body;
- if(anchor===document.body){e.style.cssText+='position:fixed;right:18px;bottom:68px;z-index:8500;width:min(460px,90vw);max-height:65vh;overflow:auto;display:none';document.body.appendChild(e)}else anchor.appendChild(e);return e;
+const $=id=>document.getElementById(id), can=()=>['admin','supervisor'].includes(window.APP?.user?.role);
+const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;', '"':'&quot;',"'":'&#39;'}[c]));
+const say=(s,t='warning')=>typeof showToast==='function'?showToast(s,t):alert(s);
+const name=a=>String(a?.descripcion||a?.actividad||'Actividad sin descripción');
+let reports=[];
+function plans(){return (APP?.data?.programaciones||[]).filter(p=>p?.id&&Array.isArray(p.actividades)&&p.actividades.length);}
+function selectedPlans(){const date=$('prog-reporte-fecha')?.value||$('prog-fecha')?.value;return plans().filter(p=>!date||p.fecha===date)}
+function install(){
+ const view=$('view-programacion');if(!view||$('seamx-reprogramar'))return;
+ const b=document.createElement('button');b.id='seamx-reprogramar';b.type='button';b.className='btn btn-outline';b.style.cssText='margin:12px 0;background:#174f37;color:#fff;border-radius:4px;font-weight:600';b.textContent='↻ Reprogramación';b.onclick=open;
+ const h=view.querySelector('.page-header');if(h)h.after(b);else view.prepend(b);
+ const hist=document.createElement('div');hist.id='seamx-reprogramacion-history';hist.style.cssText='margin:10px 0';b.after(hist);
+ b.style.display=can()?'':'none';
 }
-function state(){return APP?.user?.role||''}
-function currentDate(){return E('prog-reporte-fecha')?.value||E('prog-fecha')?.value||new Date().toISOString().slice(0,10)}
-async function load(){
- if(!TARGET.has(state()))return;
- try{const c=window.seamxSignatureDb;if(!c)return;const session=await c.auth.getSession();if(!session.data?.session)return;
- const r=await c.from('modificaciones_programacion').select('*').order('created_at',{ascending:false}).limit(300);
- if(!r.error){records=r.data||[];render();}
- }catch(e){console.warn('AC07',e)}
-}
-function currentRoleRows(){return records.filter(r=>['admin','supervisor'].includes(state())||r.destinatarios?.includes(state()))}
-function render(){
- const e=container(),items=currentRoleRows(),read=JSON.parse(localStorage.getItem('seamx_ac07_vistos_'+(APP?.user?.login||''))||'[]');const unread=items.filter(x=>!read.includes(x.id));
- e.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><div><strong>Control de cambios · AC-07</strong><p style="margin:5px 0;font-size:12px;color:#64776c">Modificaciones y avisos registrados en Supabase</p></div><span style="background:#e8f2eb;padding:7px 11px;border-radius:6px;font-size:12px">'+unread.length+' aviso(s) nuevo(s)</span></div><div id="ac07-feed" style="max-height:370px;overflow:auto;margin-top:12px"></div>';
- const b=E('ac07-feed');
- b.innerHTML=items.length?items.slice(0,35).map(x=>'<article style="padding:11px;border-top:1px solid #e0e8e2"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>'+esc(x.tipo)+' · '+esc(x.fecha)+'</strong><small>'+esc(x.usuario)+' · '+new Date(x.created_at).toLocaleString('es-PE')+'</small></div><div style="font-size:12px;margin:7px 0">Motivo: '+esc(x.motivo)+'<br>Control: '+esc(x.controles)+'</div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn btn-outline btn-sm" data-ac07="comm" data-id="'+x.id+'">Comunicado JPG</button><button class="btn btn-outline btn-sm" data-ac07="plan" data-id="'+x.id+'">Programación JPG</button><button class="btn btn-outline btn-sm" data-ac07="share" data-id="'+x.id+'">Compartir</button></div></article>').join(''):'<p style="color:#718477;font-size:12px">Sin modificaciones registradas.</p>';
- b.querySelectorAll('button[data-ac07]').forEach(btn=>btn.onclick=()=>{const rec=items.find(x=>x.id===btn.dataset.id);if(rec)produce(rec,btn.dataset.ac07)});
- localStorage.setItem('seamx_ac07_vistos_'+(APP?.user?.login||''),JSON.stringify(items.map(x=>x.id).slice(0,300)));
-}
-function dialogFor(data){
- return new Promise(resolve=>{
-  const d=document.createElement('dialog');d.style.cssText='border:1px solid #c2d1c5;border-radius:10px;padding:24px;max-width:590px;width:94%;box-shadow:0 16px 60px #0004';
-  d.innerHTML='<form id="ac07-form"><h3 style="margin:0 0 8px">¿Qué cambió en la programación?</h3><p style="font-size:12px;color:#52675a">Registro rápido del cambio. La autorización corresponde a tu sesión de supervisión.</p><label style="display:block;font-size:13px;margin:12px 0">Tipo de cambio<select name="tipo" required style="width:100%;padding:10px;margin-top:6px"><option value="actividad">Actividad</option><option value="personal">Personal</option><option value="horario">Horario</option><option value="zona">Zona</option><option value="equipo">Equipo</option><option value="metodo">Método de trabajo</option><option value="prioridad">Prioridad</option><option value="otro">Otro</option></select></label><label style="display:block;font-size:13px;margin:12px 0">¿Por qué se cambió?<textarea name="motivo" required minlength="5" rows="2" style="display:block;width:100%;box-sizing:border-box;padding:10px;margin-top:6px;border:1px solid #cad5cd;border-radius:5px" placeholder="Ej.: El equipo asignado entró a mantenimiento"></textarea></label><label style="display:block;font-size:13px;margin:12px 0">Riesgos del cambio y controles definidos<textarea name="control" required minlength="5" rows="3" style="display:block;width:100%;box-sizing:border-box;padding:10px;margin-top:6px;border:1px solid #cad5cd;border-radius:5px" placeholder="Ej.: Se verificó el nuevo equipo y se actualizó el IPERC con el personal"></textarea></label><div style="display:flex;justify-content:end;gap:9px;margin-top:16px"><button type="button" id="ac07-cancel" class="btn btn-outline">Cancelar</button><button type="submit" class="btn btn-primary">Registrar y comunicar cambio</button></div></form>';
-  document.body.append(d);d.showModal();let ended=false;const done=v=>{if(ended)return;ended=true;d.close();d.remove();resolve(v)};
-  E('ac07-cancel').onclick=()=>done(null);d.addEventListener('cancel',ev=>{ev.preventDefault();done(null)});
-  E('ac07-form').onsubmit=ev=>{ev.preventDefault();const f=new FormData(ev.currentTarget);done(Object.fromEntries(f.entries()))};
- });
-}
-function wrapSave(){
- if(typeof window.saveProgramacion!=='function'||window.saveProgramacion.__ac07)return;
- const original=window.saveProgramacion;
- async function wrapped(){
-  const p=typeof getProgramacionFormData==='function'?getProgramacionFormData():null;
-  if(!p?.id)return original.apply(this,arguments);
-  if(!['admin','supervisor'].includes(state()))return msg('Solo Supervisión y Administración pueden modificar programación');
-  if(!p.fecha||!p.actividades?.length||p.actividades.some(a=>!a.hse||!a.supervisor))return msg('Completa las actividades, supervisor y HSE');
-  const m=await dialogFor(p);if(!m)return;
+function open(){
+ if(!can())return say('Solo Supervisión y Administración pueden reprogramar');
+ const list=selectedPlans();if(!list.length)return say('No hay una programación guardada en la fecha seleccionada');
+ const d=document.createElement('dialog');d.id='seamx-reprog-modal';d.style.cssText='max-width:720px;width:calc(100% - 32px);max-height:90vh;overflow:auto;border:1px solid #bacdc1;border-radius:6px;padding:0;box-shadow:0 25px 80px #0006';
+ const select=(n,items)=>'<label>'+n+'<select name="'+(n==='Programación'?'plan':'actividad')+'" required style="width:100%;padding:10px;margin:5px 0 12px;border:1px solid #ced8d0"></select></label>';
+ d.innerHTML='<div style="background:#174f37;color:white;padding:18px 20px;display:flex;align-items:center;justify-content:space-between"><strong style="font-size:19px">Reprogramación diaria</strong><button type="button" id="sr-close" aria-label="Cerrar ventana" style="border:0;background:transparent;color:white;font-size:28px;cursor:pointer">×</button></div><form id="sr-form" style="padding:20px;display:grid;gap:9px"><label>Programación del día<select required id="sr-plan" style="width:100%;padding:10px"></select></label><label>Actividad programada<select required id="sr-activity" style="width:100%;padding:10px"></select></label><label>Actividad reprogramada / nueva instrucción<textarea required minlength="5" name="nueva" rows="2" style="width:100%;box-sizing:border-box;padding:10px"></textarea></label><label>Desviación, inconveniente o motivo<textarea required minlength="5" name="motivo" rows="2" style="width:100%;box-sizing:border-box;padding:10px"></textarea></label><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px"><label>Quién dio la orden<input required name="ordeno" style="width:100%;padding:10px;box-sizing:border-box"></label><label>Quién autorizó<input required name="autorizo" style="width:100%;padding:10px;box-sizing:border-box"></label><label>Hora de comunicación<input required name="hora" type="time" style="width:100%;padding:10px;box-sizing:border-box"></label><label>Supervisor operativo a cargo<input required name="supervisor" list="sr-supervisors" style="width:100%;padding:10px;box-sizing:border-box"></label><label>Ingeniero HSE a cargo<input required name="hse" list="sr-hse-list" style="width:100%;padding:10px;box-sizing:border-box"></label></div><datalist id="sr-supervisors"></datalist><datalist id="sr-hse-list"></datalist><p style="font-size:12px;color:#576e5e">La nueva instrucción sustituirá la actividad seleccionada. El cambio quedará registrado junto con la programación anterior.</p><button class="btn btn-primary" type="submit" id="sr-submit">Guardar reprogramación y generar reporte</button></form>';
+ document.body.appendChild(d);const pl=$('sr-plan'),act=$('sr-activity');
+ pl.innerHTML=list.map(p=>'<option value="'+p.id+'">'+safe(p.fecha)+' · '+p.actividades.length+' actividad(es) · N.º '+p.id+'</option>').join('');
+ const fill=()=>{const p=list.find(x=>String(x.id)===pl.value);act.innerHTML=(p?.actividades||[]).map((a,i)=>'<option value="'+i+'">'+safe((i+1)+'. '+name(a))+'</option>').join('');defaults()};
+ const defaults=()=>{const p=list.find(x=>String(x.id)===pl.value);const a=p?.actividades?.[Number(act.value)];if(!a)return;d.querySelector('[name="nueva"]').value=name(a);d.querySelector('[name="supervisor"]').value=a.supervisor||'';d.querySelector('[name="hse"]').value=a.hse||''};
+ pl.onchange=fill;act.onchange=defaults;fill();
+ const users=APP?.data?.usuarios||[];
+ $('sr-supervisors').innerHTML=users.filter(x=>x.rol==='supervisor'&&x.activo!==false).map(x=>'<option value="'+safe([x.nombre,x.apellido].filter(Boolean).join(' '))+'"></option>').join('');
+ $('sr-hse-list').innerHTML=users.filter(x=>x.rol==='supervisor_hse'&&x.activo!==false).map(x=>'<option value="'+safe([x.nombre,x.apellido].filter(Boolean).join(' '))+'"></option>').join('');
+ const close=()=>{d.close();d.remove()};$('sr-close').onclick=close;d.oncancel=e=>{e.preventDefault();close()};
+ $('sr-form').onsubmit=async e=>{
+  e.preventDefault();const button=$('sr-submit');button.disabled=true;
   try{
-   const c=await window.seamxExtrasEnsureAuth();
-   const nueva=appProgramacionToDb(p);
-   const r=await c.rpc('seamx_ac07_registrar',{p_id:Number(p.id),p_nueva:nueva,p_tipo:m.tipo,p_motivo:m.motivo,p_justificacion:m.motivo,p_riesgos:m.control,p_controles:m.control,p_autorizado:(APP.user?.name||APP.user?.login||'Supervisor')});
-   if(r.error)throw r.error;
-   if(typeof syncProgramacionAssignments==='function')await syncProgramacionAssignments(p);
-   if(E('prog-reporte-fecha'))E('prog-reporte-fecha').value=p.fecha;
-   if(typeof resetProgramacionForm==='function')resetProgramacionForm(false);
+   const c=await window.seamxExtrasEnsureAuth();const p=list.find(x=>String(x.id)===pl.value),i=Number(act.value),f=new FormData(e.currentTarget),old=p.actividades[i];
+   const newActivities=p.actividades.map((a,j)=>j===i?{...a,descripcion:String(f.get('nueva')).trim(),supervisor:String(f.get('supervisor')).trim(),hse:String(f.get('hse')).trim()}:a);
+   const person=[...new Set(newActivities.flatMap(a=>a.personal||[]))];
+   const nueva={fecha:p.fecha,descripcion:newActivities[0]?.descripcion||'',personal:person,charla_seguridad:(p.charlas||[p.charla]).filter(Boolean).join('\n'),hse:newActivities[0]?.hse||'',supervisor:newActivities[0]?.supervisor||'',area:newActivities[0]?.area||'',actividades:newActivities,creado_por:p.creadoPor||APP.user?.login||''};
+   const detalle={indice:i,actividad_original:name(old),actividad_nueva:String(f.get('nueva')).trim(),motivo:String(f.get('motivo')).trim(),ordeno:String(f.get('ordeno')).trim(),autorizo:String(f.get('autorizo')).trim(),hora_comunicacion:String(f.get('hora')).trim(),supervisor:String(f.get('supervisor')).trim(),hse:String(f.get('hse')).trim()};
+   const res=await c.rpc('seamx_reprogramar',{p_id:Number(p.id),p_nueva:nueva,p_detalle:detalle});
+   if(res.error)throw res.error;
+   const rec={id:res.data,fecha:p.fecha,created_at:new Date().toISOString(),original:{actividades:p.actividades},actualizado:nueva,detalle_reprogramacion:detalle,usuario:APP.user?.login||'',motivo:detalle.motivo};
    if(typeof loadAllData==='function')await loadAllData();
-   await load();msg('Modificación guardada, autorizada y comunicada en SEAMX','success');
-  }catch(err){msg('No se guardó la modificación: '+(err.message||err),'error')}
- }
- wrapped.__ac07=true;window.saveProgramacion=wrapped;
+   await load();close();say('Reprogramación registrada y comunicada','success');await report(rec,'share');
+  }catch(err){say('No se pudo reprogramar: '+(err.message||err),'error')}finally{button.disabled=false}
+ };
+ d.showModal();
 }
-function rows(rec){
- const r=rec.actualizado||{};const a=r.actividades||[];
- return a.map((v,i)=>[(i+1)+'.',v.descripcion||v.actividad||'',v.area||'',v.supervisor||'']).slice(0,18);
+async function load(){
+ try{const c=window.seamxSignatureDb,session=await c?.auth?.getSession();if(!session?.data?.session)return;
+ const r=await c.from('modificaciones_programacion').select('*').order('created_at',{ascending:false}).limit(100);if(r.error)return;
+ reports=(r.data||[]).filter(x=>x.detalle_reprogramacion?.actividad_original);
+ const div=$('seamx-reprogramacion-history');if(!div)return;
+ div.innerHTML=reports.length?'<details><summary style="cursor:pointer;font-size:13px;color:#315942">Historial de reprogramaciones ('+reports.length+')</summary><div style="display:grid;gap:8px;margin-top:10px">'+reports.slice(0,25).map(x=>'<div style="border:1px solid #dbe5dd;padding:10px"><strong>'+safe(x.fecha)+' · '+safe(x.detalle_reprogramacion.actividad_original)+'</strong><p style="font-size:12px;margin:6px 0">'+safe(x.motivo)+'</p><button type="button" class="btn btn-outline btn-sm" data-report="'+x.id+'">Reporte comparativo JPG / WhatsApp</button></div>').join('')+'</div></details>':'';
+ div.querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>report(reports.find(x=>x.id===b.dataset.report),'share'));
+ }catch(err){console.warn('Reprogramación',err)}
 }
-function compose(rec,kind){
- const c=document.createElement('canvas');c.width=1500;c.height=kind==='plan'?2050:1680;
- const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#143d2c';g.fillRect(0,0,1500,165);g.fillStyle='#fff';g.font='bold 55px Arial';g.fillText('SEAMX  |  ECOSEAM',80,83);g.font='24px Arial';g.fillText('GESTIÓN OPERACIONAL  ·  CONTROL DOCUMENTAL',82,128);
- let y=225;g.fillStyle='#143d2c';g.font='bold 40px Arial';g.fillText(kind==='plan'?'PROGRAMACIÓN DIARIA ACTUALIZADA':'COMUNICADO DE MODIFICACIÓN · AC-07',80,y);y+=40;g.fillStyle='#61746b';g.font='23px Arial';g.fillText('Fecha: '+rec.fecha+'   |   Emitido: '+new Date(rec.created_at).toLocaleString('es-PE')+'   |   Código: '+rec.id.slice(0,8).toUpperCase(),80,y);y+=58;
- function line(text,val){g.fillStyle='#eaf0ec';g.fillRect(77,y-35,1345,51);g.font='bold 23px Arial';g.fillStyle='#244d39';g.fillText(text,96,y);g.font='22px Arial';g.fillStyle='#263a30';write(val,440,y,950,35);y+=73}
- function write(str,x,yy,max,step=35){g.font='22px Arial';const words=String(str||'—').split(/\s+/);let row='';for(const w of words){if(g.measureText(row+' '+w).width>max){g.fillText(row,x,yy);yy+=step;row=w}else row+=(row?' ':'')+w}if(row)g.fillText(row,x,yy);return yy}
- if(kind==='comm'){line('Tipo de cambio',rec.tipo);line('Motivo',rec.motivo);line('Sustento',rec.justificacion);line('Riesgos reevaluados',rec.riesgos);line('Controles',rec.controles);line('Registrado por',rec.usuario);line('Autorizado por',rec.autorizado_por)}
- else{line('Registrado por',rec.usuario);line('Motivo del ajuste',rec.motivo);g.fillStyle='#143d2c';g.font='bold 28px Arial';g.fillText('ACTIVIDADES PROGRAMADAS',82,y+15);y+=75;for(const v of rows(rec)){g.fillStyle='#eef3f0';g.fillRect(76,y-26,1345,106);g.fillStyle='#243c2e';g.font='21px Arial';write(v[0]+' '+v[1],93,y,1150);g.font='19px Arial';g.fillText('Área: '+v[2]+'   |   Supervisor: '+v[3],93,y+49);y+=120;}}
- g.fillStyle='#a6b8ac';g.fillRect(75,c.height-125,1350,2);g.fillStyle='#5b6d62';g.font='21px Arial';g.fillText('Documento generado por SEAMX · Registro digital · Verificar instrucciones vigentes antes de ejecutar',80,c.height-82);
+function createImage(rec){
+ const c=document.createElement('canvas');c.width=1400;c.height=1850;const g=c.getContext('2d');
+ g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#184a34';g.fillRect(0,0,1400,155);
+ g.fillStyle='#fff';g.font='bold 51px Arial';g.fillText('ECOSEAM  /  SEAMX',72,75);g.font='23px Arial';g.fillText('REPORTE GERENCIAL · REPROGRAMACIÓN OPERATIVA',74,118);
+ const d=rec.detalle_reprogramacion||{},old=rec.original?.actividades||[],now=rec.actualizado?.actividades||[];
+ let y=220;
+ function words(t,x,yy,w,lh=30){const parts=String(t||'—').split(/\s+/);let row='';g.font='23px Arial';for(const v of parts){if(g.measureText(row+' '+v).width>w){g.fillText(row,x,yy);yy+=lh;row=v}else row+=(row?' ':'')+v}if(row)g.fillText(row,x,yy);return yy}
+ function section(title){g.fillStyle='#e8f0ea';g.fillRect(65,y-33,1270,48);g.font='bold 25px Arial';g.fillStyle='#184a34';g.fillText(title,82,y);y+=48;g.fillStyle='#263e30'}
+ function line(label,value){g.font='bold 21px Arial';g.fillStyle='#24533c';g.fillText(label,82,y);g.fillStyle='#23372b';y=Math.max(y,words(value,430,y,880))+36}
+ section('DATOS DE REPROGRAMACIÓN');line('Fecha',rec.fecha);line('Hora comunicación',d.hora_comunicacion);line('Orden impartida por',d.ordeno);line('Autorizado por',d.autorizo);line('Supervisor operativo',d.supervisor);line('Ingeniero HSE',d.hse);
+ section('COMPARATIVO DE ACTIVIDADES');
+ const idx=Number(d.indice||0);
+ for(let i=0;i<Math.max(old.length,now.length);i++){const before=old[i],after=now[i];if(!before&&!after)continue;g.font='bold 21px Arial';g.fillStyle='#24533c';g.fillText('ACTIVIDAD '+(i+1)+(i===idx?' · REPROGRAMADA':''),82,y);y+=33;g.fillStyle='#6a6f6a';g.font='19px Arial';g.fillText('ANTERIOR',85,y);g.fillStyle='#273b30';y=words(name(before),290,y,1030)+37;g.fillStyle='#6a6f6a';g.font='19px Arial';g.fillText('NUEVA',85,y);g.fillStyle='#273b30';y=words(name(after),290,y,1030)+51;if(y>1450)break}
+ section('DESVIACIÓN / INCONVENIENTE / MOTIVO');y=words(d.motivo,82,y+8,1200)+55;
+ g.fillStyle='#b6c6bb';g.fillRect(65,1740,1270,2);g.fillStyle='#50685a';g.font='20px Arial';g.fillText('Registro generado por SEAMX · Trazabilidad de programación original y modificada',75,1780);
  return c;
 }
-async function produce(rec,action){
- const kind=action==='plan'?'plan':'comm',canvas=compose(rec,kind);
- const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.93));if(!blob)return msg('No se generó el archivo');
- const file=new File([blob],'SEAMX_'+(kind==='plan'?'Programacion':'Comunicado')+'_'+rec.fecha+'.jpg',{type:'image/jpeg'});
- if(action==='share'&&navigator.share&&navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Modificación de programación SEAMX'});return}catch(e){if(e.name==='AbortError')return}}
- const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
- if(action==='share')msg('JPG descargado. Adjunta el archivo en WhatsApp; no se requiere Business API.','success');
+async function report(rec,mode){
+ if(!rec)return;const canvas=createImage(rec),blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.94));if(!blob)return say('No se pudo generar JPG');
+ const file=new File([blob],'SEAMX_Reprogramacion_'+rec.fecha+'.jpg',{type:'image/jpeg'});
+ if(mode==='share'&&navigator.share&&navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Reporte de reprogramación SEAMX'});return}catch(e){if(e.name==='AbortError')return}}
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
+ say('JPG descargado. Puedes adjuntarlo en WhatsApp o compartirlo desde tu dispositivo.','success');
 }
-function boot(){wrapSave();E('ac07-panel')?.remove();E('ac07-programacion-shortcut')?.remove();E('ac07-notify-bell')?.remove();}
-
-window.seamxAc07Refresh=load;
-function initAc07(){setTimeout(boot,450);setInterval(()=>{boot();if(APP?.user&&TARGET.has(state()))load()},15000)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initAc07,{once:true});else initAc07();
+function start(){install();setInterval(()=>{install();if($('view-programacion')?.style.display!=='none')load()},30000)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
