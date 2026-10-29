@@ -6917,6 +6917,7 @@ function openActivityRisk(id){
  const modal=document.getElementById('modal-actividad-evidencias');
  const title=modal?.querySelector('.modal-title');if(title)title.textContent='Análisis de riesgos durante la actividad';
  const btn=document.getElementById('btn-save-evidence');if(btn)btn.style.display='none';
+ const oldReport=document.getElementById('seamx-risk-brief');if(APP.user?.role==='operador'&&oldReport)oldReport.remove();
  const desc=document.getElementById('evidence-description');if(desc?.closest('.form-group'))desc.closest('.form-group').style.display='none';
  const grid=document.querySelector('#modal-actividad-evidencias .evidence-grid');if(grid)grid.style.display='';
  const safe=document.getElementById('seamx-safe-panel');if(safe)safe.style.display='';
@@ -6925,6 +6926,7 @@ function openActivityRisk(id){
 }
 function openActivityEvidence(id){
   const detailTitle=document.querySelector('#modal-actividad-evidencias .modal-title');if(detailTitle)detailTitle.textContent='Finalizar actividad';
+  const oldReport=document.getElementById('seamx-risk-brief');if(APP.user?.role==='operador'&&oldReport)oldReport.remove();
   const finishButton=document.getElementById('btn-save-evidence');if(finishButton)finishButton.style.display='';
   const descField=document.getElementById('evidence-description');if(descField){descField.readOnly=false;if(descField.closest('.form-group'))descField.closest('.form-group').style.display='';}
   ['evidence-before','evidence-before-camera','evidence-during','evidence-during-camera','evidence-after','evidence-after-camera'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='';});
