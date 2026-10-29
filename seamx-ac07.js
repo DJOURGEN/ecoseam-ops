@@ -45,9 +45,17 @@ function open(){
  $('sr-hse-list').innerHTML=users.filter(x=>x.rol==='supervisor_hse'&&x.activo!==false).map(x=>'<option value="'+safe([x.nombre,x.apellido].filter(Boolean).join(' '))+'"></option>').join('');
  const close=()=>{d.close();d.remove()};$('sr-close').onclick=close;d.oncancel=e=>{e.preventDefault();close()};
  $('sr-form').onsubmit=async e=>{
-  e.preventDefault();const button=$('sr-submit');button.disabled=true;
+  e.preventDefault();
+  const form=e.currentTarget;
+  const button=$('sr-submit');
+  button.disabled=true;
   try{
-   const c=await window.seamxExtrasEnsureAuth();const p=list.find(x=>String(x.id)===pl.value),i=Number(act.value),f=new FormData(e.currentTarget),old=p.actividades[i];
+   // Capture all form values before awaiting: currentTarget becomes null after event dispatch.
+   const f=new FormData(form);
+   const p=list.find(x=>String(x.id)===pl.value),i=Number(act.value);
+   if(!p||!p.actividades?.[i])throw new Error('No se encontró la actividad programada');
+   const old=p.actividades[i];
+   const c=await window.seamxExtrasEnsureAuth();
    const newActivities=p.actividades.map((a,j)=>j===i?{...a,descripcion:String(f.get('nueva')).trim(),supervisor:String(f.get('supervisor')).trim(),hse:String(f.get('hse')).trim()}:a);
    const person=[...new Set(newActivities.flatMap(a=>a.personal||[]))];
    const nueva={fecha:p.fecha,descripcion:newActivities[0]?.descripcion||'',personal:person,charla_seguridad:(p.charlas||[p.charla]).filter(Boolean).join('\n'),hse:newActivities[0]?.hse||'',supervisor:newActivities[0]?.supervisor||'',area:newActivities[0]?.area||'',actividades:newActivities,creado_por:p.creadoPor||APP.user?.login||''};
