@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seamx-shell-20261028-operativo-v2';
+const CACHE_NAME = 'seamx-shell-20261029-ac07-v1';
 
 const CORE_ASSETS = [
   './',
@@ -8,6 +8,7 @@ const CORE_ASSETS = [
   './liderazgo.js',
   './firmas-liderazgo.js',
   './seamx-extras.js',
+  './seamx-ac07.js',
   './liderazgo.js',
   './firmas-liderazgo.js',
 
