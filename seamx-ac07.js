@@ -1,7 +1,7 @@
 /* SEAMX AC-07 — control de cambios 29/10/2026 */
 (function(){
 'use strict';
-const TARGET=new Set(['admin','jefatura','gerencia','supervisor_hse','operador','antamina']);
+const TARGET=new Set(['admin','jefatura','gerencia','supervisor_hse','operador','antamina','supervisor']);
 let records=[],pending=null;
 const E=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -9,8 +9,8 @@ const msg=(s,type='warning')=>typeof showToast==='function'?showToast(s,type):al
 function container(){
  let e=E('ac07-panel');if(e)return e;
  e=document.createElement('section');e.id='ac07-panel';e.style.cssText='margin:18px 0;padding:17px;border:1px solid #c6d4cb;border-radius:8px;background:#fff;color:#25352f;box-shadow:0 3px 14px #002b1810';
- const form=E('prog-fecha');const anchor=form?.closest('.card')||form?.parentElement?.parentElement||E('view-programacion')||document.body;
- anchor.parentElement?.insertBefore(e,anchor.nextSibling);return e;
+ const anchor=E('view-programacion')||E('view-programacion-diaria')||document.body;
+ if(anchor===document.body){e.style.cssText+='position:fixed;right:18px;bottom:68px;z-index:8500;width:min(460px,90vw);max-height:65vh;overflow:auto;display:none';document.body.appendChild(e)}else anchor.appendChild(e);return e;
 }
 function state(){return APP?.user?.role||''}
 function currentDate(){return E('prog-reporte-fecha')?.value||E('prog-fecha')?.value||new Date().toISOString().slice(0,10)}
@@ -85,7 +85,7 @@ async function produce(rec,action){
  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
  if(action==='share')msg('JPG descargado. Adjunta el archivo en WhatsApp; no se requiere Business API.','success');
 }
-function boot(){wrapSave();if(['admin','jefatura','gerencia','supervisor_hse','operador','antamina','supervisor'].includes(state()))load()}
+function boot(){wrapSave();if(TARGET.has(state())){const bell=document.createElement('button');bell.type='button';bell.id='ac07-notify-bell';bell.textContent='🔔 Cambios';bell.style.cssText='position:fixed;right:18px;bottom:16px;z-index:8501;background:#174b34;color:white;border:0;border-radius:6px;padding:11px 17px;box-shadow:0 4px 13px #0003;font-weight:600;cursor:pointer';document.body.appendChild(bell);bell.onclick=()=>{const panel=container();panel.style.display=panel.style.display==='none'?'block':'none';load()};load()}}
 window.seamxAc07Refresh=load;
 document.addEventListener('DOMContentLoaded',()=>{setTimeout(boot,1000);setInterval(()=>{wrapSave();if(APP?.user&&TARGET.has(state()))load()},45000)});
 })();
