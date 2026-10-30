@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seamx-shell-20261029-mobile-a4-v3';
+const CACHE_NAME = 'seamx-shell-20261030-reprogramacion-form-v5';
 
 const CORE_ASSETS = [
   './',
@@ -236,6 +236,32 @@ self.addEventListener('fetch', event => {
 
   }
 
+
+  /* =======================================================
+     REPROGRAMACION
+     ONLINE: PRIORITIZE CURRENT SCRIPT OVER OLD CACHE
+     OFFLINE: PRESERVE PWA FALLBACK
+     ======================================================= */
+
+  if (
+    requestUrl.origin === self.location.origin &&
+    requestUrl.pathname.endsWith('/seamx-ac07.js')
+  ) {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_NAME);
+      try {
+        const latest = await fetch(event.request, {cache: 'no-store'});
+        if (latest.ok) {
+          await cache.put(event.request, latest.clone());
+          return latest;
+        }
+      } catch (error) {
+        console.warn('SEAMX reprogramacion: red no disponible', error);
+      }
+      return (await cache.match(event.request)) || Response.error();
+    })());
+    return;
+  }
 
   /* =======================================================
      ARCHIVOS DEL MISMO DOMINIO
