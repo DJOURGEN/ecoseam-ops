@@ -51,7 +51,15 @@ function open(){
   button.disabled=true;
   try{
    // Capture all form values before awaiting: currentTarget becomes null after event dispatch.
-   const f=new FormData(form);
+   // Read form controls directly; avoid a stale FormData constructor path in the PWA.
+   const fields={};
+   for(const key of ['nueva','motivo','ordeno','autorizo','hora','supervisor','hse']){
+    const input=form.elements.namedItem(key);
+    if(!input || !('value' in input))throw new Error('Falta el campo: '+key);
+    fields[key]=String(input.value||'').trim();
+    if(!fields[key])throw new Error('Complete el campo: '+key);
+   }
+   const f={get:key=>fields[key]??''};
    const p=list.find(x=>String(x.id)===pl.value),i=Number(act.value);
    if(!p||!p.actividades?.[i])throw new Error('No se encontró la actividad programada');
    const old=p.actividades[i];
