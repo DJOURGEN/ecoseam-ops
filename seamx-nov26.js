@@ -15,7 +15,7 @@ function applyRole(){
 const ant=role()==='antamina';const slot=el('actividades-dashboard-slot');if(ant&&slot)slot.style.display='none';
 const heading=el('activity-hero-title');if(ant&&heading)heading.textContent='Control visual de actividades';
 const v=el('view-programacion');if(v)v.classList.toggle('nov26-readonly',ant);
-if(ant&&typeof NAV_CONFIG!=='undefined'&&!NAV_CONFIG.antamina.includes('programacion'))NAV_CONFIG.antamina.splice(1,0,'programacion');
+if(ant&&typeof NAV_CONFIG!=='undefined'&&!NAV_CONFIG.antamina.includes('programacion')){NAV_CONFIG.antamina.splice(1,0,'programacion');if(typeof setupUI==='function')setupUI();if(slot)slot.style.display='none';}
 }
 async function loadPermits(){
 try{const r=await db.from('seamx_dashboard_visibilidad').select('graficos').eq('id',1).maybeSingle();if(!r.error)permits=r.data?.graficos||{}}catch(e){console.warn(e)}
@@ -88,7 +88,7 @@ function riskPanel(){
 const p=el('seamx-safe-panel');if(!p)return;p.querySelector('h3').textContent='Registro de fotografías del IPERC';
 p.querySelector('.seamx-safe-note').textContent='Guarda las fotos del IPERC completo. No se realiza análisis automático ni se generan recomendaciones.';
 p.querySelector('.seamx-safe-actions').innerHTML='<button class="btn btn-primary" id="nov26-save-iperc">Guardar fotos de actividad e IPERC</button><button class="btn btn-outline" onclick="seamxSafeClear()">Limpiar selección</button>';
-el('nov26-save-iperc').onclick=saveRisk;el('seamx-safe-output').textContent='Selecciona fotografías de antes, durante, después y del IPERC.';
+el('nov26-save-iperc').onclick=saveRisk;el('seamx-safe-output').textContent='Selecciona fotografías de antes, durante, después y del IPERC.';window.seamxSafePreviewIperc=function(input){const files=Array.from(input.files||[]);if(files.length>12||files.some(f=>!String(f.type).startsWith('image/')||f.size>12*1024*1024))return notify('Máximo 12 fotografías del IPERC; hasta 12 MB cada una');seamxSafe.iperc=files;const info=el('seamx-safe-iperc-info');if(info)info.textContent=files.length+' foto(s) seleccionadas';};
 }
 async function saveRisk(){
 const id=el('evidence-activity-id')?.value,a=APP.data.actividades.find(x=>String(x.id)===String(id));if(!a)return;
@@ -97,7 +97,7 @@ const files=Array.from(seamxSafe.iperc||[]);const fields={};const selected=[['be
 const btn=el('nov26-save-iperc');btn.disabled=true;
 try{
 for(const [kind,key] of selected){const f=selectedActivityEvidenceFile(kind);if(f)fields[key]=await uploadActivityEvidence(f,a,kind)}
-if(files.length){const previous=Array.isArray(a.fotosIperc)?a.fotosIperc:[];fields.fotos_iperc=[...previous,...await Promise.all(files.map((f,i)=>uploadActivityEvidence(f,a,'iperc-'+i)))]}
+if(files.length){const prev=await db.from('actividades').select('fotos_iperc').eq('id',a.id).maybeSingle();if(prev.error)throw prev.error;const previous=Array.isArray(prev.data?.fotos_iperc)?prev.data.fotos_iperc:[];fields.fotos_iperc=[...previous,...await Promise.all(files.map((f,i)=>uploadActivityEvidence(f,a,'iperc-'+i)))]}
 if(!Object.keys(fields).length)return notify('Selecciona fotografías para guardar');
 const ids=activityGroupMembers(a).map(r=>r.id),r=await db.from('actividades').update(fields).in('id',ids);if(r.error)throw r.error;await loadAllData();closeModal('modal-actividad-evidencias');notify('Fotografías guardadas','success');
 }catch(e){notify('No se pudo guardar: '+e.message,'error')}finally{btn.disabled=false}
