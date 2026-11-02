@@ -186,3 +186,5 @@ function install(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
 
+
+(function(){const s=document.createElement('script');s.src='seamx-nov26.js?v=20261102-integral';document.head.appendChild(s)})();
