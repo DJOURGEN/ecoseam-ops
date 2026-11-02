@@ -12,7 +12,7 @@ const s=document.createElement('style');s.id='nov26-styles';s.textContent='body.
 document.head.appendChild(s);
 }
 function applyRole(){
-const ant=role()==='antamina';const slot=el('actividades-dashboard-slot');if(ant&&slot)slot.style.display='none';
+const ant=role()==='antamina';const slot=el('actividades-dashboard-slot');if(ant&&slot)slot.style.display='none';const permissions=el('seamx-visibility-panel');if(permissions)permissions.style.display=role()==='admin'?'block':'none';
 const heading=el('activity-hero-title');if(ant&&heading)heading.textContent='Control visual de actividades';
 const v=el('view-programacion');if(v)v.classList.toggle('nov26-readonly',ant);
 if(ant&&typeof NAV_CONFIG!=='undefined'&&!NAV_CONFIG.antamina.includes('programacion')){NAV_CONFIG.antamina.splice(1,0,'programacion');if(typeof setupUI==='function')setupUI();if(slot)slot.style.display='none';}
@@ -24,7 +24,7 @@ function applyPermits(){
 ids.forEach(id=>{const p=el(id)?.closest('.seamx-ops-panel');if(p)p.style.display=role()==='antamina'&&permits[id]===false?'none':''});
 }
 function permissionEditor(){
-if(role()!=='admin'||el('seamx-visibility-panel'))return;
+if(role()!=='admin')return;if(el('seamx-visibility-panel')){el('seamx-visibility-panel').style.display='block';return;}
 const host=el('ops-metrics');if(!host)return;
 const p=document.createElement('section');p.id='seamx-visibility-panel';p.innerHTML='<h3>Dashboard visible para Antamina</h3><p>Marca los gráficos autorizados para la cuenta Antamina (solo lectura).</p><div id="nov26-options"></div><button class="btn btn-primary" id="nov26-save-permits">Guardar selección</button>';host.before(p);
 const box=el('nov26-options');
@@ -38,7 +38,7 @@ if(r.error||!r.data?.ok)throw Error(r.data?.error||r.error?.message);permits=gra
 function updateCompliance(){
 const rows=[...document.querySelectorAll('#ops-metrics .seamx-ops-metric')],item=s=>rows.find(r=>r.querySelector('small')?.textContent?.trim().toLowerCase()===s),number=s=>Number.parseFloat(item(s)?.querySelector('strong')?.textContent)||0;
 const p=number('evacuación programada'),v=number('evacuado'),target=item('cumplimiento')?.querySelector('strong');
-if(target)target.textContent=p>0?(100*v/p).toFixed(1)+'%':'Sin programación';
+if(target)target.textContent=p>0?(100*v/p).toFixed(1)+'%':'0.0%';
 }
 function controlDates(){
 if(el('seamx-filter-box'))return;
@@ -87,7 +87,7 @@ el('nov26-hdpe-note').textContent='Programado: '+x.toFixed(2)+' tn · Evacuado: 
 function riskPanel(){
 const p=el('seamx-safe-panel');if(!p)return;p.querySelector('h3').textContent='Registro de fotografías del IPERC';
 p.querySelector('.seamx-safe-note').textContent='Guarda las fotos del IPERC completo. No se realiza análisis automático ni se generan recomendaciones.';
-p.querySelector('.seamx-safe-actions').innerHTML='<button class="btn btn-primary" id="nov26-save-iperc">Guardar fotos de actividad e IPERC</button><button class="btn btn-outline" onclick="seamxSafeClear()">Limpiar selección</button>';
+p.querySelector('.seamx-safe-actions').innerHTML='<button class="btn btn-outline" onclick="seamxSafeClear()">Limpiar selección</button>';const footer=el('modal-actividad-evidencias')?.querySelector('.modal-footer');if(footer&&!el('nov26-save-iperc')){const button=document.createElement('button');button.type='button';button.className='btn btn-primary';button.id='nov26-save-iperc';button.textContent='Guardar fotografías';button.style.display='none';footer.append(button)}
 el('nov26-save-iperc').onclick=saveRisk;el('seamx-safe-output').textContent='Selecciona fotografías de antes, durante, después y del IPERC.';window.seamxSafePreviewIperc=function(input){const files=Array.from(input.files||[]);if(files.length>12||files.some(f=>!String(f.type).startsWith('image/')||f.size>12*1024*1024))return notify('Máximo 12 fotografías del IPERC; hasta 12 MB cada una');seamxSafe.iperc=files;const info=el('seamx-safe-iperc-info');if(info)info.textContent=files.length+' foto(s) seleccionadas';};
 }
 async function saveRisk(){
@@ -103,7 +103,7 @@ const ids=activityGroupMembers(a).map(r=>r.id),r=await db.from('actividades').up
 }catch(e){notify('No se pudo guardar: '+e.message,'error')}finally{btn.disabled=false}
 }
 function overrideRisk(){
-window.openActivityRisk=function(id){if(role()==='antamina')return;openActivityEvidence(id);const p=el('seamx-safe-panel'),grid=document.querySelector('#modal-actividad-evidencias .evidence-grid'),btn=el('btn-save-evidence'),desc=el('evidence-description');if(p)p.style.display='';if(grid)grid.style.display='';if(btn)btn.style.display='none';if(desc?.closest('.form-group'))desc.closest('.form-group').style.display='none';};
+window.openActivityRisk=function(id){if(role()==='antamina')return;openActivityEvidence(id);const p=el('seamx-safe-panel'),grid=document.querySelector('#modal-actividad-evidencias .evidence-grid'),btn=el('btn-save-evidence'),desc=el('evidence-description');if(p)p.style.display='';if(grid)grid.style.display='';if(btn)btn.style.display='none';const save=el('nov26-save-iperc');if(save)save.style.display='';if(desc?.closest('.form-group'))desc.closest('.form-group').style.display='none';};
 window.seamxSafeAnalyze=saveRisk;
 }
 function viewPhotos(id){
@@ -121,7 +121,7 @@ if(!gallery.children.length)gallery.textContent='Sin fotografías registradas';
 }
 function overrideEvidence(){
 const old=window.viewActivityEvidence;if(typeof old!=='function')return;
-window.viewActivityEvidence=function(id){const r=old(id);if(role()!=='operador'){let p=el('seamx-risk-brief');if(!p){p=document.createElement('section');p.id='seamx-risk-brief';p.style.cssText='padding:12px;border:1px solid #c4d8c9;margin:10px 0';el('activity-detail-review')?.before(p)}if(p){p.innerHTML='<button type="button" id="nov26-view-risk" class="btn btn-outline">Ver fotos e IPERC</button>';el('nov26-view-risk').onclick=()=>viewPhotos(id)}}return r};
+window.viewActivityEvidence=function(id){const save=el('nov26-save-iperc');if(save)save.style.display='none';const r=old(id);if(role()!=='operador'){let p=el('seamx-risk-brief');if(!p){p=document.createElement('section');p.id='seamx-risk-brief';p.style.cssText='padding:12px;border:1px solid #c4d8c9;margin:10px 0';el('activity-detail-review')?.before(p)}if(p){p.innerHTML='<button type="button" id="nov26-view-risk" class="btn btn-outline">Ver fotos e IPERC</button>';el('nov26-view-risk').onclick=()=>viewPhotos(id)}}return r};
 }
 function occupancy(){
 const old=window.inferOccProfileFromIngreso;if(typeof old!=='function')return;
@@ -129,12 +129,14 @@ window.inferOccProfileFromIngreso=function(m){const t=String([m?.descripcion,m?.
 if(/alambre|fierro|caja|estructura|rejilla|varilla|baranda|perfil|calamina|perno|corrugado|chatarra|plancha metalica/.test(t)&&!/hdpe|polietileno|jebe|cobre|bronce/.test(t)){const area=getOccAreaById('chatarra_liviana');return{area,factor:/pesad/.test(t)?.75:.20,reason:'Chatarra liviana'}}
 return old(m)};
 }
+
+function improvePresentation(){const style=document.getElementById('nov26-visual-redesign')||document.createElement('style');style.id='nov26-visual-redesign';style.textContent="\n#view-opsdashboard{overflow-x:hidden!important}\n#view-opsdashboard .seamx-ops-charts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;align-items:stretch}\n#view-opsdashboard .seamx-ops-charts>.seamx-ops-panel{min-width:0!important;overflow:hidden!important;background:linear-gradient(145deg,#fff,#f5fafb)!important;border:1px solid #d6e7e3!important;border-top:4px solid #217d78!important;padding:15px!important;box-shadow:0 4px 16px rgba(20,67,66,.075)!important;border-radius:10px!important;max-height:none!important}\n#view-opsdashboard .seamx-ops-panel h3{font-size:15px!important;line-height:1.4!important;color:#125357!important;margin-bottom:10px!important}\n#view-opsdashboard .seamx-ops-panel canvas{display:block!important;width:100%!important;min-height:210px!important;max-height:285px!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve),#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe){grid-column:span 2!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve){border-top-color:#c08b2d!important;background:linear-gradient(130deg,#fff8e9,#fff)!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe){border-top-color:#238cac!important;background:linear-gradient(130deg,#f3fbff,#fff)!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve) canvas,#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe) canvas{min-height:280px!important;max-height:360px!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-trucks){border-top-color:#3579bc!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-inbound){border-top-color:#36a67c!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-outbound){border-top-color:#ca7962!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-material-composition){border-top-color:#8a6ab8!important}\n#view-opsdashboard #ops-metrics{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(155px,1fr))!important;gap:9px!important}\n#view-opsdashboard .seamx-ops-metric{background:#f5faf8!important;border:1px solid #d8e7df!important;border-left:4px solid #218a73!important;box-shadow:none!important;border-radius:8px!important;padding:11px!important}\n#view-opsdashboard .seamx-ops-metric strong{font-size:19px!important;color:#145944!important}\nbody.seamx-antamina #seamx-visibility-panel{display:none!important}\n#view-opsdashboard #seamx-filter-box{border-radius:8px!important;gap:12px!important;line-height:1.5!important}\n#view-programacion.nov26-readonly .prog-layout{display:block!important;width:100%!important}\n#view-programacion.nov26-readonly .guard-report-wrap,#view-programacion.nov26-readonly #programacion-report-card{width:100%!important;max-width:100%!important}\n#view-programacion.nov26-readonly .seamx-doc-page{width:100%!important;min-width:0!important;max-width:none!important;transform:none!important;min-height:0!important;padding:24px!important;box-sizing:border-box!important}\n#view-programacion.nov26-readonly .seamx-doc-page .seamx-doc-table{table-layout:fixed!important;width:100%!important}\n#view-programacion.nov26-readonly .seamx-doc-page td,#view-programacion.nov26-readonly .seamx-doc-page th{overflow-wrap:anywhere!important}\n#modal-actividad-evidencias .modal-footer{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;flex-wrap:wrap!important}\n#nov26-save-iperc{background:#175d43!important;color:#fff!important}\n@media(max-width:900px){#view-opsdashboard .seamx-ops-charts{grid-template-columns:1fr!important}#view-opsdashboard .seamx-ops-panel:has(#ops-curve),#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe){grid-column:span 1!important}}\n";if(!style.isConnected)document.head.append(style);const panel=el('seamx-visibility-panel');if(panel)panel.style.display=role()==='admin'?'block':'none';const report=el('programacion-report-card');if(role()==='antamina'&&report){report.style.height='auto';report.style.overflow='visible';const page=report.querySelector('.seamx-doc-page');if(page){['width','min-width','max-width','min-height','transform','padding'].forEach((k,i)=>page.style.setProperty(k,['100%','0','none','0','none','24px'][i],'important'))}}}
 async function install(){
-styling();applyRole();riskPanel();overrideRisk();overrideEvidence();occupancy();await loadPermits();controlDates();hdpePanel();permissionEditor();applyPermits();
+styling();improvePresentation();applyRole();riskPanel();overrideRisk();overrideEvidence();occupancy();await loadPermits();controlDates();hdpePanel();permissionEditor();applyPermits();improvePresentation();
 const old=window.seamxRenderOpsDashboard;
-if(typeof old==='function'){window.seamxRenderOpsDashboard=async function(){const r=await old();controlDates();hdpePanel();permissionEditor();updateCompliance();await filterCharts();await hdpeChart();applyPermits();return r}}
+if(typeof old==='function'){window.seamxRenderOpsDashboard=async function(){const r=await old();controlDates();hdpePanel();permissionEditor();updateCompliance();await filterCharts();await hdpeChart();applyPermits();improvePresentation();return r}}
 const range=window.seamxRenderCurvaRango;if(typeof range==='function')window.seamxRenderCurvaRango=async function(){const r=await range();updateCompliance();await hdpeChart();return r};
-const nav=window.navigateTo;if(typeof nav==='function')window.navigateTo=function(...args){const v=nav(...args);applyRole();applyPermits();return v};
+const nav=window.navigateTo;if(typeof nav==='function')window.navigateTo=function(...args){const v=nav(...args);applyRole();applyPermits();requestAnimationFrame(improvePresentation);return v};
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();
