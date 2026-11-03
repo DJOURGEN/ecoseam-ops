@@ -44,9 +44,9 @@ function controlDates(){
 if(el('seamx-filter-box'))return;
 const charts=el('view-opsdashboard')?.querySelector('.seamx-ops-charts');if(!charts)return;
 const p=document.createElement('div');p.id='seamx-filter-box';
-p.innerHTML='<strong>Filtro de gráficos diarios</strong> <label>Desde <input id="nov26-from" type="date"></label> <label>Hasta <input id="nov26-to" type="date"></label> <button class="btn btn-primary" id="nov26-filter">Aplicar</button><small>Camiones, ingresos, evacuaciones, materiales y gerencias. Curvas S: filtro independiente.</small>';charts.before(p);
+p.innerHTML='<strong>Filtro de gráficos diarios</strong> <label>Desde <input id="nov26-from" type="date"></label> <label>Hasta <input id="nov26-to" type="date"></label> <button class="btn btn-primary" id="nov26-filter">Aplicar</button>';charts.before(p);
 const today=new Date(),format=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-el('nov26-from').value=format(new Date(today.getFullYear(),today.getMonth(),1));el('nov26-to').value=format(today);
+el('nov26-from').value=format(new Date(today.getFullYear(),today.getMonth(),today.getDate()-29));el('nov26-to').value=format(today);
 el('nov26-filter').onclick=filterCharts;
 }
 function draw(id,type,labels,data){if(typeof seamxOpsChart==='function')seamxOpsChart(id,type,labels,data)}
@@ -65,10 +65,22 @@ draw('ops-inbound','bar',labels,[{label:'Ingreso (tn)',data:days.map(d=>inc[d]||
 draw('ops-outbound','bar',labels,[{label:'Evacuación (tn)',data:days.map(d=>out[d]||0),backgroundColor:'#22664b'}]);
 const cv=el('ops-material-composition');if(cv&&typeof Chart!=='undefined'){Chart.getChart(cv)?.destroy();new Chart(cv,{type:'doughnut',data:{labels:['Liviano','Pesado'],datasets:[{data:[weights[0]+weights[1],weights[2]+weights[3]],backgroundColor:['#66c5a9','#195d49']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>['Total '+Number(c.raw).toFixed(2)+' tn','Metálico '+weights[c.dataIndex?2:0].toFixed(2)+' tn','No metálico '+weights[c.dataIndex?3:1].toFixed(2)+' tn']}}}}});const note=cv.closest('.seamx-ops-panel')?.querySelector('.seamx-material-note');if(note)note.textContent='Sin clasificar: '+other.toFixed(2)+' tn'}
 const bar=el('ops-gerencias-chart');if(bar){const rows=[...groups].sort((x,y)=>y[1]-x[1]),max=rows[0]?.[1]||1;bar.replaceChildren();for(const [name,v] of rows){const line=document.createElement('div');line.className='seamx-pyramid-row';const n=document.createElement('span');n.textContent=name;const val=document.createElement('div');val.className='seamx-pyramid-bar';val.style.width=Math.max(8,100*v/max)+'%';val.style.background='#267d60';val.textContent=v.toFixed(2)+' tn';line.append(n,val);bar.append(line)}}
+const planned=await db.from('dashboard_programacion').select('fecha,guardia,toneladas').gte('fecha',from).lte('fecha',to).limit(3000);
+const programmed=planned.error?0:(planned.data||[]).filter(p=>!el('ops-guardia')?.value||p.guardia===el('ops-guardia').value).reduce((sum,p)=>sum+Number(p.toneladas||0),0);
+const evacuated=(a.data||[]).reduce((sum,r)=>sum+seamxOpsPeso(r),0);
+const cells=[...document.querySelectorAll('#ops-metrics .seamx-ops-metric')];
+const setMetric=(label,value)=>{const cell=cells.find(c=>c.querySelector('small')?.textContent?.trim().toLowerCase()===label);const strong=cell?.querySelector('strong');if(strong)strong.textContent=value};
+setMetric('evacuación programada',programmed.toFixed(2)+' tn');
+setMetric('evacuado',evacuated.toFixed(2)+' tn');
+setMetric('cumplimiento',programmed>0?(100*evacuated/programmed).toFixed(1)+'%':'0.0%');
+const status=el('seamx-kpi-period')||document.createElement('div');
+status.id='seamx-kpi-period';status.style.cssText='font-size:12px;color:#3d685c;margin:6px 0';
+status.textContent='KPI de evacuación y cumplimiento: '+from+' al '+to+(planned.error?' · Sin acceso a programación':'');
+if(!status.isConnected)el('ops-metrics')?.before(status);
 applyPermits();
 }
 function hdpePanel(){
-if(el('ops-curve-hdpe'))return;const main=el('ops-curve')?.closest('.seamx-ops-panel');if(!main)return;
+if(!APP?.user||el('ops-curve-hdpe'))return;const main=el('ops-curve')?.closest('.seamx-ops-panel');if(!main)return;
 const p=document.createElement('div');p.className='seamx-ops-panel';
 p.innerHTML='<h3>Curva S · Tuberías HDPE</h3><p>Programado vs evacuado (tn) · periodo de la Curva S</p><div id="nov26-hdpe-edit"></div><p id="nov26-hdpe-note"></p><canvas id="ops-curve-hdpe"></canvas>';main.after(p);
 if(role()==='admin'){el('nov26-hdpe-edit').innerHTML='<label>Fecha <input type="date" id="nov26-hdpe-date"></label> <label>Guardia <select id="nov26-hdpe-guard"><option>A</option><option>B</option></select></label> <label>Toneladas <input type="number" min="0" step=".01" id="nov26-hdpe-ton"></label> <button class="btn btn-outline" id="nov26-hdpe-save">Guardar programación HDPE</button>';el('nov26-hdpe-save').onclick=async()=>{try{const fecha=el('nov26-hdpe-date').value,guardia=el('nov26-hdpe-guard').value,toneladas=Number(el('nov26-hdpe-ton').value);if(!fecha||!Number.isFinite(toneladas)||toneladas<0)throw Error('Datos inválidos');const c=await window.seamxExtrasEnsureAuth(),r=await c.functions.invoke('seamx-curva-hdpe-admin',{body:{fecha,guardia,toneladas}});if(r.error||!r.data?.ok)throw Error(r.data?.error||r.error?.message);notify('HDPE guardado','success');hdpeChart()}catch(e){notify(e.message,'error')}}}
@@ -124,12 +136,35 @@ const old=window.viewActivityEvidence;if(typeof old!=='function')return;
 window.viewActivityEvidence=function(id){const save=el('nov26-save-iperc');if(save)save.style.display='none';const r=old(id);if(role()!=='operador'){let p=el('seamx-risk-brief');if(!p){p=document.createElement('section');p.id='seamx-risk-brief';p.style.cssText='padding:12px;border:1px solid #c4d8c9;margin:10px 0';el('activity-detail-review')?.before(p)}if(p){p.innerHTML='<button type="button" id="nov26-view-risk" class="btn btn-outline">Ver fotos e IPERC</button>';el('nov26-view-risk').onclick=()=>viewPhotos(id)}}return r};
 }
 
+
+function improvePresentation(){
+  let sheet=el('nov26-visual-redesign');
+  if(!sheet){sheet=document.createElement('style');sheet.id='nov26-visual-redesign';document.head.appendChild(sheet)}
+  sheet.textContent="\n#view-opsdashboard{max-width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important}\n#view-opsdashboard[style*=\"block\"]{height:auto!important;max-height:none!important;overflow:visible!important}\n#view-opsdashboard>.page-header,#view-opsdashboard>.form-hint{display:none!important}\n#view-opsdashboard .seamx-ops-charts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;align-items:stretch!important}\n#view-opsdashboard .seamx-ops-charts>.seamx-ops-panel{min-width:0!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:16px!important;background:#fff!important;border:1px solid #d8e5e3!important;border-radius:12px!important;box-shadow:0 3px 13px rgba(18,58,62,.07)!important}\n#view-opsdashboard .seamx-ops-panel h3{font-size:15px!important;font-weight:750!important;color:#174f58!important;line-height:1.45!important;margin:0 0 13px!important}\n#view-opsdashboard .seamx-ops-panel canvas{width:100%!important;min-height:230px!important;max-height:320px!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve),#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe){grid-column:span 2!important;min-height:390px!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve){border-top:4px solid #cf9b31!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe){border-top:4px solid #1c91af!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-curve) canvas,#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe) canvas{min-height:300px!important;max-height:330px!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-trucks){border-top:4px solid #367bb7!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-inbound){border-top:4px solid #3ca77a!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-outbound){border-top:4px solid #cc7964!important}\n#view-opsdashboard .seamx-ops-panel:has(#ops-material-composition){border-top:4px solid #9770c6!important}\n#view-opsdashboard #ops-metrics{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important;gap:10px!important}\n#view-opsdashboard .seamx-ops-metric{min-height:75px!important;background:#f4faf8!important;border:1px solid #d8e8df!important;border-left:4px solid #279273!important;border-radius:9px!important;padding:13px!important}\n#view-opsdashboard .seamx-ops-metric strong{font-size:21px!important;color:#145944!important}\n#view-opsdashboard #seamx-visibility-panel{margin:10px 0!important}\nbody.seamx-antamina #view-opsdashboard #seamx-visibility-panel{display:none!important}\n#view-opsdashboard #seamx-filter-box{margin:8px 0!important;padding:12px!important;border-radius:10px!important;gap:10px!important;align-items:center!important}\n#view-opsdashboard #seamx-filter-box small{display:none!important}\n#view-opsdashboard #seamx-filter-box strong{color:#125e55}\n#view-opsdashboard .seamx-ops-period{display:none!important}\n#view-opsdashboard #seamx-compact-settings{margin:8px 0}\n#view-opsdashboard #seamx-compact-settings summary{cursor:pointer;padding:9px 12px;background:#eaf4f0;border:1px solid #d4e4db;border-radius:8px;font-size:12px;font-weight:700;color:#245b4c}\n#view-opsdashboard #seamx-compact-settings[open] .seamx-ops-period{display:flex!important;flex-wrap:wrap!important;margin:5px 0!important}\n#view-opsdashboard #seamx-compact-settings .seamx-ops-period{position:static!important}\n#view-programacion.nov26-readonly .prog-layout{display:block!important;min-width:0!important;width:100%!important}\n#view-programacion.nov26-readonly .prog-layout>*{max-width:100%!important}\n#view-programacion.nov26-readonly .guard-report-wrap,#view-programacion.nov26-readonly #programacion-report-card{width:100%!important;max-width:100%!important;box-sizing:border-box!important}\n#view-programacion.nov26-readonly .seamx-doc-page{width:100%!important;min-width:0!important;max-width:none!important;transform:none!important;box-sizing:border-box!important;padding:18px!important}\n@media(max-width:850px){#view-opsdashboard .seamx-ops-charts{grid-template-columns:1fr!important}#view-opsdashboard .seamx-ops-panel:has(#ops-curve),#view-opsdashboard .seamx-ops-panel:has(#ops-curve-hdpe){grid-column:span 1!important}#view-opsdashboard .seamx-ops-panel canvas{min-height:210px!important}}\n";
+  const dash=el('view-opsdashboard');
+  if(dash&&!el('seamx-compact-settings')){
+    const period=dash.querySelector('.seamx-ops-period');
+    if(period){const details=document.createElement('details');details.id='seamx-compact-settings';const summary=document.createElement('summary');summary.textContent='Opciones de periodo valorizable y guardia';period.before(details);details.append(summary,period)}
+  }
+  const editor=el('seamx-visibility-panel');
+  if(editor)editor.style.display=role()==='admin'?'block':'none';
+  const report=el('programacion-report-card');
+  if(role()==='antamina'&&report){
+    report.style.setProperty('height','auto','important');
+    report.style.setProperty('overflow','visible','important');
+    const page=report.querySelector('.seamx-doc-page');
+    if(page){for(const [k,v] of Object.entries({'width':'100%','min-width':'0','max-width':'none','min-height':'0','transform':'none','padding':'18px'}))page.style.setProperty(k,v,'important')}
+  }
+}
+
 async function install(){
 styling();improvePresentation();applyRole();riskPanel();overrideRisk();overrideEvidence();await loadPermits();controlDates();hdpePanel();permissionEditor();applyPermits();improvePresentation();
 const old=window.seamxRenderOpsDashboard;
-if(typeof old==='function'){window.seamxRenderOpsDashboard=async function(){const r=await old();controlDates();hdpePanel();permissionEditor();updateCompliance();await filterCharts();await hdpeChart();applyPermits();improvePresentation();return r}}
-const range=window.seamxRenderCurvaRango;if(typeof range==='function')window.seamxRenderCurvaRango=async function(){const r=await range();updateCompliance();await hdpeChart();return r};
-const nav=window.navigateTo;if(typeof nav==='function')window.navigateTo=function(...args){const v=nav(...args);applyRole();applyPermits();requestAnimationFrame(improvePresentation);return v};
+if(typeof old==='function'&&!old.__novfix){window.seamxRenderOpsDashboard=async function(){
+ const r=await old();controlDates();hdpePanel();permissionEditor();await hdpeChart();await filterCharts();applyPermits();improvePresentation();return r
+};window.seamxRenderOpsDashboard.__novfix=true}
+const range=window.seamxRenderCurvaRango;if(typeof range==='function')window.seamxRenderCurvaRango=async function(){const r=await range();await hdpeChart();await filterCharts();return r};
+const nav=window.navigateTo;if(typeof nav==='function')window.navigateTo=function(...args){const v=nav(...args);applyRole();hdpePanel();controlDates();permissionEditor();applyPermits();requestAnimationFrame(improvePresentation);return v};
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
 })();

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seamx-shell-20261030-reprogramacion-form-v5';
+const CACHE_NAME = 'seamx-shell-20261103-dashboard-recovery-v1';
 
 const CORE_ASSETS = [
   './',
@@ -8,6 +8,7 @@ const CORE_ASSETS = [
   './liderazgo.js',
   './firmas-liderazgo.js',
   './seamx-extras.js',
+  './seamx-nov26.js',
   './seamx-ac07.js',
   './liderazgo.js',
   './firmas-liderazgo.js',
@@ -245,7 +246,7 @@ self.addEventListener('fetch', event => {
 
   if (
     requestUrl.origin === self.location.origin &&
-    requestUrl.pathname.endsWith('/seamx-ac07.js')
+    (/\/(?:seamx-ac07|seamx-extras|seamx-nov26)\.js$/.test(requestUrl.pathname))
   ) {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);

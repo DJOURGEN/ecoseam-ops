@@ -7,36 +7,13 @@ const localStore=(key)=>{try{return JSON.parse(localStorage.getItem(key)||'[]')}
 const clean=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 function toast(message,type='warning'){if(typeof showToast==='function')showToast(message,type);else alert(message)}
 async function requireAuth(){
- const app=APP;
  const c=window.seamxSignatureDb;
- if(!app?.user?.id||!c)throw Error('Inicia sesión en SEAMX.');
- let u=await c.auth.getUser();
- if(u.data?.user?.id){
-   const p=await c.from('usuarios').select('id,auth_user_id,activo').eq('id',app.user.id).eq('activo',true).maybeSingle();
-   if(!p.error&&p.data?.auth_user_id===u.data.user.id)return c;
-   await c.auth.signOut({scope:'local'});
- }
- return new Promise((resolve,reject)=>{
-   const d=document.createElement('dialog');
-   d.style.cssText='max-width:440px;width:92vw;padding:20px;border:1px solid #b4c8ba;border-radius:10px;box-shadow:0 16px 45px #0004';
-   d.innerHTML='<form id="seamx-verify-form"><h3 style="margin-top:0">Verificar identidad SEAMX</h3><p style="font-size:13px">Escribe tu contraseña NUEVA de Supabase Auth. No necesitas otro usuario.</p><input type="password" autocomplete="current-password" required id="seamx-verify-password" style="width:100%;box-sizing:border-box;padding:11px;border:1px solid #b4c8ba"><p id="seamx-verify-error" role="status" style="color:#a33;font-size:12px"></p><div style="display:flex;gap:8px;margin-top:14px"><button type="button" id="seamx-verify-cancel">Cancelar</button><button type="submit" id="seamx-verify-ok" style="background:#16623c;color:white;border:0;padding:10px">Verificar</button></div></form>';
-   document.body.appendChild(d);let closed=false;
-   const finish=error=>{if(closed)return;closed=true;d.close();d.remove();if(error)reject(error);else resolve(c)};
-   d.querySelector('#seamx-verify-cancel').onclick=()=>finish(new Error('Verificación cancelada'));
-   d.addEventListener('cancel',e=>{e.preventDefault();finish(new Error('Verificación cancelada'))});
-   d.querySelector('#seamx-verify-form').onsubmit=async e=>{
-     e.preventDefault();const pass=d.querySelector('#seamx-verify-password'),btn=d.querySelector('#seamx-verify-ok');btn.disabled=true;
-     try{
-       const email=app.user.login==='admin'?'admin@ecoseam.com.pe':'seamx-'+app.user.id+'@ecoseam.com.pe';
-       const result=await c.auth.signInWithPassword({email,password:pass.value});pass.value='';
-       if(result.error||!result.data?.user?.id)throw Error('Contraseña nueva incorrecta');
-       const p=await c.from('usuarios').select('auth_user_id,activo').eq('id',app.user.id).eq('activo',true).maybeSingle();
-       if(p.error||p.data?.auth_user_id!==result.data.user.id)throw Error('Esta cuenta no corresponde al usuario de SEAMX');
-       finish();
-     }catch(error){await c.auth.signOut({scope:'local'}).catch(()=>{});d.querySelector('#seamx-verify-error').textContent=error.message||'Acceso no autorizado';btn.disabled=false}
-   };
-   d.showModal();d.querySelector('#seamx-verify-password').focus();
- });
+ if(!APP?.user?.id||!c)throw Error('Sesión SEAMX no disponible.');
+ const u=await c.auth.getUser();
+ if(!u.data?.user?.id)throw Error('Esta operación necesita una sesión segura activa; no se solicitará una segunda contraseña.');
+ const p=await c.from('usuarios').select('auth_user_id,activo').eq('id',APP.user.id).eq('activo',true).maybeSingle();
+ if(p.error||p.data?.auth_user_id!==u.data.user.id)throw Error('La sesión no corresponde a este usuario.');
+ return c;
 }
 window.seamxExtrasEnsureAuth=requireAuth;
 async function readPlan(){
@@ -97,7 +74,7 @@ function drawRadar(){
 }
 async function loadRadar(interactive){
  try{
-  const c=interactive?await requireAuth():window.seamxSignatureDb;
+  const c=window.seamxSignatureDb;
   if(!c)return;
   const sess=await c.auth.getSession();if(!sess.data?.session)return;
   const r=await c.functions.invoke('seamx-reportes',{body:{type:'radar'}});
@@ -106,40 +83,24 @@ async function loadRadar(interactive){
  }catch(e){if(interactive)toast(e.message||'No se pudieron cargar las evaluaciones')}
 }
 async function loadRiskReport(id){
- const box=$('seamx-risk-brief');
- if(!box)return;box.textContent='Consultando análisis de riesgos…';
+ const box=$('seamx-risk-brief');if(!box)return;
+ box.textContent='Consultando fotografías de actividad e IPERC…';
  try{
-  const c=await requireAuth();
-  const r=await c.functions.invoke('seamx-reportes',{body:{type:'activity',id}});
-  if(r.error||!r.data?.ok)throw Error(r.data?.error||r.error?.message||'No disponible');
-  box.replaceChildren();
-  const title=document.createElement('h4');title.textContent='Reporte breve de actividad y riesgos';box.appendChild(title);
-  const desc=document.createElement('p');desc.textContent='Trabajo realizado: '+(r.data.descripcion||'Sin descripción de cierre');box.appendChild(desc);
-  if(r.data.fotos?.length){const wrap=document.createElement('div');wrap.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
-    for(const url of r.data.fotos){if(!/^https:\/\//i.test(url))continue;const img=document.createElement('img');img.src=url;img.alt='Evidencia de trabajo';img.style.cssText='max-width:135px;max-height:120px;object-fit:cover;border-radius:6px';wrap.appendChild(img)}
-    box.appendChild(wrap);
-  }
-  if(!r.data.informes?.length){const p=document.createElement('p');p.textContent='Sin análisis IA registrado para esta actividad.';box.appendChild(p);return}
-  for(const report of r.data.informes.slice(0,2)){
-   const p=document.createElement('p');p.textContent='Análisis: '+report.resumen;box.appendChild(p);
-   if(report.iperc){const ip=document.createElement('p');ip.textContent='IPERC: '+report.iperc;box.appendChild(ip)}
-   if(report.fotos?.length){
-     const gallery=document.createElement('div');gallery.style.cssText='display:flex;gap:7px;flex-wrap:wrap;margin:7px 0';
-     for(const pic of report.fotos.slice(0,4)){
-       if(!/^https:\/\//i.test(pic.url))continue;
-       const wrap=document.createElement('figure');wrap.style.cssText='margin:0;max-width:145px';
-       const im=document.createElement('img');im.src=pic.url;im.alt='Evidencia de '+(pic.etapa||'análisis');
-       im.style.cssText='max-width:145px;max-height:110px;object-fit:cover;border-radius:6px';
-       const caption=document.createElement('figcaption');caption.textContent=pic.etapa||'Evidencia';
-       caption.style.fontSize='10px';wrap.append(im,caption);gallery.appendChild(wrap);
-     }
-     box.appendChild(gallery);
-   }
-   const list=document.createElement('ul');
-   for(const h of report.hallazgos.slice(0,4)){const li=document.createElement('li');li.textContent=h.riesgo+' · Control: '+h.control+' · '+h.estado;list.appendChild(li)}
-   box.appendChild(list);
-  }
- }catch(e){box.textContent='No se pudo consultar el reporte: '+(e.message||e)}
+ const act=(APP?.data?.actividades||[]).find(a=>String(a.id)===String(id));
+ if(!act)throw Error('Actividad no encontrada');
+ const ids=activityGroupMembers(act).map(a=>a.id);
+ const r=await db.from('actividades').select('descripcion_cierre,foto_antes_url,foto_durante_url,foto_despues_url,fotos_iperc').in('id',ids).limit(100);
+ if(r.error)throw r.error;
+ const rows=r.data||[],item=rows.find(x=>Array.isArray(x.fotos_iperc)&&x.fotos_iperc.length)||rows[0]||{};
+ box.replaceChildren();
+ const heading=document.createElement('h4');heading.textContent='Evidencias fotográficas';box.append(heading);
+ const desc=document.createElement('p');desc.textContent='Trabajo realizado: '+(item.descripcion_cierre||'Sin descripción de cierre');box.append(desc);
+ const gallery=document.createElement('div');gallery.style.cssText='display:flex;flex-wrap:wrap;gap:10px';
+ const pics=[['Antes',item.foto_antes_url],['Durante',item.foto_durante_url],['Después',item.foto_despues_url],...(item.fotos_iperc||[]).map((u,i)=>['IPERC '+(i+1),u])];
+ for(const [name,url] of pics){if(!/^https:\/\//.test(url||''))continue;const f=document.createElement('figure');f.style.cssText='margin:0;width:145px';const im=document.createElement('img');im.src=url;im.alt=name;im.loading='lazy';im.style.cssText='width:145px;height:110px;object-fit:cover';const cap=document.createElement('figcaption');cap.textContent=name;f.append(im,cap);gallery.append(f)}
+ if(!gallery.childElementCount)gallery.textContent='No hay fotografías guardadas';
+ box.append(gallery);
+ }catch(e){box.textContent='No se pudo consultar: '+(e.message||e)}
 }
 function install(){
  const own=$('lead-owner'),due=$('lead-due');own?.closest('label')?.remove();due?.closest('label')?.remove();
@@ -187,4 +148,4 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 
 
-(function(){const s=document.createElement('script');s.src='seamx-nov26.js?v=20261102-integral';document.head.appendChild(s)})();
+(function(){const s=document.createElement('script');s.src='seamx-nov26.js?v=20261103-fix-runtime-v1';document.head.appendChild(s)})();
