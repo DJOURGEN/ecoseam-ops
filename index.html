@@ -3428,7 +3428,7 @@ function dbMovimientoToApp(row) {
     id: row.id, fecha: row.fecha, movimiento: row.movimiento || 'ingreso',
     subclase: row.subclase || '', clase: row.clase || '', tipoResiduo: row.tipo_residuo || '',
     descripcion: row.descripcion || '', vehiculo: row.tipo_vehiculo || '', placa: row.placa || '', patioRecepcion: row.patio_recepcion || '', empresa: row.empresa || '',
-    peso: Number(row.peso_tn || 0), procedencia: row.procedencia || '', gerencia: normalizeGerenciaPatio(row.gerencia),
+    peso: Number(row.peso_tn || 0), areaOcupabilidad: row.area_ocupabilidad || '', procedencia: row.procedencia || '', gerencia: normalizeGerenciaPatio(row.gerencia),
     inicio: row.hora_inicio ? String(row.hora_inicio).slice(0,5) : '',
     fin: row.hora_fin ? String(row.hora_fin).slice(0,5) : '',
     registradoPor: row.registrado_por || '', origen: row.origen || 'aplicativo', externalId: row.external_id || '', createdAt: row.created_at || ''
@@ -5009,31 +5009,33 @@ function occNormalizeText(value){return String(value||'').normalize('NFD').repla
 function getOccAreaById(id){return OCC_AREAS.find(a=>a.id===id)||null;}
 function occMaterialText(m){return occNormalizeText(`${m?.descripcion||''} ${m?.tipoResiduo||''} ${m?.subclase||''} ${m?.clase||''}`);}
 function inferOccProfileFromIngreso(m){
-  // La subclase Metálico / No metálico es un dato original: NO se modifica
-  // ni se utiliza para decidir el área de ocupabilidad.
+  // Área física por clasificación, sin alterar subclase ni datos históricos de origen.
+  const explicit=String(m?.areaOcupabilidad||m?.area_ocupabilidad||'').trim();
+  const assigned=getOccAreaById(explicit);
   const descripcion=occNormalizeText(m?.descripcion||'');
   const tipo=occNormalizeText(m?.tipoResiduo||'');
-  const t=occNormalizeText(`${m?.descripcion||''} ${m?.tipoResiduo||''}`);
+  const texto=occNormalizeText([m?.descripcion,m?.tipoResiduo,m?.clase,m?.subclase].filter(Boolean).join(' '));
   const heavy=/pesad/.test(tipo)||(!/livian/.test(tipo)&&/pesad|rrmm|mmv/.test(descripcion));
-  // La categoría física Chatarra liviana admite material pesado O liviano.
-  // Clasificar el destino por la descripción, nunca por la subclase.
-  if(/baranda|plancha|polea|caja(?:s)?\b|alambre|fierro|residuo(?:s)?\s*(?:varios|livianos|metalicos)?|chatarra|escalera|perfil|viga|estructura|perno|valvula|clavo|mesa|locker|rodillo/.test(descripcion)){
-    return {area:getOccAreaById('chatarra_liviana'),factor:heavy?0.75:0.20,reason:'Chatarra liviana (sector físico)'};
+  const scrapFactor=heavy?0.75:0.20;
+  if(assigned)return{area:assigned,factor:assigned.id==='chatarra_liviana'?scrapFactor:assigned.factor,reason:'Área de recepción registrada'};
+  // Prioridad a materiales específicos; estructuras especiales no van a chatarra común.
+  if(/hdpe|polietileno|tuberia\s*pe|tubo\s*pe/.test(texto))return{area:getOccAreaById('tuberias_hdpe'),factor:0.20,reason:'HDPE'};
+  if(/jebe|caucho|manguera|goma|cono\s*ciclon/.test(texto))return{area:getOccAreaById('jebes'),factor:0.30,reason:'Jebes'};
+  if(/faja|correa\s*transportadora|conveyor\s*belt/.test(texto))return{area:getOccAreaById('fajas'),factor:0.50,reason:'Fajas'};
+  if(/coproduct|cobre|bronce|aluminio|inoxidable/.test(texto))return{area:getOccAreaById('coproductos'),factor:0.50,reason:'Coproductos'};
+  if(/liner|linner|revestimiento/.test(texto))return{area:getOccAreaById('linners'),factor:1.00,reason:'Liners'};
+  if(/chancad|crusher|mantle|concav|bowl|spider|mainshaft|main\s*shaft|top\s*shell|middle\s*shell|bottom\s*shell/.test(texto))return{area:getOccAreaById('comp_chancadora'),factor:0.60,reason:'Componentes de chancadora'};
+  if(/baranda|plancha|polea|caja|alambre|fierro|residuo|chatarra|escalera|perfil|viga|estructura|perno|valvula|clavo|mesa|locker|rodillo|rejilla|varilla|calamina|corrugado|suncho|varios?\s+metalicos?/.test(texto)){
+    return{area:getOccAreaById('chatarra_liviana'),factor:scrapFactor,reason:'Chatarra liviana (sector físico)'};
   }
-  if(/hdpe|polietileno|tuberia\s*pe|tubo\s*pe/.test(t))return{area:getOccAreaById('tuberias_hdpe'),factor:0.20,reason:'HDPE'};
-  if(/jebe|caucho|manguera|cono\s*ciclon|goma/.test(t))return{area:getOccAreaById('jebes'),factor:0.30,reason:'Jebes'};
-  if(/faja|correa\s*transportadora|belt/.test(t))return{area:getOccAreaById('fajas'),factor:0.50,reason:'Fajas'};
-  if(/coproduct|cobre|bronce|aluminio|inoxidable/.test(t))return{area:getOccAreaById('coproductos'),factor:0.50,reason:'Coproductos'};
-  if(/chancad|crusher|mantle|concav|bowl|spider|mainshaft|main\s*shaft/.test(t))return{area:getOccAreaById('comp_chancadora'),factor:0.60,reason:'Comp. chancadora'};
-  if(/liner|linner|revestimiento/.test(t))return{area:getOccAreaById('linners'),factor:1.00,reason:'Linners'};
-  return{area:getOccAreaById('chatarra_liviana'),factor:heavy?0.75:0.20,reason:'Materiales varios - Chatarra liviana'};
+  return{area:getOccAreaById('chatarra_liviana'),factor:scrapFactor,reason:'Material pendiente de clasificación específica'};
 }
 function inferOccAreaFromIngreso(m){return inferOccProfileFromIngreso(m).area;}
 function inferOccProfileFromEvacuacion(e){
   return inferOccProfileFromIngreso({descripcion:e?.descripcion||'',tipoResiduo:e?.tipoResiduo||'',subclase:e?.subclase||'',clase:e?.clase||''});
 }
 function inferOccAreaFromEvacuacion(e){return inferOccProfileFromEvacuacion(e).area;}
-function isEvacuacionPatio4388(e){const z=occNormalizeText(e?.zonaCarga||'');return !z||/4388/.test(z);}
+function isEvacuacionPatio4388(e){const z=occNormalizeText(e?.zonaCarga||'');return /4388/.test(z);}
 
 function getOccStatus(pct){
   if(pct>OCC_LIMIT)return{key:'critical',label:'Sobre el límite'};
@@ -5046,30 +5048,40 @@ function countOcupabilidadPendientes(){
     String(m.movimiento||'ingreso').toLowerCase()==='ingreso').length;
 }
 function calculateOcupabilidad(){
-  const result=OCC_AREAS.map(a=>({...a,occupiedM2:a.baseM2,tnIn:0,tnOut:0,m2In:0,m2Out:0,movements:[]})),byId=Object.fromEntries(result.map(a=>[a.id,a]));
+  // Base física tomada el 25/07/2026; ingresos de Control de patios y
+  // evacuaciones efectivas del Excel IDO. No contar salida de camión como material.
+  const result=OCC_AREAS.map(a=>({...a,occupiedM2:a.baseM2,tnIn:0,tnOut:0,m2In:0,m2Out:0,movements:[]}));
+  const byId=Object.fromEntries(result.map(a=>[a.id,a]));
   (APP.data.movimientos||[]).forEach(m=>{
-    if(String(m.patioRecepcion||'')!=='4388'||!m.fecha||String(m.fecha).slice(0,10)<=OCC_BASE_DATE)return;
+    if(String(m.patioRecepcion||'').trim()!=='4388'||!m.fecha||String(m.fecha).slice(0,10)<=OCC_BASE_DATE)return;
     if(String(m.movimiento||'ingreso').toLowerCase()!=='ingreso')return;
     const profile=inferOccProfileFromIngreso(m),area=profile.area,tn=Number(m.peso||0),factor=Number(profile.factor||area?.factor||0);
-    if(!area||!Number.isFinite(tn)||tn<=0||!factor)return;
-    const m2=tn/factor,item=byId[area.id];
+    if(!area||!Number.isFinite(tn)||tn<=0||factor<=0)return;
+    const m2=tn/factor,item=byId[area.id];if(!item)return;
     item.tnIn+=tn;item.m2In+=m2;item.occupiedM2+=m2;
     item.movements.push({fecha:String(m.fecha).slice(0,10),type:'ingreso',tn,m2,factor,descripcion:m.descripcion||m.tipoResiduo||'Ingreso de Control de patios',source:'Control de patios'});
   });
+  const counted=new Set();
   (APP.data.ocupabilidadEvacuaciones||[]).forEach(e=>{
-    const eDate=String(e.fecha||'').slice(0,10);
-    if(!eDate||eDate<=OCC_BASE_DATE||!isEvacuacionPatio4388(e))return;
+    const date=String(e.fecha||'').slice(0,10);
+    if(!date||date<=OCC_BASE_DATE||!isEvacuacionPatio4388(e))return;
+    // Cada línea única del Excel IDO se aplica una vez; no agrupar solo por ticket.
+    const unique=String(e.claveUnica||'').trim()||('registro:'+String(e.id??'')+'|'+date+'|'+String(e.descripcion||''));
+    if(counted.has(unique))return;counted.add(unique);
     const inferred=inferOccProfileFromEvacuacion(e);
     const selected=e.areaId&&getOccAreaById(e.areaId);
     const profile=selected?{area:selected,factor:selected.id==='chatarra_liviana'?inferred.factor:selected.factor}:inferred;
     const area=profile.area,item=area?byId[area.id]:null,tn=Number(e.toneladas||0),factor=Number(profile.factor||area?.factor||0);
-    if(!item||!Number.isFinite(tn)||tn<=0||!factor)return;
+    if(!item||!Number.isFinite(tn)||tn<=0||factor<=0)return;
     const m2=tn/factor;
     item.tnOut+=tn;item.m2Out+=m2;item.occupiedM2-=m2;
-    item.movements.push({fecha:eDate,type:'evacuacion',tn,m2,factor,descripcion:e.descripcion||e.tipoResiduo||'Evacuación Excel IDO',source:'Excel IDO'});
+    item.movements.push({fecha:date,type:'evacuacion',tn,m2,factor,descripcion:e.descripcion||e.tipoResiduo||'Evacuación Excel IDO',source:'Excel IDO'});
   });
   result.forEach(item=>{
-    item.occupiedM2=Math.max(0,item.occupiedM2);
+    // No esconder diferencias históricas: salida superior a base + entradas.
+    item.rawM2=item.occupiedM2;
+    item.unreconciledM2=Math.max(0,-item.rawM2);
+    item.occupiedM2=Math.max(0,item.rawM2);
     item.pct=item.totalM2?item.occupiedM2/item.totalM2:0;
     item.netM2=item.occupiedM2-item.baseM2;
     item.limitM2=item.totalM2*OCC_LIMIT;
@@ -5079,7 +5091,6 @@ function calculateOcupabilidad(){
   });
   return result;
 }
-
 let OCC_PLAN_ZOOM=1,OCC_PLAN_PAN_X=0,OCC_PLAN_PAN_Y=0,OCC_PLAN_DRAG=null;
 function clampOcupabilidadPlanoPan(){
   const wrap=document.getElementById('occ-real-map-wrap'),stage=document.getElementById('occ-real-plan-stage');if(!wrap||!stage)return;
@@ -5210,7 +5221,11 @@ function renderOcupabilidad(){
   if(sourceNote){
     let warning=document.getElementById('occ-patio-warning');
     if(!warning){warning=document.createElement('div');warning.id='occ-patio-warning';warning.style.cssText='margin-top:9px;font-size:12px;font-weight:700';sourceNote.appendChild(warning);}
-    warning.textContent=pendientes?`Atención: ${pendientes} ingresos no se reflejan en la ocupabilidad porque carecen de patio de recepción. Verificar si corresponden al 4388.`:'';
+    const mismatch=data.filter(a=>a.unreconciledM2>0.01);
+    const messages=[];
+    if(pendientes)messages.push('Atención: '+pendientes+' ingresos sin patio de recepción no se reflejan en ocupabilidad.');
+    if(mismatch.length)messages.push('Conciliación pendiente: las evacuaciones registradas superan el saldo base más ingresos en '+mismatch.map(a=>a.short+' ('+a.unreconciledM2.toFixed(1)+' m²)').join(', ')+'. Revisar stock base y clasificación; se muestra 0 m² como piso del indicador.');
+    warning.textContent=messages.join(' ');
   }
   set('occ-kpi-total',(pct*100).toFixed(1)+'%');set('occ-kpi-m2',occupied.toFixed(1));set('occ-kpi-critical',critical);set('occ-kpi-net',(net>=0?'+':'')+net.toFixed(1));set('occ-last-update','Actualizado '+new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'}));
   document.querySelectorAll('.occ-zone').forEach(zone=>{
@@ -5228,7 +5243,7 @@ function renderOccDetail(data){
   const item=data.find(a=>a.id===OCC_SELECTED_AREA_ID)||data[0],box=document.getElementById('occ-selected-detail');if(!item||!box)return;
   const marginLabel=item.marginToLimit>=0?'Margen hasta 40%':'Exceso sobre 40%',margin=Math.abs(item.marginToLimit);
   const movements=item.movements.length?item.movements.slice(0,10).map(m=>`<div class="occ-movement ${m.type}"><div>${formatDate(m.fecha)}</div><div><strong>${m.type==='ingreso'?'Ingreso':'Evacuación'} · ${m.tn.toFixed(2)} tn</strong><small>${escapeHtml(m.descripcion)} · ${escapeHtml(m.source)}</small></div><div style="font-weight:900;color:${m.type==='ingreso'?'var(--success)':'var(--warning)'}">${m.type==='ingreso'?'+':'−'}${m.m2.toFixed(2)} m²</div></div>`).join(''):'<div class="wa-empty">Sin movimientos posteriores al 25/07/2026.</div>';
-  box.innerHTML=`<div class="occ-detail-head"><div><div class="card-title">${escapeHtml(item.short)}</div><div class="card-subtitle">Conversión: ${escapeHtml(item.factorLabel||((item.factor||0).toFixed(2)+' tn/m²'))}</div></div><span class="occ-status-pill ${item.status.key}">${item.status.label}</span></div><div style="font-size:34px;font-weight:900;color:var(--navy);margin-top:12px">${(item.pct*100).toFixed(1)}%</div><div class="occ-meter"><span class="${item.status.key}" style="width:${Math.min(100,item.pct*100)}%"></span></div><div class="occ-meter-labels"><span>0%</span><span>Límite 40%</span><span>100%</span></div><div class="occ-detail-grid"><div class="occ-detail-metric"><span>Área base</span><strong>${item.baseM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área actual</span><strong>${item.occupiedM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Ingresos</span><strong style="color:var(--success)">+${item.m2In.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Evacuaciones</span><strong style="color:var(--warning)">−${item.m2Out.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>${marginLabel}</span><strong style="color:${item.marginToLimit>=0?'var(--success)':'var(--danger)'}">${margin.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área total</span><strong>${item.totalM2.toFixed(2)} m²</strong></div></div><div class="card-title" style="font-size:12px;margin-top:16px">Movimientos considerados</div><div class="occ-movement-list">${movements}</div>`;
+  box.innerHTML=`<div class="occ-detail-head"><div><div class="card-title">${escapeHtml(item.short)}</div><div class="card-subtitle">Conversión: ${escapeHtml(item.factorLabel||((item.factor||0).toFixed(2)+' tn/m²'))}</div></div><span class="occ-status-pill ${item.status.key}">${item.status.label}</span></div><div style="font-size:34px;font-weight:900;color:var(--navy);margin-top:12px">${(item.pct*100).toFixed(1)}%</div><div class="occ-meter"><span class="${item.status.key}" style="width:${Math.min(100,item.pct*100)}%"></span></div><div class="occ-meter-labels"><span>0%</span><span>Límite 40%</span><span>100%</span></div><div class="occ-detail-grid"><div class="occ-detail-metric"><span>Área base</span><strong>${item.baseM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área actual</span><strong>${item.occupiedM2.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Ingresos</span><strong style="color:var(--success)">+${item.m2In.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Evacuaciones</span><strong style="color:var(--warning)">−${item.m2Out.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>${marginLabel}</span><strong style="color:${item.marginToLimit>=0?'var(--success)':'var(--danger)'}">${margin.toFixed(2)} m²</strong></div><div class="occ-detail-metric"><span>Área total</span><strong>${item.totalM2.toFixed(2)} m²</strong></div></div>${item.unreconciledM2>0.01?'<p style="font-size:12px;color:#a44227;font-weight:700;margin-top:8px">Conciliación pendiente: evacuaciones superiores al stock de referencia en '+item.unreconciledM2.toFixed(2)+' m². Verificar antes de usar este porcentaje para decisiones.</p>':''}<div class="card-title" style="font-size:12px;margin-top:16px">Movimientos considerados</div><div class="occ-movement-list">${movements}</div>`;
 }
 function openEvacuacionModal(id=null){
   if(!canEditOcupabilidad()){showToast('Tu usuario tiene permiso solo de visualización','warning');return;}
