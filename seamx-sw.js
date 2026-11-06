@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seamx-shell-20261103-dashboard-recovery-v1';
+const CACHE_NAME = 'seamx-shell-20261106-liderazgo-radar-v1';
 
 const CORE_ASSETS = [
   './',
@@ -246,7 +246,7 @@ self.addEventListener('fetch', event => {
 
   if (
     requestUrl.origin === self.location.origin &&
-    (/\/(?:seamx-ac07|seamx-extras|seamx-nov26)\.js$/.test(requestUrl.pathname))
+    (/\/(?:seamx-ac07|seamx-extras|seamx-nov26|liderazgo)\.js$/.test(requestUrl.pathname))
   ) {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);

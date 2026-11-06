@@ -163,7 +163,123 @@ window.seamxLeadRender=function(){
    });
  }
  records=source;
+ if(APP.currentView === 'opsdashboard')window.seamxLeadDashboard();
 };
+let dashboardChart = null;
+let dashboardUser = null;
+
+function dashboardScore(value){
+ if(value === 0 || value === '0')return 0;
+ if(value === 1 || value === '1')return 1;
+ if(value === 2 || value === '2')return 2;
+ return null;
+}
+
+window.seamxLeadDashboard = function(){
+ const panel = read('lead-dashboard-summary');
+ if(!panel)return;
+
+ const user = APP.user;
+ const evaluator = isEvaluator();
+ const supervisor = ['supervisor','supervisor_hse'].includes(user?.role);
+ const select = read('lead-dashboard-supervisor');
+ const chartBox = read('lead-dashboard-radar');
+ const criteria = read('lead-dashboard-criteria');
+ const note = read('lead-dashboard-note');
+ const kpis = read('lead-dashboard-values');
+ const previous = dashboardUser === user?.id ? select.value : '';
+ dashboardUser = user?.id;
+ dashboardChart?.destroy();
+ dashboardChart = null;
+
+ panel.hidden = !evaluator && !supervisor;
+ if(panel.hidden){
+  select.replaceChildren();
+  criteria.replaceChildren();
+  kpis.replaceChildren();
+  note.textContent = '';
+  chartBox.hidden = true;
+  return;
+ }
+
+ let evaluations = get();
+ if(!Array.isArray(evaluations))evaluations = [];
+ evaluations = evaluations.filter(r=>r && (evaluator ||
+  (user.id != null && r.supervisor_id != null && String(user.id) === String(r.supervisor_id))));
+
+ read('lead-dashboard-filter').hidden = !evaluator;
+ if(evaluator){
+  const roster = new Map();
+  for(const u of APP.data?.usuarios || []){
+   if(u.id == null || !['supervisor','supervisor_hse'].includes(String(u.rol || u.role).toLowerCase()) ||
+      [false,0,'false','f'].includes(u.activo))continue;
+   const name = [u.nombre,u.apellido].filter(Boolean).join(' ') || u.name || u.login;
+   if(name)roster.set('id:'+u.id,name);
+  }
+  const recordKey = r=>r.supervisor_id != null && r.supervisor_id !== '' ?
+   'id:'+r.supervisor_id : 'name:'+(r.supervisor || '');
+  for(const r of evaluations){
+   const key = recordKey(r);
+   if(r.supervisor && !roster.has(key))roster.set(key,r.supervisor);
+  }
+  const options = [...roster].sort((a,b)=>a[1].localeCompare(b[1],'es'));
+  select.replaceChildren(new Option('Todos los supervisores',''),
+   ...options.map(([key,name])=>new Option(name,key)));
+  if(roster.has(previous))select.value = previous;
+  if(select.value)evaluations = evaluations.filter(r=>recordKey(r) === select.value);
+ }else{
+  select.replaceChildren();
+ }
+
+ const count = evaluations.length;
+ const average = count ? evaluations.reduce((sum,r)=>sum+Number(r.pct || 0),0)/count : null;
+ const indicators = [['Evaluaciones locales',count],['Promedio',average === null ? '—' : average.toFixed(1)+'%']];
+ if(evaluator)indicators.push(
+  ['Compromisos pendientes',evaluations.filter(r=>r.commitment && !r.verified).length],
+  ['Críticas sin verificar',evaluations.filter(r=>r.crit && !r.verified).length]);
+ kpis.innerHTML = indicators.map(([label,value])=>'<div class="lead-kpi"><small>'+label+'</small><b>'+value+'</b></div>').join('');
+
+ const scores = CRITERIOS.map((_,index)=>{
+  const values = evaluations.map(r=>dashboardScore(r.answers?.[index]?.v)).filter(v=>v !== null);
+  return values.length ? values.reduce((sum,value)=>sum+value,0)/values.length : null;
+ });
+ const hasScores = scores.some(score=>score !== null);
+ chartBox.hidden = !hasScores;
+ criteria.replaceChildren();
+ if(!hasScores){
+  note.textContent = count ? 'Las evaluaciones de esta selección no tienen puntuaciones por criterio.' :
+   'No hay evaluaciones de esta selección guardadas en este navegador.';
+  return;
+ }
+ note.textContent = 'Promedio por criterio en escala de 0 a 2. Excluye N/A. Datos guardados en este navegador.';
+ const scoreText = value=>value === null ? 'Sin datos' : value.toLocaleString('es-PE',{maximumFractionDigits:2});
+ criteria.innerHTML = CRITERIOS.map((criterion,index)=>
+  '<tr><th scope="row">C'+(index+1)+' · '+esc(criterion)+'</th><td>'+scoreText(scores[index])+'</td></tr>').join('');
+ const plot = read('lead-dashboard-plot');
+ plot.hidden = typeof Chart !== 'function';
+ if(plot.hidden)return;
+ dashboardChart = new Chart(read('ops-lead-radar'),{
+  type:'radar',
+  data:{
+   labels:CRITERIOS.map((_,index)=>'C'+(index+1)),
+   datasets:[{data:scores,borderColor:'#1d673e',backgroundColor:'rgba(29,103,62,.18)',
+    borderWidth:2,pointBackgroundColor:'#1d673e',pointRadius:3,pointHitRadius:8,spanGaps:false,
+    fill:scores.every(score=>score !== null)}]
+  },
+  options:{
+   responsive:true,maintainAspectRatio:false,animation:false,
+   scales:{r:{min:0,max:2,ticks:{stepSize:1},pointLabels:{color:'#294739',font:{size:11}}}},
+   plugins:{legend:{display:false},tooltip:{callbacks:{
+    title:()=>[],
+    label:item=>item.label+' · '+scoreText(item.raw)+' / 2',
+    afterLabel:item=>CRITERIOS[item.dataIndex].match(/.{1,40}(?:\s|$)|\S+/g)
+   }}}
+  }
+ });
+};
+window.addEventListener('storage',event=>{
+ if((event.key === LS || event.key === null) && APP.currentView === 'opsdashboard')window.seamxLeadDashboard();
+});
 window.seamxLeadInit=setup;
 window.seamxLeadPrint=function(){if(!isEvaluator())return;const v=read('lead-eval-tab');if(v)v.hidden=false;const rep=read('lead-report-tab');if(rep)rep.hidden=true;window.print()};
 window.seamxLeadExport=function(){if(!isEvaluator())return;const payload=JSON.stringify(get(),null,2),blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='seamx_evaluaciones_liderazgo_'+date()+'.json';a.click();URL.revokeObjectURL(url)};

@@ -1279,6 +1279,20 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
 </style>
 <style>#view-opsdashboard .seamx-ops-panel,#view-habilitado .seamx-ops-panel,#view-liderazgo .lead-bar{border-radius:12px;box-shadow:0 4px 18px rgba(18,55,32,.07);border:1px solid #d6e3d8}#view-opsdashboard .seamx-ops-metric,#view-habilitado .seamx-habilitado-item{border-radius:10px;box-shadow:0 3px 12px rgba(18,55,32,.06)}#view-liderazgo .lead-tabs{flex-wrap:wrap;gap:9px}#view-liderazgo .lead-tabs button{border-radius:8px;min-height:40px}@media(max-width:640px){#view-opsdashboard .seamx-ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}#view-habilitado .seamx-ops-controls{grid-template-columns:1fr!important}#view-liderazgo .lead-bar{grid-template-columns:1fr}}</style><style id="seamx-dashboard-one-screen-20261027">
+
+#lead-dashboard-summary[hidden], #lead-dashboard-summary [hidden] {display:none!important}
+#view-opsdashboard #lead-dashboard-summary {display:grid;flex-shrink:0;gap:10px;padding:12px!important}
+.lead-dashboard-header {display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+#view-opsdashboard .lead-dashboard-header h3 {margin:0 auto 0 0;font-size:15px}
+#lead-dashboard-filter {display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px}
+#lead-dashboard-supervisor {width:auto;max-width:100%;padding:5px 8px}
+#view-opsdashboard #lead-dashboard-values {display:grid!important;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px!important;margin:0!important}
+.lead-dashboard-plot {position:relative;width:min(100%,580px);height:clamp(240px,38vw,350px);margin:auto}
+#view-opsdashboard #ops-lead-radar {height:100%!important;max-height:none}
+#lead-dashboard-radar summary {cursor:pointer;font-size:12px;color:var(--text)}
+#lead-dashboard-radar table {width:100%;font-size:12px;border-collapse:collapse;margin-top:6px}
+#lead-dashboard-radar :is(th,td) {padding:5px 8px;text-align:left;border-bottom:1px solid var(--border)}
+#lead-dashboard-radar td:last-child {white-space:nowrap}
 /* Dashboard consolidado tipo informe: indicadores y siete visualizaciones visibles en escritorio. */
 @media(min-width:1100px){
  body #view-opsdashboard{display:none;min-width:0}
@@ -1294,14 +1308,7 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
  #view-opsdashboard .seamx-ops-metric{min-width:0!important;padding:8px 9px!important;min-height:54px!important}
  #view-opsdashboard .seamx-ops-metric small{font-size:9px!important;line-height:1.1!important;display:block}
  #view-opsdashboard .seamx-ops-metric strong{font-size:16px!important;line-height:1.3!important}
- #view-opsdashboard #lead-dashboard-summary{order:4;display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:0!important;padding:6px 10px!important}
- #view-opsdashboard #lead-dashboard-summary>h3{font-size:11px!important;margin:0 9px 0 0!important}
- #view-opsdashboard #lead-dashboard-values{display:flex!important;flex:1!important;gap:10px!important;margin:0!important}
- #view-opsdashboard #lead-dashboard-values .lead-kpi{padding:0 8px!important;min-width:0!important;flex:1!important}
- #view-opsdashboard #lead-dashboard-values small{font-size:9px!important}
- #view-opsdashboard #lead-dashboard-values b{font-size:14px!important}
- #view-opsdashboard #lead-go{font-size:10px!important;padding:5px 8px!important;min-height:0!important}
- #view-opsdashboard #lead-dashboard-summary>p.lead-muted{display:none!important}
+ #view-opsdashboard #lead-dashboard-summary{order:4}
  #view-opsdashboard .seamx-ops-charts{flex:1!important;min-height:390px;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(185px,1fr))!important;gap:7px!important;overflow:hidden}
  #view-opsdashboard .seamx-ops-charts>.seamx-ops-panel{grid-column:auto!important;display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;overflow:hidden!important;padding:8px 10px!important;margin:0!important}
  #view-opsdashboard .seamx-ops-charts>.seamx-ops-panel.seamx-curve-panel{grid-column:span 2!important}
@@ -2023,7 +2030,29 @@ body.seamx-antamina #view-actividades .activity-team-row{background:#f5fbf8;bord
   </div>
   <p class="form-hint">Meta mensual y valorizable: 850 tn · Guardia A/B: 425 tn cada una · La selección mensual modifica únicamente valorizable. Programación manual guardada en este navegador.</p>
   <div id="ops-metrics" class="seamx-ops-metrics"></div>
-<section class="seamx-ops-panel" id="lead-dashboard-summary" style="margin:0 0 12px"><h3>Seguimiento de liderazgo preventivo</h3><div id="lead-dashboard-values" class="lead-kpis"><p class="lead-muted">Sin evaluaciones en este navegador.</p></div><button class="lead-btn-alt" onclick="navigateTo('liderazgo')" id="lead-go">Abrir evaluaciones</button><p class="lead-muted">Datos locales provisionales; no consolidados entre dispositivos.</p></section>
+  <section class="seamx-ops-panel" id="lead-dashboard-summary" hidden>
+    <div class="lead-dashboard-header">
+      <h3>Evaluación de liderazgo preventivo</h3>
+      <label id="lead-dashboard-filter" hidden>Supervisor
+        <select id="lead-dashboard-supervisor" class="form-control" onchange="seamxLeadDashboard()"></select>
+      </label>
+      <button type="button" class="lead-btn-alt" onclick="navigateTo('liderazgo')" id="lead-go">Abrir evaluaciones</button>
+    </div>
+    <div id="lead-dashboard-values" class="lead-kpis"></div>
+    <p id="lead-dashboard-note" class="lead-muted" role="status"></p>
+    <div id="lead-dashboard-radar" hidden>
+      <div id="lead-dashboard-plot" class="lead-dashboard-plot">
+        <canvas id="ops-lead-radar" role="img" aria-label="Radar del promedio por criterio, en una escala de 0 a 2" aria-describedby="lead-dashboard-note"></canvas>
+      </div>
+      <details>
+        <summary>Ver puntuación por criterio</summary>
+        <table>
+          <thead><tr><th scope="col">Criterio de evaluación</th><th scope="col">Promedio / 2</th></tr></thead>
+          <tbody id="lead-dashboard-criteria"></tbody>
+        </table>
+      </details>
+    </div>
+  </section>
   <div class="seamx-ops-charts">
     <div class="seamx-ops-panel seamx-curve-panel"><h3>Curva S · Programado vs evacuado (tn)</h3>
     <div class="seamx-curve-range" aria-label="Rango de consulta de la curva S">
@@ -4122,6 +4151,7 @@ function doLogout() {
   Object.keys(sessionStorage).filter(k=>k.startsWith(SESSION_KEYS.scrollPrefix)).forEach(k=>sessionStorage.removeItem(k));
   history.replaceState(null,'',location.pathname+location.search);
   APP.user = null;
+  window.seamxLeadDashboard?.();
   document.getElementById('page-app').style.display = 'none';
   document.getElementById('page-login').style.display = 'flex';
   document.getElementById('login-user').value = '';
@@ -7406,6 +7436,7 @@ async function seamxRenderGerenciaPiramide(){
 function seamxOpsPeso(r){const n=v=>v==null||v===''?NaN:Number(String(v).replace(',','.'));const p=n(r.peso_tn),q=n(r.peso_4388);return Number.isFinite(p)?p:(Number.isFinite(q)?q:0)}
 function seamxOpsMaterialTipo(r){const d=String(r.descripcion||r.tipo_residuo||'').toLowerCase();return /liner|linners|hdpe|tuber[ií]a|faja/.test(d)?'Plataforma':'Tolva'}
 async function seamxRenderOpsDashboard(){
+  window.seamxLeadDashboard?.();
   if(!document.getElementById('ops-mes').value)document.getElementById('ops-mes').value=seamxOpsMonth();
   if(!document.getElementById('ops-fecha').value)document.getElementById('ops-fecha').value=new Date().toLocaleDateString('en-CA');
   const programControls=document.querySelector('.seamx-curve-programming');
@@ -7434,12 +7465,6 @@ async function seamxRenderOpsDashboard(){
   const valorMeta=850;
   const target=850;
   document.getElementById('ops-metrics').innerHTML=[['Meta mensual/valorizable','850 tn'],['Evacuación programada',cumPlan.toFixed(2)+' tn'],['Evacuado',evacuadas.toFixed(2)+' tn'],['Cumplimiento',(evacuadas/target*100).toFixed(1)+'%'],['Ocupabilidad 4388',occupied],['Evacuación valorizable',valorReal===null?'Sin datos':valorReal.toFixed(2)+' tn'],['Cumplimiento valorizable',valorReal===null?'—':(100*valorReal/valorMeta).toFixed(1)+'%']].map(x=>'<div class="seamx-ops-metric"><small>'+x[0]+'</small><strong>'+x[1]+'</strong></div>').join('');
-  if(['admin','gerencia','jefatura'].includes(APP.user?.role)){
-    const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='';
-    try{const evaluations=JSON.parse(localStorage.getItem('seamx_liderazgo_borradores_v1')||'[]');const avg=evaluations.length?evaluations.reduce((s,x)=>s+Number(x.pct||0),0)/evaluations.length:0;
-      document.getElementById('lead-dashboard-values').innerHTML=[['Evaluaciones locales',evaluations.length],['Promedio',evaluations.length?avg.toFixed(1)+'%':'—'],['Compromisos pendientes',evaluations.filter(x=>x.commitment&&!x.verified).length],['Críticas sin verificar',evaluations.filter(x=>x.crit&&!x.verified).length]].map(x=>'<div class="lead-kpi"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>').join('');
-    }catch(e){console.warn(e)}
-  }else{const block=document.getElementById('lead-dashboard-summary');if(block)block.style.display='none'}
   const mensualPendiente=Math.max(0,850-evacuadas),valorPendiente=Math.max(0,850-(valorReal||0));
   seamxOpsChart('ops-month-share','doughnut',['Evacuado','Pendiente'],[{data:[evacuadas,mensualPendiente],backgroundColor:['#1d673e','#d9e2d8']}]);
   const valorTitle=document.querySelector('#ops-value-share')?.closest('.seamx-ops-panel')?.querySelector('h3');if(valorTitle)valorTitle.textContent='Meta valorizable · '+valorInicio+' al '+valorFin;
