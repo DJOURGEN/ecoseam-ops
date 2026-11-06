@@ -1282,6 +1282,9 @@ body{padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-
 
 #lead-dashboard-summary[hidden], #lead-dashboard-summary [hidden] {display:none!important}
 #view-opsdashboard #lead-dashboard-summary {display:grid;flex-shrink:0;gap:10px;padding:12px!important}
+@media(min-width:901px){
+ #view-opsdashboard #lead-dashboard-summary {width:calc((100% - 12px) / 2);align-self:flex-start;box-sizing:border-box}
+}
 .lead-dashboard-header {display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
 #view-opsdashboard .lead-dashboard-header h3 {margin:0 auto 0 0;font-size:15px}
 #lead-dashboard-filter {display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px}
